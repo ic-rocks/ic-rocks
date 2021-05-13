@@ -1,11 +1,32 @@
 {
-    "genesis-token": {
-        "mercury": "renrk-eyaaa-aaaaa-aaada-cai"
-    },
-    "governance": {
-        "mercury": "rrkah-fqaaa-aaaaa-aaaaq-cai"
-    },
-    "ledger": {
-        "mercury": "ryjl3-tyaaa-aaaaa-aaaba-cai"
-    }
+  "ic-management": {
+    "mercury": "aaaaa-aa"
+  },
+  "registry": {
+    "mercury": "rwlgt-iiaaa-aaaaa-aaaaa-cai"
+  },
+  "governance": {
+    "mercury": "rrkah-fqaaa-aaaaa-aaaaq-cai"
+  },
+  "ledger": {
+    "mercury": "ryjl3-tyaaa-aaaaa-aaaba-cai"
+  },
+  "root": {
+    "mercury": "r7inp-6aaaa-aaaaa-aaabq-cai"
+  },
+  "cycles-minting": {
+    "mercury": "rkp4c-7iaaa-aaaaa-aaaca-cai"
+  },
+  "lifeline": {
+    "mercury": "rno2w-sqaaa-aaaaa-aaacq-cai"
+  },
+  "genesis-token": {
+    "mercury": "renrk-eyaaa-aaaaa-aaada-cai"
+  },
+  "identity": {
+    "mercury": "rdmx6-jaaaa-aaaaa-aaadq-cai"
+  },
+  "nns-ui": {
+    "mercury": "qoctq-giaaa-aaaaa-aaaea-cai"
+  }
 }
