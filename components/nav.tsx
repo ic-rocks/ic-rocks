@@ -1,4 +1,5 @@
 import ActiveLink from "./ActiveLink";
+import DarkModeToggle from "./DarkModeToggle";
 
 export default function Nav() {
   return (
@@ -20,6 +21,8 @@ export default function Nav() {
           </ActiveLink>
         </li>
       </ul>
+
+      <DarkModeToggle />
     </nav>
   );
 }

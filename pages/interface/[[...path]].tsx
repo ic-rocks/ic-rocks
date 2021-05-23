@@ -1,3 +1,4 @@
+import classnames from "classnames";
 import path from "path";
 import fs from "fs";
 import glob from "glob";
@@ -5,6 +6,15 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import ActiveLink from "../../components/ActiveLink";
 import { useEffect, useState } from "react";
+
+import { PrismLight as SyntaxHighlighter } from "react-syntax-highlighter";
+import javascript from "react-syntax-highlighter/dist/cjs/languages/prism/javascript";
+import typescript from "react-syntax-highlighter/dist/cjs/languages/prism/typescript";
+import { coldarkDark } from "react-syntax-highlighter/dist/cjs/styles/prism";
+import classNames from "classnames";
+SyntaxHighlighter.registerLanguage("javascript", javascript);
+SyntaxHighlighter.registerLanguage("typescript", typescript);
+
 const didc = import("../../lib/didc-js/didc_js");
 
 export async function getStaticPaths() {
@@ -52,9 +62,12 @@ export async function getStaticProps({ params: { path: path_ = "" } }) {
   };
 }
 
+const LANGUAGES = ["candid", "javascript", "typescript"];
+
 const Interface = ({ current, file, children }) => {
   const router = useRouter();
   const [bindings, setBindings] = useState(null);
+  const [language, setLanguage] = useState(LANGUAGES[0]);
   const { path: path_ } = router.query;
   useEffect(() => {
     if (file) {
@@ -78,7 +91,7 @@ const Interface = ({ current, file, children }) => {
           key={joined}
           href={`/interface${joined}`}
           linkClassName="text-blue-600 hover:underline"
-          activeClassName="text-black cursor-default"
+          activeClassName="cursor-default"
         >
           {part}
         </ActiveLink>,
@@ -92,7 +105,7 @@ const Interface = ({ current, file, children }) => {
         <ActiveLink
           href="/interface"
           linkClassName="text-blue-600 hover:underline"
-          activeClassName="text-black cursor-default"
+          activeClassName="cursor-default"
         >
           interfaces
         </ActiveLink>
@@ -100,13 +113,34 @@ const Interface = ({ current, file, children }) => {
       </h1>
       {file ? (
         <div>
-          <pre className="text-xs p-4 bg-gray-100 mt-4">{file}</pre>
-          <pre className="text-xs p-4 bg-gray-100 mt-4">
-            {bindings ? bindings.js : null}
-          </pre>
-          <pre className="text-xs p-4 bg-gray-100 mt-4">
-            {bindings ? bindings.ts : null}
-          </pre>
+          <ul className="flex">
+            {LANGUAGES.map((lang) => (
+              <li key={lang}>
+                <button
+                  className={classnames(
+                    "px-3 py-1 focus:outline-none transition-200 transition-colors",
+                    {
+                      "bg-gray-200 dark:bg-gray-800": lang !== language,
+                      "bg-gray-300 dark:bg-gray-600": lang === language,
+                    }
+                  )}
+                  onClick={() => setLanguage(lang)}
+                >
+                  {lang}
+                </button>
+              </li>
+            ))}
+          </ul>
+          <SyntaxHighlighter
+            language={language}
+            style={{ ...coldarkDark, marginTop: 0 }}
+          >
+            {language === "candid"
+              ? file
+              : language === "javascript"
+              ? bindings.js || ""
+              : bindings.ts || ""}
+          </SyntaxHighlighter>
         </div>
       ) : (
         <ul>
