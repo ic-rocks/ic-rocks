@@ -1,8 +1,15 @@
+const defaultTheme = require("tailwindcss/defaultTheme");
+
 module.exports = {
-  purge: ["./src/**/*.{js,ts,jsx,tsx,html}"],
-  darkMode: "media",
+  purge: ["./components/**/*.{js,ts,jsx,tsx}", "./pages/**/*.{js,ts,jsx,tsx}"],
+  darkMode: 'media',
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        sans: ["Aestetico", ...defaultTheme.fontFamily.sans],
+        mono: ["Space Mono", ...defaultTheme.fontFamily.mono],
+      },
+    },
   },
   variants: {
     extend: {},

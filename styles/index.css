@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url("https://fonts.googleapis.com/css2?family=Space+Mono&display=swap");
+
+@font-face {
+  font-family: Aestetico;
+  src: url("../public/fonts/Aestetico-Regular/font.woff2") format("woff2"),
+    url("../public/fonts/Aestetico-Regular/font.woff") format("woff");
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: Aestetico;
+  src: url("../public/fonts/Aestetico-Bold/font.woff2") format("woff2"),
+    url("../public/fonts/Aestetico-Bold/font.woff") format("woff");
+  font-weight: 700;
+}

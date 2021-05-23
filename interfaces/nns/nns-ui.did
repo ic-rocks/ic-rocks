@@ -1,0 +1,3 @@
+service : {
+  get_icp_to_cycles_conversion_rate: () -> (nat64) query;
+}
