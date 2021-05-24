@@ -1,3 +1,157 @@
+type AccountIdentifier = text;
+type AttachCanisterRequest = record {
+  name: text;
+  canister_id: principal;
+};
+type AttachCanisterResponse = variant {
+  Ok: null;
+  CanisterAlreadyAttached: null;
+  NameAlreadyTaken: null;
+  NameTooLong: null;
+  CanisterLimitExceeded: null;
+};
+type SubAccount = vec nat8;
+type SubAccountDetails = record {
+  name: text;
+  sub_account: SubAccount;
+  account_identifier: AccountIdentifier;
+};
+type CreateSubAccountResponse = variant {
+  Ok: SubAccountDetails;
+  AccountNotFound: null;
+  NameTooLong: null;
+  SubAccountLimitExceeded: null;
+};
+type DetachCanisterRequest = record {
+  canister_id: principal;
+};
+type DetachCanisterResponse = variant {
+  Ok: null;
+  CanisterNotFound: null;
+};
+type HardwareWalletAccountDetails = record {
+  name: text;
+  account_identifier: AccountIdentifier;
+};
+type AccountDetails = record {
+  account_identifier: AccountIdentifier;
+  hardware_wallet_accounts: vec HardwareWalletAccountDetails;
+  sub_accounts: vec SubAccountDetails;
+};
+type GetAccountResponse = variant {
+  Ok: AccountDetails;
+  AccountNotFound: null;
+};
+type CanisterDetails = record {
+  name: text;
+  canister_id: principal;
+};
+type BlockHeight = nat64;
+type Stats = record {
+  latest_transaction_block_height: BlockHeight;
+  seconds_since_last_ledger_sync: nat64;
+  sub_accounts_count: nat64;
+  hardware_wallet_accounts_count: nat64;
+  accounts_count: nat64;
+  earliest_transaction_block_height: BlockHeight;
+  transactions_count: nat64;
+  block_height_synced_up_to: opt nat64;
+  latest_transaction_timestamp_nanos: nat64;
+  earliest_transaction_timestamp_nanos: nat64;
+};
+type GetTransactionsRequest = record {
+  page_size: nat8;
+  offset: nat32;
+  account_identifier: AccountIdentifier;
+};
+type Timestamp = record {
+  timestamp_nanos: nat64;
+};
+type ICPTs = record {
+  e8s: nat64;
+};
+type Send = record {
+  to: AccountIdentifier;
+  fee: ICPTs;
+  amount: ICPTs;
+};
+type Receive = record {
+  fee: ICPTs;
+  from: AccountIdentifier;
+  amount: ICPTs;
+};
+type Transfer = variant {
+  Burn: record {
+    amount: ICPTs;
+  };
+  Mint: record {
+    amount: ICPTs;
+  };
+  Send: Send;
+  Receive: Receive;
+};
+type Transaction = record {
+  memo: nat64;
+  timestamp: Timestamp;
+  block_height: BlockHeight;
+  transfer: Transfer;
+};
+type GetTransactionsResponse = record {
+  total: nat32;
+  transactions: vec Transaction;
+};
+type HeaderField = record {text; text};
+type HttpRequest = record {
+  url: text;
+  method: text;
+  body: vec nat8;
+  headers: vec HeaderField;
+};
+type HttpResponse = record {
+  body: vec nat8;
+  headers: vec HeaderField;
+  status_code: nat16;
+};
+type RegisterHardwareWalletRequest = record {
+  name: text;
+  account_identifier: AccountIdentifier;
+};
+type RegisterHardwareWalletResponse = variant {
+  Ok: null;
+  AccountNotFound: null;
+  HardwareWalletAlreadyRegistered: null;
+  HardwareWalletLimitExceeded: null;
+  NameTooLong: null;
+};
+type RemoveHardwareWalletRequest = record {
+  account_identifier: AccountIdentifier;
+};
+type RemoveHardwareWalletResponse = variant {
+  Ok: null;
+  HardwareWalletNotFound: null;
+};
+type RenameSubAccountRequest = record {
+  new_name: text;
+  account_identifier: AccountIdentifier;
+};
+type RenameSubAccountResponse = variant {
+  Ok: null;
+  AccountNotFound: null;
+  SubAccountNotFound: null;
+  NameTooLong: null;
+};
 service : {
+  add_account: () -> (AccountIdentifier);
+  attach_canister: (AttachCanisterRequest) -> (AttachCanisterResponse);
+  create_sub_account: (text) -> (CreateSubAccountResponse);
+  detach_canister: (DetachCanisterRequest) -> (DetachCanisterResponse);
+  get_account: () -> (GetAccountResponse) query;
+  get_canisters: () -> (vec CanisterDetails) query;
   get_icp_to_cycles_conversion_rate: () -> (nat64) query;
+  get_stats: () -> (Stats) query;
+  get_transactions: (GetTransactionsRequest) -> (GetTransactionsResponse) query;
+  http_request: (HttpRequest) -> (HttpResponse) query;
+  register_hardware_wallet: (RegisterHardwareWalletRequest) -> (RegisterHardwareWalletResponse);
+  remove_hardware_wallet: (RemoveHardwareWalletRequest) -> (RemoveHardwareWalletResponse);
+  rename_sub_account: (RenameSubAccountRequest) -> (RenameSubAccountResponse);
 }
