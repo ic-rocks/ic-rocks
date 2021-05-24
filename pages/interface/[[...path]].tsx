@@ -9,6 +9,7 @@ import { BiPencil } from "react-icons/bi";
 import { FiFilePlus } from "react-icons/fi";
 import ActiveLink from "../../components/ActiveLink";
 import CodeBlock from "../../components/CodeBlock";
+import { TITLE_SUFFIX } from "../../lib/constants";
 
 const didc = import("../../lib/didc-js/didc_js");
 const GITHUB_REPO = "https://github.com/ic-cubes/ic-tools";
@@ -101,7 +102,9 @@ const Interface = ({ current, children }) => {
   return (
     <div className="py-16">
       <Head>
-        <title>interfaces{current ? "/" + current : ""} | IC Tools</title>
+        <title>
+          interfaces{current ? "/" + current : ""} {TITLE_SUFFIX}
+        </title>
       </Head>
       <h1 className="text-3xl mb-8">
         <ActiveLink

@@ -4,6 +4,7 @@ import Head from "next/head";
 import { useEffect, useState } from "react";
 import governanceIdl from "../lib/canisters/governance.did";
 import nnsUiIdl from "../lib/canisters/nns-ui.did";
+import { TITLE_SUFFIX } from "../lib/constants";
 import useInterval from "../lib/useInterval";
 declare const Buffer;
 
@@ -117,7 +118,7 @@ function Prices() {
   return (
     <div className="font-mono">
       <Head>
-        <title>ICP Price | IC Tools</title>
+        <title>ICP Price {TITLE_SUFFIX}</title>
       </Head>
       <section className="py-16">
         <h2 className="text-3xl mb-4">Latest ICP price: {latestPrice}</h2>
