@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from "react";
-import { DateTime } from "luxon";
 import { Actor, HttpAgent, IDL } from "@dfinity/agent";
+import { DateTime } from "luxon";
+import Head from "next/head";
+import { useEffect, useState } from "react";
 import governanceIdl from "../lib/canisters/governance.did";
 import nnsUiIdl from "../lib/canisters/nns-ui.did";
 import useInterval from "../lib/useInterval";
+declare const Buffer;
 
 const UpdateIcpXdrConversionRatePayload = (IDL) =>
   IDL.Record({
@@ -42,48 +44,52 @@ function Prices() {
     );
   }, []);
 
-  const fetchData = async () => {
-    const data = await governance.list_proposals({
-      include_reward_status: [0, 1, 2, 3, 4].map(BigInt),
-      before_proposal: [],
-      limit: proposals.length ? 1 : count,
-      exclude_topic: [1, 3, 4, 5, 6, 7, 8, 9, 10].map(BigInt),
-      include_status: [1, 2, 3, 4, 5].map(BigInt),
-    });
+  const fetchData = () => {
+    (async () => {
+      const data = (await governance.list_proposals({
+        include_reward_status: [0, 1, 2, 3, 4].map(BigInt),
+        before_proposal: [],
+        limit: proposals.length ? 1 : count,
+        exclude_topic: [1, 3, 4, 5, 6, 7, 8, 9, 10].map(BigInt),
+        include_status: [1, 2, 3, 4, 5].map(BigInt),
+      })) as { proposal_info: any[] };
 
-    const filtered = data.proposal_info.filter(
-      (p) => !proposals.length || p.id[0].id > proposals[0].id
-    );
-
-    const formatted = filtered.map((p) => {
-      const payload = IDL.decode(
-        [UpdateIcpXdrConversionRatePayload(IDL)],
-        Buffer.from(p.proposal[0].action[0].ExecuteNnsFunction.payload)
+      const filtered = data.proposal_info.filter(
+        (p) => !proposals.length || p.id[0].id > proposals[0].id
       );
-      const source = JSON.parse(payload[0].data_source);
-      return {
-        id: p.id[0].id,
-        status: p.status,
-        topic: p.topic,
-        reward_status: p.reward_status,
-        latest_tally: p.latest_tally[0],
-        timestamp_proposal: Number(p.proposal_timestamp_seconds),
-        timestamp_decided: Number(p.decided_timestamp_seconds),
-        timestamp_executed: Number(p.executed_timestamp_seconds),
-        source,
-        timestamp_payload: Number(payload[0].timestamp_seconds),
-        icp_xdr: Number(payload[0].xdr_permyriad_per_icp) / 10000,
-      };
-    });
-    console.log(formatted);
 
-    setProposals((prev) => formatted.concat(prev));
+      const formatted = filtered.map((p) => {
+        const payload = IDL.decode(
+          [UpdateIcpXdrConversionRatePayload(IDL)],
+          Buffer.from(p.proposal[0].action[0].ExecuteNnsFunction.payload)
+        ) as any[];
+        const source = JSON.parse(payload[0].data_source);
+        return {
+          id: p.id[0].id,
+          status: p.status,
+          topic: p.topic,
+          reward_status: p.reward_status,
+          latest_tally: p.latest_tally[0],
+          timestamp_proposal: Number(p.proposal_timestamp_seconds),
+          timestamp_decided: Number(p.decided_timestamp_seconds),
+          timestamp_executed: Number(p.executed_timestamp_seconds),
+          source,
+          timestamp_payload: Number(payload[0].timestamp_seconds),
+          icp_xdr: Number(payload[0].xdr_permyriad_per_icp) / 10000,
+        };
+      });
+      console.log(formatted);
+
+      setProposals((prev) => formatted.concat(prev));
+    })();
   };
 
-  const fetchPrice = async () => {
-    const data = await nnsUi.get_icp_to_cycles_conversion_rate();
-    console.log(data);
-    setPrice(data);
+  const fetchPrice = () => {
+    (async () => {
+      const data = await nnsUi.get_icp_to_cycles_conversion_rate();
+      console.log(data);
+      setPrice(data);
+    })();
   };
 
   useEffect(fetchPrice, []);
@@ -110,6 +116,9 @@ function Prices() {
 
   return (
     <div className="font-mono">
+      <Head>
+        <title>ICP Price | IC Tools</title>
+      </Head>
       <section className="py-16">
         <h2 className="text-3xl mb-4">Latest ICP price: {latestPrice}</h2>
         <h2 className="mb-4">Timestamp: {timestamp}</h2>

@@ -1,9 +1,10 @@
 import fs from "fs";
 import glob from "glob";
+import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import path from "path";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { BiPencil } from "react-icons/bi";
 import { FiFilePlus } from "react-icons/fi";
 import ActiveLink from "../../components/ActiveLink";
@@ -99,6 +100,9 @@ const Interface = ({ current, children }) => {
 
   return (
     <div className="py-16">
+      <Head>
+        <title>interfaces{current ? "/" + current : ""} | IC Tools</title>
+      </Head>
       <h1 className="text-3xl mb-8">
         <ActiveLink
           href="/interface"
