@@ -1,21 +1,16 @@
-import classnames from "classnames";
-import path from "path";
 import fs from "fs";
 import glob from "glob";
-import { useRouter } from "next/router";
 import Link from "next/link";
+import { useRouter } from "next/router";
+import path from "path";
+import React, { useEffect, useState } from "react";
+import { BiPencil } from "react-icons/bi";
+import { FiFilePlus } from "react-icons/fi";
 import ActiveLink from "../../components/ActiveLink";
-import { useEffect, useState } from "react";
-
-import { PrismLight as SyntaxHighlighter } from "react-syntax-highlighter";
-import javascript from "react-syntax-highlighter/dist/cjs/languages/prism/javascript";
-import typescript from "react-syntax-highlighter/dist/cjs/languages/prism/typescript";
-import { coldarkDark } from "react-syntax-highlighter/dist/cjs/styles/prism";
-import classNames from "classnames";
-SyntaxHighlighter.registerLanguage("javascript", javascript);
-SyntaxHighlighter.registerLanguage("typescript", typescript);
+import CodeBlock from "../../components/CodeBlock";
 
 const didc = import("../../lib/didc-js/didc_js");
+const GITHUB_REPO = "https://github.com/ic-cubes/ic-tools";
 
 export async function getStaticPaths() {
   const base = `${process.cwd()}/public/interfaces`;
@@ -58,13 +53,10 @@ export async function getStaticProps({ params: { path: path_ = "" } }) {
   };
 }
 
-const LANGUAGES = ["candid", "javascript", "typescript"];
-
 const Interface = ({ current, children }) => {
   const router = useRouter();
-  const [file, setFile] = useState("");
+  const [candid, setCandid] = useState("");
   const [bindings, setBindings] = useState(null);
-  const [language, setLanguage] = useState(LANGUAGES[0]);
   const { path: path_ } = router.query;
 
   useEffect(() => {
@@ -72,7 +64,7 @@ const Interface = ({ current, children }) => {
       fetch(`/interfaces/${current}.did`)
         .then((res) => res.text())
         .then((data) => {
-          setFile(data);
+          setCandid(data);
           didc.then((mod) => {
             const gen = mod.generate(data);
             setBindings(gen);
@@ -80,7 +72,7 @@ const Interface = ({ current, children }) => {
         })
         .catch(console.error);
     } else {
-      setFile("");
+      setCandid("");
     }
   }, [current]);
 
@@ -118,46 +110,38 @@ const Interface = ({ current, children }) => {
         {title}
       </h1>
       {children ? (
-        <ul>
-          {children.map((child) => (
-            <li key={child}>
-              <Link href={`/interface${current ? "/" + current : ""}/${child}`}>
-                <a className="hover:underline">{child}</a>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <div>
-          <ul className="flex">
-            {LANGUAGES.map((lang) => (
-              <li key={lang}>
-                <button
-                  className={classnames(
-                    "px-3 py-1 focus:outline-none transition-200 transition-colors",
-                    {
-                      "bg-gray-200 dark:bg-gray-800": lang !== language,
-                      "bg-gray-300 dark:bg-gray-600": lang === language,
-                    }
-                  )}
-                  onClick={() => setLanguage(lang)}
+        <>
+          <ul className="mb-8">
+            {children.map((child) => (
+              <li key={child}>
+                <Link
+                  href={`/interface${current ? "/" + current : ""}/${child}`}
                 >
-                  {lang}
-                </button>
+                  <a className="hover:underline">{child}</a>
+                </Link>
               </li>
             ))}
           </ul>
-          <SyntaxHighlighter
-            language={language}
-            style={{ ...coldarkDark, marginTop: 0 }}
+          <a
+            className="inline-flex items-center text-blue-600 hover:underline"
+            href={`${GITHUB_REPO}/new/main/public/interfaces/${current}?filename=newfile.did&value=%2F%2F%20Candid%20file%20here`}
+            target="_blank"
           >
-            {language === "candid"
-              ? file
-              : language === "javascript"
-              ? bindings.js || ""
-              : bindings.ts || ""}
-          </SyntaxHighlighter>
-        </div>
+            <FiFilePlus className="mr-0.5" />
+            Add new file
+          </a>
+        </>
+      ) : (
+        <>
+          <CodeBlock candid={candid} bindings={bindings} className="mb-8" />
+          <a
+            className="inline-flex items-center text-blue-600 hover:underline"
+            href={`${GITHUB_REPO}/edit/main/public/interfaces/${current}.did`}
+            target="_blank"
+          >
+            <BiPencil className="mr-0.5" /> Edit this file
+          </a>
+        </>
       )}
     </div>
   );

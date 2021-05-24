@@ -6,6 +6,7 @@ export default class MyDocument extends Document {
       <Html>
         <Head></Head>
         <body className="dark:bg-gray-900 dark:text-white">
+          <script src="noflash.js" />
           <Main />
           <NextScript />
         </body>
