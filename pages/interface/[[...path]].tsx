@@ -18,7 +18,7 @@ SyntaxHighlighter.registerLanguage("typescript", typescript);
 const didc = import("../../lib/didc-js/didc_js");
 
 export async function getStaticPaths() {
-  const base = `${process.cwd()}/interfaces`;
+  const base = `${process.cwd()}/public/interfaces`;
   const paths = glob
     .sync(`${base}/**/*.did`)
     .concat(glob.sync(`${base}/**/*/`))
@@ -40,23 +40,19 @@ export async function getStaticPaths() {
 
 export async function getStaticProps({ params: { path: path_ = "" } }) {
   const current = (typeof path_ === "string" ? [path_] : path_).join("/");
-  const base = `${process.cwd()}/interfaces/${current}`;
+  const base = `${process.cwd()}/public/interfaces/${current}`;
 
-  // If directory, list children. Otherwise, read .did file
-  let file = null,
-    children = null;
+  // If directory, list children
+  let children = null;
   if (fs.existsSync(base) && fs.lstatSync(base).isDirectory()) {
     children = glob
       .sync(`${base}/**/*.did`)
       .map((did) => path.relative(base, did).replace(/\.did$/, ""));
-  } else {
-    file = fs.readFileSync(`${base}.did`).toString();
   }
 
   return {
     props: {
       current,
-      file,
       children,
     },
   };
@@ -64,19 +60,29 @@ export async function getStaticProps({ params: { path: path_ = "" } }) {
 
 const LANGUAGES = ["candid", "javascript", "typescript"];
 
-const Interface = ({ current, file, children }) => {
+const Interface = ({ current, children }) => {
   const router = useRouter();
+  const [file, setFile] = useState("");
   const [bindings, setBindings] = useState(null);
   const [language, setLanguage] = useState(LANGUAGES[0]);
   const { path: path_ } = router.query;
+
   useEffect(() => {
-    if (file) {
-      didc.then((mod) => {
-        const gen = mod.generate(file);
-        setBindings(gen);
-      });
+    if (current) {
+      fetch(`/interfaces/${current}.did`)
+        .then((res) => res.text())
+        .then((data) => {
+          setFile(data);
+          didc.then((mod) => {
+            const gen = mod.generate(data);
+            setBindings(gen);
+          });
+        })
+        .catch(console.error);
+    } else {
+      setFile("");
     }
-  }, [file]);
+  }, [current]);
 
   let title;
   if (path_) {
@@ -111,7 +117,17 @@ const Interface = ({ current, file, children }) => {
         </ActiveLink>
         {title}
       </h1>
-      {file ? (
+      {children ? (
+        <ul>
+          {children.map((child) => (
+            <li key={child}>
+              <Link href={`/interface${current ? "/" + current : ""}/${child}`}>
+                <a className="hover:underline">{child}</a>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      ) : (
         <div>
           <ul className="flex">
             {LANGUAGES.map((lang) => (
@@ -142,16 +158,6 @@ const Interface = ({ current, file, children }) => {
               : bindings.ts || ""}
           </SyntaxHighlighter>
         </div>
-      ) : (
-        <ul>
-          {children.map((child) => (
-            <li key={child}>
-              <Link href={`/interface${current ? "/" + current : ""}/${child}`}>
-                <a className="hover:underline">{child}</a>
-              </Link>
-            </li>
-          ))}
-        </ul>
       )}
     </div>
   );
