@@ -13,7 +13,7 @@ export default function Nav() {
             <ActiveLink href="/icp">icp</ActiveLink>
           </li>
           <li className="pr-4">
-            <ActiveLink href="/interface" exact={false}>
+            <ActiveLink href="/interfaces" exact={false}>
               interfaces
             </ActiveLink>
           </li>

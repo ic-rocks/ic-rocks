@@ -55,7 +55,7 @@ export async function getStaticProps({ params: { path: path_ = "" } }) {
   };
 }
 
-const Interface = ({ current, children }) => {
+const Interfaces = ({ current, children }) => {
   const router = useRouter();
   const [candid, setCandid] = useState("");
   const [bindings, setBindings] = useState(null);
@@ -89,7 +89,7 @@ const Interface = ({ current, children }) => {
         </span>,
         <ActiveLink
           key={joined}
-          href={`/interface${joined}`}
+          href={`/interfaces${joined}`}
           linkClassName="text-blue-600 hover:underline"
           activeClassName="cursor-default"
         >
@@ -108,7 +108,7 @@ const Interface = ({ current, children }) => {
       </Head>
       <h1 className="text-3xl mb-8">
         <ActiveLink
-          href="/interface"
+          href="/interfaces"
           linkClassName="text-blue-600 hover:underline"
           activeClassName="cursor-default"
         >
@@ -122,7 +122,7 @@ const Interface = ({ current, children }) => {
             {children.map((child) => (
               <li key={child}>
                 <Link
-                  href={`/interface${current ? "/" + current : ""}/${child}`}
+                  href={`/interfaces${current ? "/" + current : ""}/${child}`}
                 >
                   <a className="hover:underline">{child}</a>
                 </Link>
@@ -154,4 +154,4 @@ const Interface = ({ current, children }) => {
   );
 };
 
-export default Interface;
+export default Interfaces;
