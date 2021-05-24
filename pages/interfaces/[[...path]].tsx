@@ -4,10 +4,12 @@ import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import path from "path";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { BiPencil } from "react-icons/bi";
 import { FiFilePlus } from "react-icons/fi";
 import ActiveLink from "../../components/ActiveLink";
+import CanistersList from "../../components/CanistersList";
+import CanisterUI from "../../components/CanisterUI";
 import CodeBlock from "../../components/CodeBlock";
 import { TITLE_SUFFIX } from "../../lib/constants";
 
@@ -57,6 +59,8 @@ export async function getStaticProps({ params: { path: path_ = "" } }) {
 
 const Interfaces = ({ current, children }) => {
   const router = useRouter();
+  const [canisters, setCanisters] = useState({});
+  const [matches, setMatches] = useState([]);
   const [candid, setCandid] = useState("");
   const [bindings, setBindings] = useState(null);
   const { path: path_ } = router.query;
@@ -77,6 +81,25 @@ const Interfaces = ({ current, children }) => {
       setCandid("");
     }
   }, [current]);
+
+  useEffect(() => {
+    fetch("/interfaces/canisters.json")
+      .then((res) => res.json())
+      .then((json) => {
+        setCanisters(json);
+      });
+  }, []);
+
+  useEffect(() => {
+    if (current) {
+      const keys = Object.keys(canisters);
+      if (keys.length) {
+        setMatches(keys.filter((key) => canisters[key] === current));
+      }
+    } else {
+      setMatches([]);
+    }
+  }, [current, canisters]);
 
   let title;
   if (path_) {
@@ -118,35 +141,50 @@ const Interfaces = ({ current, children }) => {
       </h1>
       {children ? (
         <>
-          <ul className="mb-8">
-            {children.map((child) => (
-              <li key={child}>
-                <Link
-                  href={`/interfaces${current ? "/" + current : ""}/${child}`}
-                >
-                  <a className="hover:underline">{child}</a>
-                </Link>
-              </li>
-            ))}
-          </ul>
-          <a
-            className="inline-flex items-center text-blue-600 hover:underline"
-            href={`${GITHUB_REPO}/new/main/public/interfaces/${current}?filename=newfile.did&value=%2F%2F%20Candid%20file%20here`}
-            target="_blank"
-          >
-            <FiFilePlus className="mr-0.5" />
-            Add new file
-          </a>
+          <section>
+            <ul className="mb-8">
+              {children.map((child) => (
+                <li key={child}>
+                  <Link
+                    href={`/interfaces${current ? "/" + current : ""}/${child}`}
+                  >
+                    <a className="hover:underline text-blue-600">{child}</a>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <a
+              className="inline-flex items-center text-blue-600 hover:underline"
+              href={`${GITHUB_REPO}/new/main/public/interfaces/${current}?filename=newfile.did&value=%2F%2F%20Candid%20file%20here`}
+              target="_blank"
+            >
+              <FiFilePlus className="mr-0.5" />
+              Add new interface...
+            </a>
+          </section>
+
+          <section>
+            <h1 className="text-3xl mt-16 mb-8">Canisters</h1>
+            <CanistersList canisters={canisters} className="mb-8" />
+            <a
+              className="inline-flex items-center text-blue-600 hover:underline"
+              href={`${GITHUB_REPO}/edit/main/public/interfaces/canisters.json`}
+              target="_blank"
+            >
+              <BiPencil className="mr-0.5" /> Edit canisters.json
+            </a>
+          </section>
         </>
       ) : (
         <>
+          <CanisterUI candid={candid} matches={matches} />
           <CodeBlock candid={candid} bindings={bindings} className="mb-8" />
           <a
             className="inline-flex items-center text-blue-600 hover:underline"
             href={`${GITHUB_REPO}/edit/main/public/interfaces/${current}.did`}
             target="_blank"
           >
-            <BiPencil className="mr-0.5" /> Edit this file
+            <BiPencil className="mr-0.5" /> Edit {current}.did
           </a>
         </>
       )}
