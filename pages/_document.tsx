@@ -14,7 +14,7 @@ export default class MyDocument extends Document {
           <meta property="og:image" content="/cubes.png" />
         </Head>
         <body className="dark:bg-gray-900 dark:text-white">
-          <script src="noflash.js" />
+          <script src="/noflash.js" />
           <Main />
           <NextScript />
         </body>
