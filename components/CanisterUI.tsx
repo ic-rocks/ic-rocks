@@ -23,7 +23,7 @@ export default function CanisterUI({
       {matches.length > 0 ? (
         <>
           <span>Explore canisters:</span>
-          <ul>
+          <ul className="font-mono">
             {matches.map((canisterId) => (
               <li key={canisterId}>
                 <a

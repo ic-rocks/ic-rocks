@@ -1,15 +1,17 @@
 import classnames from "classnames";
 import React, { useCallback, useState } from "react";
 import { BsCheck, BsClipboard } from "react-icons/bs";
-import { PrismLight as SyntaxHighlighter } from "react-syntax-highlighter";
-import javascript from "react-syntax-highlighter/dist/cjs/languages/prism/javascript";
-import typescript from "react-syntax-highlighter/dist/cjs/languages/prism/typescript";
-import { coldarkDark } from "react-syntax-highlighter/dist/cjs/styles/prism";
+import { Light as SyntaxHighlighter } from "react-syntax-highlighter";
+import javascript from "react-syntax-highlighter/dist/cjs/languages/hljs/javascript";
+import typescript from "react-syntax-highlighter/dist/cjs/languages/hljs/typescript";
+import { monokai } from "react-syntax-highlighter/dist/cjs/styles/hljs";
 import { useClipboard } from "use-clipboard-copy";
+import candid from "../lib/candid";
 import { Bindings } from "../lib/didc-js/didc_js";
 
 SyntaxHighlighter.registerLanguage("javascript", javascript);
 SyntaxHighlighter.registerLanguage("typescript", typescript);
+SyntaxHighlighter.registerLanguage("candid", candid);
 
 const LANGUAGES = ["candid", "javascript", "typescript"];
 
@@ -70,7 +72,7 @@ export default function CodeBlock({
           language={language}
           className="text-sm"
           customStyle={{ marginTop: 0 }}
-          style={coldarkDark}
+          style={monokai}
         >
           {displayCode}
         </SyntaxHighlighter>
