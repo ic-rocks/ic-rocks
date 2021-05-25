@@ -7,7 +7,7 @@ function ActiveLink({
   exact = true,
   className = "",
   linkClassName = "",
-  activeClassName = "font-bold",
+  activeClassName = "font-bold cursor-default",
 }) {
   const router = useRouter();
   const active = exact

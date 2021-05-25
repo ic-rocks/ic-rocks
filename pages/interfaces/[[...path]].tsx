@@ -8,9 +8,8 @@ import React, { useEffect, useState } from "react";
 import { BiPencil } from "react-icons/bi";
 import { FiFilePlus } from "react-icons/fi";
 import ActiveLink from "../../components/ActiveLink";
-import CanistersList from "../../components/CanistersList";
-import CanisterUI from "../../components/CanisterUI";
 import CodeBlock from "../../components/CodeBlock";
+import MatchingCanistersList from "../../components/MatchingCanistersList";
 import { TITLE_SUFFIX } from "../../lib/constants";
 
 const didc = import("../../lib/didc-js/didc_js");
@@ -140,44 +139,30 @@ const Interfaces = ({ current, children }) => {
         {title}
       </h1>
       {children ? (
-        <>
-          <section>
-            <ul className="mb-8">
-              {children.map((child) => (
-                <li key={child}>
-                  <Link
-                    href={`/interfaces${current ? "/" + current : ""}/${child}`}
-                  >
-                    <a className="hover:underline text-blue-600">{child}</a>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-            <a
-              className="inline-flex items-center text-blue-600 hover:underline"
-              href={`${GITHUB_REPO}/new/main/public/interfaces/${current}?filename=newfile.did&value=%2F%2F%20Candid%20file%20here`}
-              target="_blank"
-            >
-              <FiFilePlus className="mr-0.5" />
-              Add new interface...
-            </a>
-          </section>
-
-          <section>
-            <h1 className="text-3xl mt-16 mb-8">Canisters</h1>
-            <CanistersList canisters={canisters} className="mb-8" />
-            <a
-              className="inline-flex items-center text-blue-600 hover:underline"
-              href={`${GITHUB_REPO}/edit/main/public/interfaces/canisters.json`}
-              target="_blank"
-            >
-              <BiPencil className="mr-0.5" /> Edit canisters.json
-            </a>
-          </section>
-        </>
+        <section>
+          <ul className="mb-8">
+            {children.map((child) => (
+              <li key={child}>
+                <Link
+                  href={`/interfaces${current ? "/" + current : ""}/${child}`}
+                >
+                  <a className="hover:underline text-blue-600">{child}</a>
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <a
+            className="inline-flex items-center text-blue-600 hover:underline"
+            href={`${GITHUB_REPO}/new/main/public/interfaces/${current}?filename=newfile.did&value=%2F%2F%20Candid%20file%20here`}
+            target="_blank"
+          >
+            <FiFilePlus className="mr-0.5" />
+            Add new interface...
+          </a>
+        </section>
       ) : (
         <>
-          <CanisterUI candid={candid} matches={matches} />
+          <MatchingCanistersList canisterIds={matches} />
           <CodeBlock candid={candid} bindings={bindings} className="mb-8" />
           <a
             className="inline-flex items-center text-blue-600 hover:underline"
