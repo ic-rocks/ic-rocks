@@ -61,7 +61,7 @@ const Account = () => {
         const res = (await ledger.account_balance_dfx({
           account: accountId,
         })) as { es8: BigInt };
-        setBalance(res!.e8s);
+        setBalance(res["e8s"]);
       })();
 
       setIsLoadingTxs(true);
