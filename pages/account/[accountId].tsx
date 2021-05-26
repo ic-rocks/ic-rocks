@@ -14,6 +14,7 @@ import {
   FiChevronsRight,
 } from "react-icons/fi";
 import Search404 from "../../components/Search404";
+import { TransactionTypeLabel } from "../../components/TransactionTypeLabel";
 import ledgerIdl from "../../lib/canisters/ledger.did";
 import { GITHUB_REPO, TITLE_SUFFIX } from "../../lib/constants";
 import { formatNumber } from "../../lib/numbers";
@@ -247,8 +248,10 @@ const Account = () => {
                       key={tx.tx_hash}
                       className="border border-gray-400 dark:border-gray-600"
                     >
-                      <td className="px-2 py-2 overflow-hidden overflow-ellipsis">
-                        {tx.tx_hash}
+                      <td className="px-2 py-2 overflow-hidden overflow-ellipsis text-blue-600">
+                        <Link href={`/transaction/${tx.tx_hash}`}>
+                          <a className="hover:underline">{tx.tx_hash}</a>
+                        </Link>
                       </td>
                       <td className="px-2 py-2 overflow-hidden overflow-ellipsis">
                         {DateTime.fromMillis(tx.timestamp / 1e6).toRelative()}
@@ -263,7 +266,7 @@ const Account = () => {
                         )}
                       >
                         {tx.type === "MINT" ? (
-                          "Mint"
+                          <TransactionTypeLabel type={tx.type} />
                         ) : tx.from === accountId ? (
                           tx.from
                         ) : (
@@ -284,7 +287,7 @@ const Account = () => {
                         )}
                       >
                         {tx.type === "BURN" ? (
-                          "Burn"
+                          <TransactionTypeLabel type={tx.type} />
                         ) : tx.to === accountId ? (
                           tx.to
                         ) : (
@@ -297,7 +300,7 @@ const Account = () => {
                       </td>
                       <td className="px-2 py-2 overflow-hidden overflow-ellipsis">
                         {formatNumber(
-                          Number(tx.amount.value) /
+                          Math.abs(Number(tx.amount.value)) /
                             10 ** tx.amount.currency.decimals
                         )}{" "}
                         <span className="text-xs">
@@ -310,7 +313,8 @@ const Account = () => {
                               Math.abs(Number(tx.fee.value)) /
                                 10 ** tx.fee.currency.decimals
                             )
-                          : 0}
+                          : 0}{" "}
+                        <span className="text-xs">ICP</span>
                       </td>
                     </tr>
                   );

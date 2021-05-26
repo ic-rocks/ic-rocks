@@ -1,3 +1,5 @@
+export type TransactionType = "TRANSACTION" | "FEE" | "MINT" | "BURN";
+
 export type TransactionResult = {
   transactions: {
     block_identifier: {
@@ -12,7 +14,7 @@ export type TransactionResult = {
         operation_identifier: {
           index: number;
         };
-        type: "TRANSACTION" | "FEE" | "MINT" | "BURN";
+        type: TransactionType;
         status: "COMPLETED";
         account: {
           address: string;

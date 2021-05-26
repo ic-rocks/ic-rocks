@@ -1,3 +1,5 @@
+import { blobFromHex } from "@dfinity/agent";
+import { getCrc32 } from "@dfinity/agent/lib/cjs/utils/getCrc";
 import { useRouter } from "next/router";
 import { useState } from "react";
 
@@ -9,10 +11,23 @@ export default function SearchBar() {
   };
   const handleSubmit = (e) => {
     e.preventDefault();
+
     if (input.includes("-")) {
       router.push(`/principal/${input}`);
     } else {
-      router.push(`/account/${input}`);
+      try {
+        const blob = blobFromHex(input);
+        const crc32Buf = Buffer.alloc(4);
+        crc32Buf.writeUInt32BE(getCrc32(blob.slice(4)));
+        const isAccount = blob.slice(0, 4).toString() === crc32Buf.toString();
+        if (isAccount) {
+          router.push(`/account/${input}`);
+        } else {
+          router.push(`/transaction/${input}`);
+        }
+      } catch (error) {
+        console.warn(error);
+      }
     }
     setInput("");
   };
