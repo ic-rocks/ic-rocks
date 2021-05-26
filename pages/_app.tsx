@@ -1,4 +1,4 @@
-import Nav from "../components/Nav";
+import Nav from "../components/Navbar";
 import "../styles/index.css";
 
 function MyApp({ Component, pageProps }) {
