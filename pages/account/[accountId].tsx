@@ -33,7 +33,7 @@ const Account = () => {
   const [balance, setBalance] = useState(null);
   const [txs, setTxs] = useState(null);
   const [accounts, setAccounts] = useState({});
-  const [isValid, setIsValid] = useState(false);
+  const [isValid, setIsValid] = useState(true);
   const [isLoadingTxs, setIsLoadingTxs] = useState(false);
   const [page, setPage] = useState(0);
   const { accountId } = router.query as { accountId: string };
@@ -147,36 +147,30 @@ const Account = () => {
       });
   }, []);
 
-  const title = `Account ${accountId}`;
   const maxPage = txs ? Math.floor(txs.total_count / PAGE_SIZE) : null;
 
   return isValid ? (
     <div className="py-16">
       <Head>
         <title>
-          {title} {TITLE_SUFFIX}
+          Account {accountId} {TITLE_SUFFIX}
         </title>
       </Head>
       <h1 className="text-3xl mb-8">
         Account <small className="text-2xl">{accountId}</small>
       </h1>
-      <table className="w-full border-collapse border border-gray-800">
-        <thead className="bg-gray-100 dark:bg-gray-700">
+      <table className="w-full">
+        <thead className="bg-gray-100 dark:bg-gray-800">
           <tr>
-            <th
-              colSpan={2}
-              className="border border-gray-400 dark:border-gray-600 px-2 py-2"
-            >
+            <th colSpan={2} className="px-2 py-2">
               Account Details
             </th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="divide-y divide-gray-300 dark:divide-gray-700">
           <tr>
-            <td className="border border-gray-400 dark:border-gray-600 px-2 w-1/4">
-              Balance
-            </td>
-            <td className="border border-gray-400 dark:border-gray-600 px-2 w-3/4">
+            <td className="px-2 py-2 w-1/4">Balance</td>
+            <td className="px-2 py-2 w-3/4">
               {balance != null ? (
                 <>
                   {formatNumber(Number(balance) / 1e8)}{" "}
@@ -188,18 +182,14 @@ const Account = () => {
             </td>
           </tr>
           <tr>
-            <td className="border border-gray-400 dark:border-gray-600 px-2 w-1/4">
-              Transactions
-            </td>
-            <td className="border border-gray-400 dark:border-gray-600 px-2 w-3/4">
-              {!isLoadingTxs ? formatNumber(txs.total_count) : null}
+            <td className="px-2 py-2 w-1/4">Transactions</td>
+            <td className="px-2 py-2 w-3/4">
+              {txs ? formatNumber(txs.total_count) : null}
             </td>
           </tr>
           <tr>
-            <td className="border border-gray-400 dark:border-gray-600 px-2 w-1/4">
-              Name
-            </td>
-            <td className="border border-gray-400 dark:border-gray-600 px-2 w-3/4">
+            <td className="px-2 py-2 w-1/4">Name</td>
+            <td className="px-2 py-2 w-3/4">
               {accounts[accountId] || (
                 <span className="inline-flex items-center">
                   Unknown{" "}
@@ -217,9 +207,9 @@ const Account = () => {
         </tbody>
       </table>
 
-      <table className="w-full table-fixed border-collapse border border-gray-800 mt-8">
-        <thead className="bg-gray-100 dark:bg-gray-700">
-          <tr className="border border-gray-400 dark:border-gray-600">
+      <table className="w-full table-fixed mt-8">
+        <thead className="bg-gray-100 dark:bg-gray-800">
+          <tr>
             <th className="text-left px-2 py-2 w-16">Tx Hash</th>
             <th className="text-left px-2 py-2 w-16">Timestamp</th>
             <th className="text-left px-2 py-2 w-16">From</th>
@@ -228,9 +218,9 @@ const Account = () => {
             <th className="text-left px-2 py-2 w-16">Fee</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="divide-y divide-gray-300 dark:divide-gray-700">
           {isLoadingTxs ? (
-            <tr className="border border-gray-400 dark:border-gray-600">
+            <tr>
               <td
                 colSpan={6}
                 className="text-center py-2 italic text-gray-600 dark:text-gray-400"
@@ -244,10 +234,7 @@ const Account = () => {
                 .slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE)
                 .map((tx) => {
                   return (
-                    <tr
-                      key={tx.tx_hash}
-                      className="border border-gray-400 dark:border-gray-600"
-                    >
+                    <tr key={tx.tx_hash}>
                       <td className="px-2 py-2 overflow-hidden overflow-ellipsis text-blue-600">
                         <Link href={`/transaction/${tx.tx_hash}`}>
                           <a className="hover:underline">{tx.tx_hash}</a>
@@ -320,7 +307,7 @@ const Account = () => {
                   );
                 })
             ) : (
-              <tr className="border border-gray-400 dark:border-gray-600">
+              <tr>
                 <td
                   colSpan={6}
                   className="text-center py-2 italic text-gray-600 dark:text-gray-400"

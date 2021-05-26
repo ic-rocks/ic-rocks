@@ -26,7 +26,7 @@ export default function SearchBar() {
           router.push(`/transaction/${input}`);
         }
       } catch (error) {
-        console.warn(error);
+        router.push(`/account/${input}`);
       }
     }
     setInput("");

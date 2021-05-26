@@ -108,57 +108,38 @@ export default function CanisterDetails({
 
   return (
     <div className={className}>
-      <table className="w-full border-collapse border border-gray-800">
-        <thead className="bg-gray-100 dark:bg-gray-700">
+      <table className="w-full">
+        <thead className="bg-gray-100 dark:bg-gray-800">
           <tr>
-            <th
-              colSpan={2}
-              className="border border-gray-400 dark:border-gray-600 px-2 py-2"
-            >
+            <th colSpan={2} className="px-2 py-2">
               Overview
             </th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="divide-y divide-gray-300 dark:divide-gray-700">
           <tr>
-            <td className="border border-gray-400 dark:border-gray-600 px-2 w-1/6">
-              Name
-            </td>
-            <td className="border border-gray-400 dark:border-gray-600 px-2 w-5/6">
+            <td className="px-2 py-2 w-1/6">Name</td>
+            <td className="px-2 py-2 w-5/6">
               {canisterName ? canisterName : "Unknown"}
             </td>
           </tr>
           <tr>
-            <td className="border border-gray-400 dark:border-gray-600 px-2 w-1/6">
-              Type
-            </td>
-            <td className="border border-gray-400 dark:border-gray-600 px-2 w-5/6">
-              {type}
-            </td>
+            <td className="px-2 py-2 w-1/6">Type</td>
+            <td className="px-2 py-2 w-5/6">{type}</td>
           </tr>
           {type == "Canister" && (
             <>
               <tr>
-                <td className="border border-gray-400 dark:border-gray-600 px-2 w-1/6">
-                  Subnet
-                </td>
-                <td className="border border-gray-400 dark:border-gray-600 px-2 w-5/6">
-                  {data?.subnet || "-"}
-                </td>
+                <td className="px-2 py-2 w-1/6">Subnet</td>
+                <td className="px-2 py-2 w-5/6">{data?.subnet || "-"}</td>
               </tr>
               <tr>
-                <td className="border border-gray-400 dark:border-gray-600 px-2 w-1/6">
-                  Module Hash
-                </td>
-                <td className="border border-gray-400 dark:border-gray-600 px-2 w-5/6">
-                  {data?.moduleHash || "-"}
-                </td>
+                <td className="px-2 py-2 w-1/6">Module Hash</td>
+                <td className="px-2 py-2 w-5/6">{data?.moduleHash || "-"}</td>
               </tr>
               <tr>
-                <td className="border border-gray-400 dark:border-gray-600 px-2 w-1/6">
-                  Controller
-                </td>
-                <td className="border border-gray-400 dark:border-gray-600 px-2 w-5/6">
+                <td className="px-2 py-2 w-1/6">Controller</td>
+                <td className="px-2 py-2 w-5/6">
                   {data?.controller ? (
                     <Link href={`/principal/${data?.controller}`}>
                       <a className="hover:underline text-blue-600">
@@ -173,10 +154,8 @@ export default function CanisterDetails({
             </>
           )}
           <tr>
-            <td className="border border-gray-400 dark:border-gray-600 px-2 w-1/6 align-top">
-              Accounts
-            </td>
-            <td className="border border-gray-400 dark:border-gray-600 px-2 w-5/6">
+            <td className="px-2 py-2 w-1/6 align-top">Accounts</td>
+            <td className="px-2 py-2 w-5/6">
               <div className="divide-y divide-gray-200 dark:divide-gray-800">
                 {subaccounts
                   .slice(0, showSubaccounts ? 10 : 1)
@@ -207,10 +186,7 @@ export default function CanisterDetails({
           </tr>
           {candidEncoded && (
             <tr>
-              <td
-                colSpan={2}
-                className="border border-gray-400 dark:border-gray-600 px-2 py-1 text-sm"
-              >
+              <td colSpan={2} className="px-2 py-1 text-sm">
                 <a
                   className="hover:underline text-blue-600"
                   href={`${CANDID_UI_URL}?id=${canisterId}&did=${candidEncoded}`}

@@ -22,7 +22,7 @@ const Transaction = () => {
   const router = useRouter();
   const [tx, setTx] = useState(null);
   const [accounts, setAccounts] = useState({});
-  const [isValid, setIsValid] = useState(false);
+  const [isValid, setIsValid] = useState(true);
   const [isLoadingTxs, setIsLoadingTxs] = useState(false);
   const { transactionId } = router.query as { transactionId: string };
 
@@ -109,26 +109,18 @@ const Transaction = () => {
       });
   }, []);
 
-  const title = `Transaction ${transactionId}`;
   const date = tx ? DateTime.fromMillis(tx.timestamp / 1e6).toUTC() : null;
 
   return isValid ? (
     <div className="py-16">
       <Head>
         <title>
-          {title} {TITLE_SUFFIX}
+          Transaction {transactionId} {TITLE_SUFFIX}
         </title>
       </Head>
       <h1 className="text-3xl mb-8">Transaction Details</h1>
       <table className="w-full">
-        {/* <thead className="bg-gray-100 dark:bg-gray-700">
-          <tr>
-            <th colSpan={2} className="px-2 py-2">
-              Transaction Details
-            </th>
-          </tr>
-        </thead> */}
-        <tbody className="divide-y divide-gray-400 dark:divide-gray-600">
+        <tbody className="divide-y divide-gray-300 dark:divide-gray-700">
           <tr>
             <td className="px-2 py-2 w-1/6">Hash</td>
             <td className="px-2 py-2 w-5/6">{tx ? tx.tx_hash : null}</td>

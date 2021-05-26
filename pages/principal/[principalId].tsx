@@ -12,7 +12,7 @@ const didc = import("../../lib/didc-js/didc_js");
 const PrincipalPage = () => {
   const router = useRouter();
   const [name, setName] = useState("");
-  const [isValid, setIsValid] = useState(false);
+  const [isValid, setIsValid] = useState(true);
   const [candid, setCandid] = useState("");
   const [bindings, setBindings] = useState(null);
   const { principalId } = router.query as { principalId: string };
@@ -62,13 +62,11 @@ const PrincipalPage = () => {
       });
   }, [principalId]);
 
-  const title = `Principal ${principalId}`;
-
   return isValid ? (
     <div className="py-16">
       <Head>
         <title>
-          {title} {TITLE_SUFFIX}
+          Principal {principalId} {TITLE_SUFFIX}
         </title>
       </Head>
       <h1 className="text-3xl mb-8">

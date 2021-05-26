@@ -14,31 +14,25 @@ export default function CanistersList({
 }) {
   return (
     <div className={className}>
-      <table className="table-auto w-full border-collapse border border-gray-800">
-        <thead className="bg-gray-100 dark:bg-gray-700">
+      <table className="table-auto w-full">
+        <thead className="bg-gray-100 dark:bg-gray-800">
           <tr>
-            <th className="border border-gray-400 dark:border-gray-600 px-2">
-              Canister ID
-            </th>
-            <th className="border border-gray-400 dark:border-gray-600 px-2">
-              Interface
-            </th>
+            <th className="px-2 py-2">Canister ID</th>
+            <th className="px-2 py-2">Interface</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="divide-y divide-gray-300 dark:divide-gray-700">
           {Object.entries(canisters).map(([canisterId, name]) => {
             return (
               <tr key={canisterId} className="">
-                <td className="border border-gray-400 dark:border-gray-600 px-2 font-mono text-sm">
+                <td className="px-2 font-mono text-sm">
                   <Link href={`/principal/${canisterId}`}>
                     <a className="hover:underline text-blue-600">
                       {canisterId}
                     </a>
                   </Link>
                 </td>
-                <td className="border border-gray-400 dark:border-gray-600 px-2">
-                  {name}
-                </td>
+                <td className="px-2">{name}</td>
               </tr>
             );
           })}
