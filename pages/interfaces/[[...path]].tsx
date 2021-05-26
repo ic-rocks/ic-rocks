@@ -138,7 +138,7 @@ const Interfaces = ({ current, children }) => {
       </h1>
       {children ? (
         <section>
-          <ul className="mb-8">
+          <ul className="mb-8 divide-y divide-gray-200 dark:divide-gray-800">
             {children.map((child) => (
               <li key={child}>
                 <Link

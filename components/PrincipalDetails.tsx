@@ -14,7 +14,7 @@ const CANDID_UI_URL = "https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.ic0.app/";
 
 type Type = "Canister" | "User" | "Anonymous" | "Derived";
 
-export default function CanisterDetails({
+export default function PrincipalDetails({
   className,
   canisterId,
   candid,
@@ -108,8 +108,12 @@ export default function CanisterDetails({
 
   return (
     <div className={className}>
-      <table className="w-full">
+      <table className="w-full table-fixed">
         <thead className="bg-gray-100 dark:bg-gray-800">
+          <tr className="invisible">
+            <td className="w-1/6" />
+            <td className="w-5/6" />
+          </tr>
           <tr>
             <th colSpan={2} className="px-2 py-2">
               Overview
@@ -131,15 +135,19 @@ export default function CanisterDetails({
             <>
               <tr>
                 <td className="px-2 py-2 w-1/6">Subnet</td>
-                <td className="px-2 py-2 w-5/6">{data?.subnet || "-"}</td>
+                <td className="px-2 py-2 w-5/6 overflow-hidden overflow-ellipsis">
+                  {data?.subnet || "-"}
+                </td>
               </tr>
               <tr>
                 <td className="px-2 py-2 w-1/6">Module Hash</td>
-                <td className="px-2 py-2 w-5/6">{data?.moduleHash || "-"}</td>
+                <td className="px-2 py-2 w-5/6 overflow-hidden overflow-ellipsis">
+                  {data?.moduleHash || "-"}
+                </td>
               </tr>
               <tr>
                 <td className="px-2 py-2 w-1/6">Controller</td>
-                <td className="px-2 py-2 w-5/6">
+                <td className="px-2 py-2 w-5/6 overflow-hidden overflow-ellipsis">
                   {data?.controller ? (
                     <Link href={`/principal/${data?.controller}`}>
                       <a className="hover:underline text-blue-600">
@@ -155,7 +163,7 @@ export default function CanisterDetails({
           )}
           <tr>
             <td className="px-2 py-2 w-1/6 align-top">Accounts</td>
-            <td className="px-2 py-2 w-5/6">
+            <td className="px-2 py-2 w-5/6 overflow-hidden overflow-ellipsis">
               <div className="divide-y divide-gray-200 dark:divide-gray-800">
                 {subaccounts
                   .slice(0, showSubaccounts ? 10 : 1)

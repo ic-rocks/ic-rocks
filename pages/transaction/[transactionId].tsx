@@ -119,11 +119,13 @@ const Transaction = () => {
         </title>
       </Head>
       <h1 className="text-3xl mb-8">Transaction Details</h1>
-      <table className="w-full">
+      <table className="table-fixed w-full">
         <tbody className="divide-y divide-gray-300 dark:divide-gray-700">
           <tr>
             <td className="px-2 py-2 w-1/6">Hash</td>
-            <td className="px-2 py-2 w-5/6">{tx ? tx.tx_hash : null}</td>
+            <td className="px-2 py-2 w-5/6 overflow-hidden overflow-ellipsis">
+              {tx ? tx.tx_hash : null}
+            </td>
           </tr>
           <tr>
             <td className="px-2 py-2 w-1/6">Block</td>

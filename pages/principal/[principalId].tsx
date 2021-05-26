@@ -2,8 +2,8 @@ import { Principal } from "@dfinity/agent";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
-import CanisterDetails from "../../components/CanisterDetails";
 import CodeBlock from "../../components/CodeBlock";
+import PrincipalDetails from "../../components/PrincipalDetails";
 import Search404 from "../../components/Search404";
 import { TITLE_SUFFIX } from "../../lib/constants";
 
@@ -69,11 +69,11 @@ const PrincipalPage = () => {
           Principal {principalId} {TITLE_SUFFIX}
         </title>
       </Head>
-      <h1 className="text-3xl mb-8">
+      <h1 className="text-3xl mb-8 overflow-hidden overflow-ellipsis">
         Principal <small className="text-2xl">{principalId}</small>
       </h1>
       {isValid && (
-        <CanisterDetails
+        <PrincipalDetails
           candid={candid}
           canisterId={principalId}
           canisterName={name}

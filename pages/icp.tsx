@@ -108,7 +108,7 @@ function Prices() {
     }
 
     if (proposals[0]) {
-      const ts = DateTime.fromSeconds(proposals[0].timestamp_executed);
+      const ts = DateTime.fromSeconds(proposals[0].timestamp_payload);
       timestamp = `${ts.toLocaleString(
         DateTime.DATETIME_SHORT_WITH_SECONDS
       )} (${ts.toRelative()})`;
@@ -116,51 +116,76 @@ function Prices() {
   }
 
   return (
-    <div className="font-mono">
+    <div>
       <Head>
         <title>ICP Price {TITLE_SUFFIX}</title>
       </Head>
       <section className="py-16">
-        <h2 className="text-3xl mb-4">Latest ICP price: {latestPrice}</h2>
-        <h2 className="mb-4">Timestamp: {timestamp}</h2>
-        <h2 className="mb-8">{xdrUsd ? `1 XDR = ${xdrUsd} USD` : null}</h2>
-        <p>
-          Price data is read from the governance canister, and acts as an
-          on-chain oracle of ICP price.
-        </p>
+        <h1 className="text-3xl mb-4">ICP Price Oracle</h1>
+        <table className="w-full">
+          <tbody className="divide-y divide-gray-300 dark:divide-gray-700">
+            <tr>
+              <td className="px-2 py-2 w-1/6">Latest ICP Price</td>
+              <td className="px-2 py-2 w-5/6">{latestPrice}</td>
+            </tr>
+            <tr>
+              <td className="px-2 py-2 w-1/6">Timestamp</td>
+              <td className="px-2 py-2 w-5/6">{timestamp}</td>
+            </tr>
+            <tr>
+              <td className="px-2 py-2 w-1/6">XDR Rate</td>
+              <td className="px-2 py-2 w-5/6">
+                {xdrUsd ? `1 XDR = ${xdrUsd} USD` : null}
+              </td>
+            </tr>
+            <tr>
+              <td colSpan={2} className="px-2 py-2">
+                Price data is read from the governance canister, and acts as an
+                on-chain oracle of ICP price.
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </section>
-      <label className="py-8">Latest {count} price updates:</label>
-      <ul className="list-none">
-        <li className="grid grid-cols-8">
-          <div>ID</div>
-          <div>Proposed Timestamp</div>
-          <div>Executed Timestamp</div>
-          <div>Payload Timestamp</div>
-          <div>ICP Source</div>
-          <div>SDR Source</div>
-          <div>Price (XDR)</div>
-          <div>Price (USD)</div>
-        </li>
-        {proposals.map((proposal) => {
-          return (
-            <li
-              key={proposal.id}
-              className="grid grid-cols-8 gap-1 border-t border-gray-800"
-            >
-              <div>{proposal.id.toString()}</div>
-              <div>{formatTimestamp(proposal.timestamp_proposal)}</div>
-              <div>{formatTimestamp(proposal.timestamp_executed)}</div>
-              <div>{formatTimestamp(proposal.timestamp_payload)}</div>
-              <div>{proposal.source.icp}</div>
-              <div>{proposal.source.sdr}</div>
-              <div>{proposal.icp_xdr.toFixed(4)}</div>
-              <div>
-                {xdrUsd ? `${(xdrUsd * proposal.icp_xdr).toFixed(2)}` : null}
-              </div>
-            </li>
-          );
-        })}
-      </ul>
+      <h2 className="text-xl mb-4">Latest {count} price updates</h2>
+      <table className="table-auto w-full">
+        <thead className="bg-gray-100 dark:bg-gray-800">
+          <tr className="bg-gray-100 dark:bg-gray-800">
+            <th className="px-2 py-2">ID</th>
+            <th className="px-2 py-2">Proposed Timestamp</th>
+            <th className="px-2 py-2">Executed Timestamp</th>
+            <th className="px-2 py-2">Payload Timestamp</th>
+            <th className="px-2 py-2">ICP Source</th>
+            <th className="px-2 py-2">SDR Source</th>
+            <th className="px-2 py-2">Price (XDR)</th>
+            <th className="px-2 py-2">Price (USD)</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-gray-300 dark:divide-gray-700">
+          {proposals.map((proposal) => {
+            return (
+              <tr key={proposal.id}>
+                <td className="px-2 py-2">{proposal.id.toString()}</td>
+                <td className="px-2 py-2">
+                  {formatTimestamp(proposal.timestamp_proposal)}
+                </td>
+                <td className="px-2 py-2">
+                  {formatTimestamp(proposal.timestamp_executed)}
+                </td>
+                <td className="px-2 py-2">
+                  {formatTimestamp(proposal.timestamp_payload)}
+                </td>
+                <td className="px-2 py-2">{proposal.source.icp}</td>
+                <td className="px-2 py-2">{proposal.source.sdr}</td>
+                <td className="px-2 py-2">{proposal.icp_xdr.toFixed(4)}</td>
+                <td className="px-2 py-2">
+                  {xdrUsd ? `${(xdrUsd * proposal.icp_xdr).toFixed(2)}` : null}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
     </div>
   );
 }

@@ -156,11 +156,15 @@ const Account = () => {
           Account {accountId} {TITLE_SUFFIX}
         </title>
       </Head>
-      <h1 className="text-3xl mb-8">
+      <h1 className="text-3xl mb-8 overflow-hidden overflow-ellipsis">
         Account <small className="text-2xl">{accountId}</small>
       </h1>
-      <table className="w-full">
+      <table className="w-full table-fixed">
         <thead className="bg-gray-100 dark:bg-gray-800">
+          <tr className="invisible">
+            <td className="w-1/4" />
+            <td className="w-3/4" />
+          </tr>
           <tr>
             <th colSpan={2} className="px-2 py-2">
               Account Details
@@ -210,12 +214,12 @@ const Account = () => {
       <table className="w-full table-fixed mt-8">
         <thead className="bg-gray-100 dark:bg-gray-800">
           <tr>
-            <th className="text-left px-2 py-2 w-16">Tx Hash</th>
-            <th className="text-left px-2 py-2 w-16">Timestamp</th>
-            <th className="text-left px-2 py-2 w-16">From</th>
-            <th className="text-left px-2 py-2 w-16">To</th>
-            <th className="text-left px-2 py-2 w-16">Amount</th>
-            <th className="text-left px-2 py-2 w-16">Fee</th>
+            <th className="text-left px-2 py-2 w-1/6">Tx Hash</th>
+            <th className="text-left px-2 py-2 w-1/6">Timestamp</th>
+            <th className="text-left px-2 py-2 w-1/6">From</th>
+            <th className="text-left px-2 py-2 w-1/6">To</th>
+            <th className="text-left px-2 py-2 w-1/6">Amount</th>
+            <th className="text-left px-2 py-2 w-1/6">Fee</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-300 dark:divide-gray-700">

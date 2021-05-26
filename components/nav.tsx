@@ -5,7 +5,7 @@ import SearchBar from "./Searchbar";
 export default function Nav() {
   return (
     <nav className="flex justify-center py-4">
-      <div className="flex justify-between sm:max-w-screen-lg sm:w-full px-4">
+      <div className="flex sm:flex-row flex-col items-stretch justify-between sm:max-w-screen-lg w-full px-4">
         <ul className="flex items-center">
           <li className="pr-4">
             <ActiveLink href="/">Home</ActiveLink>

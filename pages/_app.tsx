@@ -1,4 +1,4 @@
-import Nav from "../components/nav";
+import Nav from "../components/Nav";
 import "../styles/index.css";
 
 function MyApp({ Component, pageProps }) {
@@ -6,7 +6,7 @@ function MyApp({ Component, pageProps }) {
     <div>
       <Nav />
       <main className="flex flex-col items-center">
-        <div className="sm:max-w-screen-lg sm:w-full px-4">
+        <div className="sm:max-w-screen-lg w-full px-4">
           <Component {...pageProps} />
         </div>
       </main>

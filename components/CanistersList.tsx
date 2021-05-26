@@ -18,14 +18,14 @@ export default function CanistersList({
         <thead className="bg-gray-100 dark:bg-gray-800">
           <tr>
             <th className="px-2 py-2">Canister ID</th>
-            <th className="px-2 py-2">Interface</th>
+            <th className="px-2 py-2">Name</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-300 dark:divide-gray-700">
           {Object.entries(canisters).map(([canisterId, name]) => {
             return (
-              <tr key={canisterId} className="">
-                <td className="px-2 font-mono text-sm">
+              <tr key={canisterId}>
+                <td className="px-2">
                   <Link href={`/principal/${canisterId}`}>
                     <a className="hover:underline text-blue-600">
                       {canisterId}

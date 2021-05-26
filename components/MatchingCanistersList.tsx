@@ -16,7 +16,7 @@ export default function MatchingCanistersList({
     <div className={classnames(className, "mb-8")}>
       <span>Canisters with this interface:</span>
       {canisterIds.length > 0 ? (
-        <ul className="font-mono">
+        <ul>
           {canisterIds.map((canisterId) => (
             <li key={canisterId}>
               <Link href={`/principal/${canisterId}`}>
