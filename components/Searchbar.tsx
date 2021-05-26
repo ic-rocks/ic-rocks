@@ -9,7 +9,11 @@ export default function SearchBar() {
   };
   const handleSubmit = (e) => {
     e.preventDefault();
-    router.push(`/canister/${input}`);
+    if (input.includes("-")) {
+      router.push(`/principal/${input}`);
+    } else {
+      router.push(`/account/${input}`);
+    }
     setInput("");
   };
 
@@ -19,7 +23,7 @@ export default function SearchBar() {
         type="text"
         name="search"
         className="px-2 py-1 bg-gray-200 dark:bg-gray-800 focus:outline-none focus:border border-black dark:border-gray-200 rounded font-sm w-64"
-        placeholder="Search for canister..."
+        placeholder="Search for principal or account"
         value={input}
         onChange={handleChange}
       />

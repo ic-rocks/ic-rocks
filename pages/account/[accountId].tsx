@@ -1,59 +1,20 @@
 import { Actor, blobFromHex, HttpAgent } from "@dfinity/agent";
 import { getCrc32 } from "@dfinity/agent/lib/cjs/utils/getCrc";
+import classnames from "classnames";
 import { DateTime } from "luxon";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
+import Search404 from "../../components/Search404";
 import ledgerIdl from "../../lib/canisters/ledger.did";
-import nnsUiIdl from "../../lib/canisters/nns-ui.did";
 import { TITLE_SUFFIX } from "../../lib/constants";
-
-type TransactionResult = {
-  transactions: {
-    block_identifier: {
-      index: number;
-      hash: string;
-    };
-    transaction: {
-      transaction_identifier: {
-        hash: string;
-      };
-      operations: {
-        operation_identifier: {
-          index: number;
-        };
-        type: string;
-        status: string;
-        account: {
-          address: string;
-        };
-        amount: {
-          value: string;
-          currency: {
-            symbol: string;
-            decimals: number;
-          };
-        };
-      }[];
-      metadata: {
-        block_height: number;
-        memo: number;
-        timestamp: number;
-      };
-    };
-  }[];
-  total_count: number;
-};
+import { TransactionResult } from "../../lib/types/TransactionResult";
 
 const agent = new HttpAgent({ host: "https://ic0.app" });
 const ledger = Actor.createActor(ledgerIdl, {
   agent,
   canisterId: "ryjl3-tyaaa-aaaaa-aaaba-cai",
-});
-const nnsUi = Actor.createActor(nnsUiIdl, {
-  agent,
-  canisterId: "qoctq-giaaa-aaaaa-aaaea-cai",
 });
 
 const Account = () => {
@@ -69,10 +30,15 @@ const Account = () => {
     setBalance(null);
     setTxs(null);
 
-    const blob = blobFromHex(accountId);
-    const crc32Buf = Buffer.alloc(4);
-    crc32Buf.writeUInt32BE(getCrc32(blob.slice(4)));
-    const valid = blob.slice(0, 4).toString() === crc32Buf.toString();
+    let valid = false;
+    try {
+      const blob = blobFromHex(accountId);
+      const crc32Buf = Buffer.alloc(4);
+      crc32Buf.writeUInt32BE(getCrc32(blob.slice(4)));
+      valid = blob.slice(0, 4).toString() === crc32Buf.toString();
+    } catch (error) {
+      console.warn(error);
+    }
     setIsValid(valid);
 
     if (valid) {
@@ -84,6 +50,7 @@ const Account = () => {
 
         fetch("https://rosetta-api.internetcomputer.org/search/transactions", {
           body: JSON.stringify({
+            limit: 25,
             network_identifier: {
               blockchain: "Internet Computer",
               network: "00000000000000020101",
@@ -116,9 +83,9 @@ const Account = () => {
     }
   }, [accountId]);
 
-  const title = isValid ? `Account ${accountId}` : "Account not found";
+  const title = `Account ${accountId}`;
 
-  return (
+  return isValid ? (
     <div className="py-16">
       <Head>
         <title>
@@ -126,13 +93,7 @@ const Account = () => {
         </title>
       </Head>
       <h1 className="text-3xl mb-8">
-        {isValid ? (
-          <>
-            Account <small className="text-2xl">{accountId}</small>
-          </>
-        ) : (
-          title
-        )}
+        Account <small className="text-2xl">{accountId}</small>
       </h1>
       <table className="w-full border-collapse border border-gray-800">
         <thead className="bg-gray-100 dark:bg-gray-700">
@@ -150,8 +111,15 @@ const Account = () => {
             <td className="border border-gray-400 dark:border-gray-600 px-2 w-1/4">
               Balance
             </td>
-            <td className="border border-gray-400 dark:border-gray-600 px-2 font-mono w-3/4">
-              {balance != null ? (Number(balance) / 1e8).toFixed(8) : "-"}
+            <td className="border border-gray-400 dark:border-gray-600 px-2 w-3/4">
+              {balance != null ? (
+                <>
+                  {(Number(balance) / 1e8).toFixed(8)}{" "}
+                  <span className="text-xs">ICP</span>
+                </>
+              ) : (
+                "-"
+              )}
             </td>
           </tr>
         </tbody>
@@ -183,25 +151,31 @@ const Account = () => {
                     <td className="px-2 py-2 overflow-hidden overflow-ellipsis">
                       {DateTime.fromMillis(tx.timestamp / 1e6).toRelative()}
                     </td>
-                    <td className="px-2 py-2 overflow-hidden overflow-ellipsis">
+                    <td
+                      className={classnames(
+                        "px-2 py-2 overflow-hidden overflow-ellipsis",
+                        { "text-blue-600": tx.from !== accountId }
+                      )}
+                    >
                       {tx.from === accountId ? (
                         tx.from
                       ) : (
                         <Link href={`/account/${tx.from}`}>
-                          <a className="hover:underline text-blue-600">
-                            {tx.from}
-                          </a>
+                          <a className="hover:underline">{tx.from}</a>
                         </Link>
                       )}
                     </td>
-                    <td className="px-2 py-2 overflow-hidden overflow-ellipsis">
+                    <td
+                      className={classnames(
+                        "px-2 py-2 overflow-hidden overflow-ellipsis",
+                        { "text-blue-600": tx.to !== accountId }
+                      )}
+                    >
                       {tx.to === accountId ? (
                         tx.to
                       ) : (
                         <Link href={`/account/${tx.to}`}>
-                          <a className="hover:underline text-blue-600">
-                            {tx.to}
-                          </a>
+                          <a className="hover:underline">{tx.to}</a>
                         </Link>
                       )}
                     </td>
@@ -233,6 +207,8 @@ const Account = () => {
         </tbody>
       </table>
     </div>
+  ) : (
+    <Search404 input={accountId} />
   );
 };
 

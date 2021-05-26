@@ -19,7 +19,7 @@ export default function MatchingCanistersList({
         <ul className="font-mono">
           {canisterIds.map((canisterId) => (
             <li key={canisterId}>
-              <Link href={`/canister/${canisterId}`}>
+              <Link href={`/principal/${canisterId}`}>
                 <a className="hover:underline text-blue-600">{canisterId}</a>
               </Link>
             </li>

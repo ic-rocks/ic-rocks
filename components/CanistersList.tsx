@@ -30,7 +30,7 @@ export default function CanistersList({
             return (
               <tr key={canisterId} className="">
                 <td className="border border-gray-400 dark:border-gray-600 px-2 font-mono text-sm">
-                  <Link href={`/canister/${canisterId}`}>
+                  <Link href={`/principal/${canisterId}`}>
                     <a className="hover:underline text-blue-600">
                       {canisterId}
                     </a>

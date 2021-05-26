@@ -1,5 +1,4 @@
 import {
-  Actor,
   blobFromBuffer,
   blobFromText,
   Certificate,
@@ -10,14 +9,8 @@ import { getCrc32 } from "@dfinity/agent/lib/cjs/utils/getCrc.js";
 import { sha224 } from "@dfinity/agent/lib/cjs/utils/sha224.js";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
-import ledgerIdl from "../lib/canisters/ledger.did";
 
 const CANDID_UI_URL = "https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.ic0.app/";
-const agent = new HttpAgent({ host: "https://ic0.app" });
-const ledger = Actor.createActor(ledgerIdl, {
-  agent,
-  canisterId: "ryjl3-tyaaa-aaaaa-aaaba-cai",
-});
 
 type Type = "Canister" | "User" | "Anonymous" | "Derived";
 
@@ -38,12 +31,16 @@ export default function CanisterDetails({
   const [showSubaccounts, setShowSubaccounts] = useState(false);
 
   useEffect(() => {
-    if (!canisterId) return;
-
     setData(null);
     setShowSubaccounts(false);
 
-    const principal = Principal.fromText(canisterId).toBlob();
+    let principal;
+    try {
+      principal = Principal.fromText(canisterId).toBlob();
+    } catch (error) {
+      return;
+    }
+
     let type_ = "Canister";
     switch (principal.slice(-1)[0]) {
       case 1:
@@ -116,7 +113,7 @@ export default function CanisterDetails({
           <tr>
             <th
               colSpan={2}
-              className="border border-gray-400 dark:border-gray-600 px-2"
+              className="border border-gray-400 dark:border-gray-600 px-2 py-2"
             >
               Overview
             </th>
@@ -163,7 +160,7 @@ export default function CanisterDetails({
                 </td>
                 <td className="border border-gray-400 dark:border-gray-600 px-2 font-mono text-sm w-5/6">
                   {data?.controller ? (
-                    <Link href={`/canister/${data?.controller}`}>
+                    <Link href={`/principal/${data?.controller}`}>
                       <a className="hover:underline text-blue-600">
                         {data?.controller}
                       </a>
@@ -180,7 +177,7 @@ export default function CanisterDetails({
               Accounts
             </td>
             <td className="border border-gray-400 dark:border-gray-600 px-2 text-sm w-5/6">
-              <div className="divide-y divide-gray-200 font-mono">
+              <div className="divide-y divide-gray-200 dark:divide-gray-800 font-mono">
                 {subaccounts
                   .slice(0, showSubaccounts ? 10 : 1)
                   .map((subaccount, index) => {
@@ -192,7 +189,7 @@ export default function CanisterDetails({
                           </a>
                         </Link>
                         {showSubaccounts && (
-                          <span className="w-8 px-2 text-right text-gray-400">
+                          <span className="w-8 px-2 text-right text-gray-400 dark:text-gray-600">
                             {index}
                           </span>
                         )}

@@ -4,27 +4,28 @@ import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import CanisterDetails from "../../components/CanisterDetails";
 import CodeBlock from "../../components/CodeBlock";
+import Search404 from "../../components/Search404";
 import { TITLE_SUFFIX } from "../../lib/constants";
 
 const didc = import("../../lib/didc-js/didc_js");
 
-const Canister = () => {
+const PrincipalPage = () => {
   const router = useRouter();
   const [name, setName] = useState("");
   const [isValid, setIsValid] = useState(false);
   const [candid, setCandid] = useState("");
   const [bindings, setBindings] = useState(null);
-  const { canisterId } = router.query as { canisterId: string };
+  const { principalId } = router.query as { principalId: string };
 
   useEffect(() => {
-    if (typeof canisterId !== "string" || !canisterId) return;
+    if (typeof principalId !== "string" || !principalId) return;
 
     setName("");
     setCandid("");
     setBindings(null);
 
     try {
-      Principal.fromText(canisterId);
+      Principal.fromText(principalId);
       setIsValid(true);
     } catch (error) {
       setIsValid(false);
@@ -35,7 +36,7 @@ const Canister = () => {
     fetch("/interfaces/canisters.json")
       .then((res) => res.json())
       .then((json) => {
-        const name = json[canisterId];
+        const name = json[principalId];
         setName(name);
 
         if (name) {
@@ -59,11 +60,11 @@ const Canister = () => {
           setCandid("");
         }
       });
-  }, [canisterId]);
+  }, [principalId]);
 
-  const title = isValid ? `Principal ${canisterId}` : "Principal not found";
+  const title = `Principal ${principalId}`;
 
-  return (
+  return isValid ? (
     <div className="py-16">
       <Head>
         <title>
@@ -71,18 +72,12 @@ const Canister = () => {
         </title>
       </Head>
       <h1 className="text-3xl mb-8">
-        {isValid ? (
-          <>
-            Principal <small className="text-2xl">{canisterId}</small>
-          </>
-        ) : (
-          title
-        )}
+        Principal <small className="text-2xl">{principalId}</small>
       </h1>
       {isValid && (
         <CanisterDetails
           candid={candid}
-          canisterId={canisterId}
+          canisterId={principalId}
           canisterName={name}
           className="mb-8"
         />
@@ -91,7 +86,9 @@ const Canister = () => {
         <CodeBlock candid={candid} bindings={bindings} className="mb-8" />
       )}
     </div>
+  ) : (
+    <Search404 input={principalId} />
   );
 };
 
-export default Canister;
+export default PrincipalPage;
