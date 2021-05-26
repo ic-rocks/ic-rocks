@@ -8,7 +8,7 @@ import { TITLE_SUFFIX } from "../../lib/constants";
 
 const didc = import("../../lib/didc-js/didc_js");
 
-const Interfaces = () => {
+const Canister = () => {
   const router = useRouter();
   const [name, setName] = useState("");
   const [isValid, setIsValid] = useState(false);
@@ -19,12 +19,15 @@ const Interfaces = () => {
   useEffect(() => {
     if (typeof canisterId !== "string" || !canisterId) return;
 
+    setName("");
+    setCandid("");
+    setBindings(null);
+
     try {
       Principal.fromText(canisterId);
       setIsValid(true);
     } catch (error) {
       setIsValid(false);
-      setCandid("");
       console.warn(error);
       return;
     }
@@ -58,7 +61,7 @@ const Interfaces = () => {
       });
   }, [canisterId]);
 
-  const title = isValid ? `Canister ${canisterId}` : "Canister not found";
+  const title = isValid ? `Principal ${canisterId}` : "Principal not found";
 
   return (
     <div className="py-16">
@@ -67,7 +70,15 @@ const Interfaces = () => {
           {title} {TITLE_SUFFIX}
         </title>
       </Head>
-      <h1 className="text-3xl mb-8">{title}</h1>
+      <h1 className="text-3xl mb-8">
+        {isValid ? (
+          <>
+            Principal <small className="text-2xl">{canisterId}</small>
+          </>
+        ) : (
+          title
+        )}
+      </h1>
       {isValid && (
         <CanisterDetails
           candid={candid}
@@ -83,4 +94,4 @@ const Interfaces = () => {
   );
 };
 
-export default Interfaces;
+export default Canister;

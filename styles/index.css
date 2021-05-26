@@ -17,3 +17,7 @@
     url("../public/fonts/Aestetico-Bold/font.woff") format("woff");
   font-weight: 700;
 }
+
+th {
+  text-align: left;
+}

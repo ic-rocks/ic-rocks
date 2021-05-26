@@ -23,6 +23,7 @@
     "use-dark-mode": "^2.3.1"
   },
   "devDependencies": {
+    "@types/luxon": "^1.26.5",
     "@types/react": "^17.0.6",
     "postcss-preset-env": "^6.7.0",
     "tailwindcss": "^2.1.2",
