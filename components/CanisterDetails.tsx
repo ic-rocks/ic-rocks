@@ -124,7 +124,7 @@ export default function CanisterDetails({
             <td className="border border-gray-400 dark:border-gray-600 px-2 w-1/6">
               Name
             </td>
-            <td className="border border-gray-400 dark:border-gray-600 px-2 font-mono text-sm w-5/6">
+            <td className="border border-gray-400 dark:border-gray-600 px-2 w-5/6">
               {canisterName ? canisterName : "Unknown"}
             </td>
           </tr>
@@ -132,7 +132,7 @@ export default function CanisterDetails({
             <td className="border border-gray-400 dark:border-gray-600 px-2 w-1/6">
               Type
             </td>
-            <td className="border border-gray-400 dark:border-gray-600 px-2 font-mono text-sm w-5/6">
+            <td className="border border-gray-400 dark:border-gray-600 px-2 w-5/6">
               {type}
             </td>
           </tr>
@@ -142,7 +142,7 @@ export default function CanisterDetails({
                 <td className="border border-gray-400 dark:border-gray-600 px-2 w-1/6">
                   Subnet
                 </td>
-                <td className="border border-gray-400 dark:border-gray-600 px-2 font-mono text-sm w-5/6">
+                <td className="border border-gray-400 dark:border-gray-600 px-2 w-5/6">
                   {data?.subnet || "-"}
                 </td>
               </tr>
@@ -150,7 +150,7 @@ export default function CanisterDetails({
                 <td className="border border-gray-400 dark:border-gray-600 px-2 w-1/6">
                   Module Hash
                 </td>
-                <td className="border border-gray-400 dark:border-gray-600 px-2 font-mono text-sm w-5/6">
+                <td className="border border-gray-400 dark:border-gray-600 px-2 w-5/6">
                   {data?.moduleHash || "-"}
                 </td>
               </tr>
@@ -158,7 +158,7 @@ export default function CanisterDetails({
                 <td className="border border-gray-400 dark:border-gray-600 px-2 w-1/6">
                   Controller
                 </td>
-                <td className="border border-gray-400 dark:border-gray-600 px-2 font-mono text-sm w-5/6">
+                <td className="border border-gray-400 dark:border-gray-600 px-2 w-5/6">
                   {data?.controller ? (
                     <Link href={`/principal/${data?.controller}`}>
                       <a className="hover:underline text-blue-600">
@@ -176,8 +176,8 @@ export default function CanisterDetails({
             <td className="border border-gray-400 dark:border-gray-600 px-2 w-1/6 align-top">
               Accounts
             </td>
-            <td className="border border-gray-400 dark:border-gray-600 px-2 text-sm w-5/6">
-              <div className="divide-y divide-gray-200 dark:divide-gray-800 font-mono">
+            <td className="border border-gray-400 dark:border-gray-600 px-2 w-5/6">
+              <div className="divide-y divide-gray-200 dark:divide-gray-800">
                 {subaccounts
                   .slice(0, showSubaccounts ? 10 : 1)
                   .map((subaccount, index) => {

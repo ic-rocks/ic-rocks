@@ -10,11 +10,9 @@ import { FiFilePlus } from "react-icons/fi";
 import ActiveLink from "../../components/ActiveLink";
 import CodeBlock from "../../components/CodeBlock";
 import MatchingCanistersList from "../../components/MatchingCanistersList";
-import { TITLE_SUFFIX } from "../../lib/constants";
+import { GITHUB_REPO, TITLE_SUFFIX } from "../../lib/constants";
 
 const didc = import("../../lib/didc-js/didc_js");
-const GITHUB_REPO = "https://github.com/ic-cubes/ic-tools";
-
 export async function getStaticPaths() {
   const base = `${process.cwd()}/public/interfaces`;
   const paths = glob

@@ -12,8 +12,8 @@ export type TransactionResult = {
         operation_identifier: {
           index: number;
         };
-        type: string;
-        status: string;
+        type: "TRANSACTION" | "FEE" | "MINT" | "BURN";
+        status: "COMPLETED";
         account: {
           address: string;
         };

@@ -19,5 +19,9 @@
 }
 
 th {
-  text-align: left;
+  @apply text-left;
+}
+
+button {
+  @apply focus:outline-none;
 }
