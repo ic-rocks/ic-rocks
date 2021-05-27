@@ -1,4 +1,4 @@
-export const TITLE = "IC Tools";
+export const TITLE = "ic.rocks";
 
 export const TITLE_SUFFIX = "| " + TITLE;
 
