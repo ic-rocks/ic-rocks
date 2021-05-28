@@ -151,7 +151,7 @@ const Account = () => {
 
   return isValid ? (
     <div className="py-16">
-      <MetaTitle title={`Account ${accountId}`} />
+      <MetaTitle title={`Account${accountId ? ` ${accountId}` : ""}`} />
       <h1 className="text-3xl mb-8 overflow-hidden overflow-ellipsis">
         Account <small className="text-2xl">{accountId}</small>
       </h1>

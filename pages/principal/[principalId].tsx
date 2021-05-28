@@ -1,5 +1,4 @@
 import { Principal } from "@dfinity/agent";
-import Head from "next/head";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import CodeBlock from "../../components/CodeBlock";
@@ -64,7 +63,7 @@ const PrincipalPage = () => {
 
   return isValid ? (
     <div className="py-16">
-      <MetaTitle title={`Principal ${principalId}`} />
+      <MetaTitle title={`Principal${principalId ? ` ${principalId}` : ""}`} />
       <h1 className="text-3xl mb-8 overflow-hidden overflow-ellipsis">
         Principal <small className="text-2xl">{principalId}</small>
       </h1>

@@ -112,7 +112,9 @@ const Transaction = () => {
 
   return isValid ? (
     <div className="py-16">
-      <MetaTitle title={`Transaction ${transactionId}`} />
+      <MetaTitle
+        title={`Transaction${transactionId ? ` ${transactionId}` : ""}`}
+      />
       <h1 className="text-3xl mb-8">Transaction Details</h1>
       <table className="table-fixed w-full">
         <tbody className="divide-y divide-gray-300 dark:divide-gray-700">
