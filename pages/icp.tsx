@@ -1,10 +1,9 @@
 import { Actor, HttpAgent, IDL } from "@dfinity/agent";
 import { DateTime } from "luxon";
-import Head from "next/head";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { MetaTitle } from "../components/MetaTags";
 import governanceIdl from "../lib/canisters/governance.did";
 import nnsUiIdl from "../lib/canisters/nns-ui.did";
-import { TITLE_SUFFIX } from "../lib/constants";
 import useInterval from "../lib/useInterval";
 declare const Buffer;
 
@@ -117,9 +116,7 @@ function Prices() {
 
   return (
     <div>
-      <Head>
-        <title>ICP Price {TITLE_SUFFIX}</title>
-      </Head>
+      <MetaTitle title="ICP Price" />
       <section className="py-16">
         <h1 className="text-3xl mb-4">ICP Price Oracle</h1>
         <table className="w-full">

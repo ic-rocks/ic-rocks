@@ -3,9 +3,9 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import CodeBlock from "../../components/CodeBlock";
+import { MetaTitle } from "../../components/MetaTags";
 import PrincipalDetails from "../../components/PrincipalDetails";
 import Search404 from "../../components/Search404";
-import { TITLE_SUFFIX } from "../../lib/constants";
 
 const didc = import("../../lib/didc-js/didc_js");
 
@@ -64,11 +64,7 @@ const PrincipalPage = () => {
 
   return isValid ? (
     <div className="py-16">
-      <Head>
-        <title>
-          Principal {principalId} {TITLE_SUFFIX}
-        </title>
-      </Head>
+      <MetaTitle title={`Principal ${principalId}`} />
       <h1 className="text-3xl mb-8 overflow-hidden overflow-ellipsis">
         Principal <small className="text-2xl">{principalId}</small>
       </h1>

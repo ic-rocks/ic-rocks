@@ -1,6 +1,5 @@
 import fs from "fs";
 import glob from "glob";
-import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import path from "path";
@@ -10,7 +9,8 @@ import { FiFilePlus } from "react-icons/fi";
 import ActiveLink from "../../components/ActiveLink";
 import CodeBlock from "../../components/CodeBlock";
 import MatchingCanistersList from "../../components/MatchingCanistersList";
-import { GITHUB_REPO, TITLE_SUFFIX } from "../../lib/constants";
+import { MetaTitle } from "../../components/MetaTags";
+import { GITHUB_REPO } from "../../lib/constants";
 
 const didc = import("../../lib/didc-js/didc_js");
 export async function getStaticPaths() {
@@ -121,11 +121,7 @@ const Interfaces = ({ current, children }) => {
 
   return (
     <div className="py-16">
-      <Head>
-        <title>
-          interfaces{current ? "/" + current : ""} {TITLE_SUFFIX}
-        </title>
-      </Head>
+      <MetaTitle title={`interfaces${current ? "/" + current : ""}`} />
       <h1 className="text-3xl mb-8">
         <ActiveLink
           href="/interfaces"

@@ -2,7 +2,6 @@ import { Actor, blobFromHex, HttpAgent } from "@dfinity/agent";
 import { getCrc32 } from "@dfinity/agent/lib/cjs/utils/getCrc";
 import classnames from "classnames";
 import { DateTime } from "luxon";
-import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
@@ -13,10 +12,11 @@ import {
   FiChevronsLeft,
   FiChevronsRight,
 } from "react-icons/fi";
+import { MetaTitle } from "../../components/MetaTags";
 import Search404 from "../../components/Search404";
 import { TransactionTypeLabel } from "../../components/TransactionTypeLabel";
 import ledgerIdl from "../../lib/canisters/ledger.did";
-import { GITHUB_REPO, TITLE_SUFFIX } from "../../lib/constants";
+import { GITHUB_REPO } from "../../lib/constants";
 import { formatNumber } from "../../lib/numbers";
 import { TransactionResult } from "../../lib/types/TransactionResult";
 
@@ -151,11 +151,7 @@ const Account = () => {
 
   return isValid ? (
     <div className="py-16">
-      <Head>
-        <title>
-          Account {accountId} {TITLE_SUFFIX}
-        </title>
-      </Head>
+      <MetaTitle title={`Account ${accountId}`} />
       <h1 className="text-3xl mb-8 overflow-hidden overflow-ellipsis">
         Account <small className="text-2xl">{accountId}</small>
       </h1>

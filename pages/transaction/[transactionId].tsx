@@ -1,14 +1,13 @@
 import { Actor, HttpAgent } from "@dfinity/agent";
 import classnames from "classnames";
 import { DateTime } from "luxon";
-import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
+import { MetaTitle } from "../../components/MetaTags";
 import Search404 from "../../components/Search404";
 import { TransactionTypeLabel } from "../../components/TransactionTypeLabel";
 import ledgerIdl from "../../lib/canisters/ledger.did";
-import { TITLE_SUFFIX } from "../../lib/constants";
 import { formatNumber } from "../../lib/numbers";
 import { TransactionResult } from "../../lib/types/TransactionResult";
 
@@ -113,11 +112,7 @@ const Transaction = () => {
 
   return isValid ? (
     <div className="py-16">
-      <Head>
-        <title>
-          Transaction {transactionId} {TITLE_SUFFIX}
-        </title>
-      </Head>
+      <MetaTitle title={`Transaction ${transactionId}`} />
       <h1 className="text-3xl mb-8">Transaction Details</h1>
       <table className="table-fixed w-full">
         <tbody className="divide-y divide-gray-300 dark:divide-gray-700">
