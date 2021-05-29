@@ -1,4 +1,5 @@
 import { Actor, HttpAgent, IDL } from "@dfinity/agent";
+import classNames from "classnames";
 import { del, set } from "object-path-immutable";
 import React, { useCallback, useEffect, useReducer, useState } from "react";
 import { BsArrowReturnRight } from "react-icons/bs";
@@ -6,12 +7,12 @@ import { CgSpinner } from "react-icons/cg";
 import { FiExternalLink } from "react-icons/fi";
 import { any, getShortname, validate } from "../lib/candid/utils";
 import { Bindings } from "../lib/didc-js/didc_js";
-import { DELETE_ITEM, Input, Output } from "./candid/Elements";
+import { DELETE_ITEM, Input, Output, OUTPUT_DISPLAYS } from "./candid/Elements";
 
 const CANDID_UI_URL = "https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.ic0.app/";
 const agent = new HttpAgent({ host: "https://ic0.app" });
 
-export type Type = "loading" | "input" | "output" | "error";
+export type Type = "loading" | "input" | "output" | "error" | "outputDisplay";
 
 function reducer(
   state,
@@ -28,6 +29,14 @@ function reducer(
         ...state,
         isLoading: {
           ...state.isLoading,
+          [func]: payload,
+        },
+      };
+    case "outputDisplay":
+      return {
+        ...state,
+        outputDisplays: {
+          ...state.outputDisplays,
           [func]: payload,
         },
       };
@@ -86,6 +95,7 @@ export default function CandidUI({
     inputs: {},
     errors: {},
     outputs: {},
+    outputDisplays: {},
     history: [],
   });
 
@@ -177,6 +187,9 @@ export default function CandidUI({
       </div>
       {methods.map(([funcName, func]) => {
         const isQuery = func.annotations[0] === "query";
+        const outputDisplay =
+          state.outputDisplays[funcName] || OUTPUT_DISPLAYS[0];
+
         return (
           <form
             key={funcName}
@@ -225,13 +238,37 @@ export default function CandidUI({
                   "Call"
                 )}
               </button>
-              <p className="mt-2 text-xs italic text-gray-500">
-                <BsArrowReturnRight className="inline" />
-                {func.retTypes.length ? getShortname(func.retTypes[0]) : "()"}
-              </p>
+              <div className="mt-2 flex items-center">
+                <span className="text-xs italic text-gray-500">
+                  <BsArrowReturnRight className="inline" />
+                  {func.retTypes.length ? getShortname(func.retTypes[0]) : "()"}
+                </span>
+                {state.outputs[funcName] && !state.outputs[funcName].err && (
+                  <div className="text-xs ml-2">
+                    {OUTPUT_DISPLAYS.map((display) => (
+                      <button
+                        type="button"
+                        className={classNames("px-1 py-0.5 btn-default", {
+                          "text-gray-500": display !== outputDisplay,
+                        })}
+                        onClick={() =>
+                          dispatch({
+                            type: "outputDisplay",
+                            func: funcName,
+                            payload: display,
+                          })
+                        }
+                      >
+                        {display}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
               {state.outputs[funcName] ? (
                 <div className="mt-1">
                   <Output
+                    display={outputDisplay}
                     type={func.retTypes[0]}
                     value={state.outputs[funcName]}
                   />

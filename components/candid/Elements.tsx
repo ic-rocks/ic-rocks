@@ -11,6 +11,14 @@ import {
 
 export const DELETE_ITEM = Symbol("DELETE_ITEM");
 
+export const OUTPUT_DISPLAYS = ["Pretty", "JSON", "Candid", "Raw"] as const;
+
+const Nested = ({ children }) => (
+  <div className="pl-2 border-l border-gray-300 dark:border-gray-700">
+    {children}
+  </div>
+);
+
 export const Input = ({
   argName,
   path = [],
@@ -48,7 +56,7 @@ export const Input = ({
     return (
       <div className={className}>
         {label}
-        <div className="pl-2 border-l border-gray-300 dark:border-gray-700">
+        <Nested>
           {fields.map(([fieldName, fieldType], i) => (
             <Input
               key={fieldName}
@@ -61,7 +69,7 @@ export const Input = ({
               handleInput={handleInput}
             />
           ))}
-        </div>
+        </Nested>
       </div>
     );
   }
@@ -71,7 +79,7 @@ export const Input = ({
     return (
       <div className={className}>
         {label}
-        <div className="pl-2 border-l border-gray-300 dark:border-gray-700">
+        <Nested>
           {vec.map((_, i) => (
             <div className="flex items-start mb-1" key={i}>
               <button
@@ -108,7 +116,7 @@ export const Input = ({
             </button>
             <label className="text-xs italic text-gray-500">Add item</label>
           </div>
-        </div>
+        </Nested>
       </div>
     );
   }
@@ -222,34 +230,209 @@ export const Input = ({
   );
 };
 
-export const Output = ({
-  type,
-  value: { res, err },
+type OUTPUT_DISPLAY = "raw" | "parsed";
+
+const EmptyOutput = ({ value = "empty" }) => (
+  <span className="text-gray-500">{value}</span>
+);
+
+const OutputWrapper = ({
+  value,
+  className,
 }: {
-  type: IDL.Type;
-  value: any;
+  value: string;
+  className?: string;
 }) => {
-  if (err) {
+  if (value.length > 50) {
     return (
-      <pre className="border border-gray-300 dark:border-gray-700 p-1 whitespace-pre-wrap text-xs text-red-500">
-        {err}
+      <pre
+        style={{ maxHeight: "12rem" }}
+        className={classNames(
+          className,
+          "border border-gray-300 dark:border-gray-700 p-1 whitespace-pre-wrap break-all text-xs overflow-auto"
+        )}
+      >
+        {value}
       </pre>
     );
-  } else {
+  }
+  return <>{value}</>;
+};
+
+export const Output = ({
+  type,
+  argName,
+  value: { res, err },
+  showLabel = true,
+  display,
+}: {
+  type: IDL.Type;
+  argName?: string;
+  value: any;
+  showLabel?: boolean;
+  display: typeof OUTPUT_DISPLAYS[number];
+}) => {
+  if (err) {
+    return <OutputWrapper value={err} className="text-red-500" />;
+  }
+
+  if (display === "Candid") {
+    return <OutputWrapper value={IDL.FuncClass.argsToString([type], [res])} />;
+  } else if (display === "JSON") {
+    return <OutputWrapper value={stringify(res)} />;
+  } else if (display === "Raw") {
+    return (
+      <OutputWrapper value={"0x" + type.encodeValue(res).toString("hex")} />
+    );
+  }
+
+  const shortname = getShortname(type);
+  const description = argName != null ? `${argName} (${shortname})` : shortname;
+  const label = (
+    <label className="block text-xs italic text-gray-500">{description}</label>
+  );
+
+  if (type instanceof IDL.VecClass) {
     if (
-      type instanceof IDL.FixedNatClass ||
-      type instanceof IDL.FixedIntClass
+      type["_type"] instanceof IDL.FixedNatClass ||
+      type["_type"] instanceof IDL.FixedIntClass
     ) {
-      return res.toString();
+      if (type["_type"].name === "nat8") {
+        // buffer
+        return (
+          <div>
+            {label}
+            <OutputWrapper value={"0x" + Buffer.from(res).toString("hex")} />
+          </div>
+        );
+      } else {
+        return (
+          <div>
+            {label}
+            <OutputWrapper value={stringify(res)} />
+          </div>
+        );
+      }
+    } else {
+      if (res.length) {
+        return (
+          <div>
+            {label}
+            <Nested>
+              {res.map((r, i) => (
+                <div key={i} className="mb-2">
+                  <Output
+                    type={type["_type"]}
+                    argName={i}
+                    value={{ res: r }}
+                    display={display}
+                  />
+                </div>
+              ))}
+            </Nested>
+          </div>
+        );
+      } else {
+        return (
+          <div>
+            {label}
+            <EmptyOutput value="[]" />
+          </div>
+        );
+      }
+    }
+  } else if (type instanceof IDL.RecordClass || type instanceof IDL.RecClass) {
+    const fields =
+      type instanceof IDL.RecClass ? type["_type"]["_fields"] : type["_fields"];
+    const isTuple = type instanceof IDL.TupleClass;
+    return (
+      <Nested>
+        {fields.map(([fieldName, fieldType], i) => {
+          const key = isTuple ? i : fieldName;
+          return (
+            <div key={key}>
+              <Output
+                type={fieldType}
+                argName={key}
+                value={{ res: res[key] }}
+                display={display}
+              />
+            </div>
+          );
+        })}
+      </Nested>
+    );
+  } else if (type instanceof IDL.VariantClass) {
+    const selectedName = Object.keys(res)[0];
+    const selectedField = type["_fields"].find(
+      ([name]) => name === selectedName
+    );
+
+    return (
+      <div>
+        <div>{showLabel && label}</div>
+        <div>{selectedName}</div>
+        {!(selectedField[1] instanceof IDL.NullClass) && (
+          <Output
+            type={selectedField[1]}
+            argName={selectedName}
+            value={{ res: res[selectedName] }}
+            display={display}
+          />
+        )}
+      </div>
+    );
+  } else if (type instanceof IDL.OptClass) {
+    if (res.length === 0) {
+      return (
+        <div>
+          {label}
+          <EmptyOutput />
+        </div>
+      );
     } else {
       return (
-        <pre
-          className="border border-gray-300 dark:border-gray-700 p-1 overflow-auto text-xs"
-          style={{ maxHeight: "12rem" }}
-        >
-          {stringify(res)}
-        </pre>
+        <div>
+          {label}
+          <Output
+            type={type["_type"]}
+            value={{ res: res[0] }}
+            showLabel={false}
+            display={display}
+          />
+        </div>
       );
     }
+  } else if (
+    type instanceof IDL.FixedNatClass ||
+    type instanceof IDL.FixedIntClass
+  ) {
+    return (
+      <div>
+        {label}
+        {res.toString()}
+      </div>
+    );
+  } else if (type instanceof IDL.TextClass) {
+    return (
+      <div>
+        {label}
+        {res.length ? res : <EmptyOutput />}
+      </div>
+    );
+  } else if (type instanceof IDL.PrincipalClass) {
+    return (
+      <div>
+        {label}
+        {res.toText()}
+      </div>
+    );
+  } else {
+    return (
+      <div>
+        {label}
+        <OutputWrapper value={stringify(res)} />
+      </div>
+    );
   }
 };

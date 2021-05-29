@@ -79,6 +79,7 @@ const PrincipalPage = () => {
         <>
           {bindings && (
             <CandidUI
+              candid={candid}
               canisterId={principalId}
               jsBindings={bindings.js}
               className="mb-8"
