@@ -1,5 +1,5 @@
 import { IDL, Principal } from "@dfinity/agent";
-import { pluralize } from "../pluralize";
+import { pluralize } from "../strings";
 
 export const any = (arr: any[]): boolean =>
   arr.reduce((prev, curr) => prev || curr, false);

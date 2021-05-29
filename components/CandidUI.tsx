@@ -247,6 +247,7 @@ export default function CandidUI({
                   <div className="text-xs ml-2">
                     {OUTPUT_DISPLAYS.map((display) => (
                       <button
+                        key={display}
                         type="button"
                         className={classNames("px-1 py-0.5 btn-default", {
                           "text-gray-500": display !== outputDisplay,
