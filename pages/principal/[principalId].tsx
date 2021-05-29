@@ -1,6 +1,7 @@
 import { Principal } from "@dfinity/agent";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
+import CandidUI from "../../components/CandidUI";
 import CodeBlock from "../../components/CodeBlock";
 import { MetaTitle } from "../../components/MetaTags";
 import PrincipalDetails from "../../components/PrincipalDetails";
@@ -69,14 +70,22 @@ const PrincipalPage = () => {
       </h1>
       {isValid && (
         <PrincipalDetails
-          candid={candid}
           canisterId={principalId}
           canisterName={name}
           className="mb-8"
         />
       )}
       {candid && (
-        <CodeBlock candid={candid} bindings={bindings} className="mb-8" />
+        <>
+          {bindings && (
+            <CandidUI
+              canisterId={principalId}
+              jsBindings={bindings.js}
+              className="mb-8"
+            />
+          )}
+          <CodeBlock candid={candid} bindings={bindings} className="mb-8" />
+        </>
       )}
     </div>
   ) : (
