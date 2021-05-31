@@ -1,12 +1,16 @@
-import { Principal } from "@dfinity/agent";
+import { Actor, HttpAgent, Principal } from "@dfinity/agent";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
+import CandidUI from "../../components/CandidUI";
 import CodeBlock from "../../components/CodeBlock";
 import { MetaTitle } from "../../components/MetaTags";
 import PrincipalDetails from "../../components/PrincipalDetails";
 import Search404 from "../../components/Search404";
+import CandidService from "../../lib/canisters/get-candid.did";
 
 const didc = import("../../lib/didc-js/didc_js");
+
+const agent = new HttpAgent({ host: "https://ic0.app" });
 
 const PrincipalPage = () => {
   const router = useRouter();
@@ -14,14 +18,36 @@ const PrincipalPage = () => {
   const [isValid, setIsValid] = useState(true);
   const [candid, setCandid] = useState("");
   const [bindings, setBindings] = useState(null);
-  const { principalId } = router.query as { principalId: string };
+  const { principalId, candid: candidOverride } = router.query as {
+    principalId: string;
+    candid?: string;
+  };
+
+  const setCandidAndBindings = (newCandid) => {
+    setCandid(newCandid);
+    if (newCandid) {
+      didc.then((mod) => {
+        const gen = mod.generate(newCandid);
+        setBindings(gen);
+      });
+    } else {
+      setBindings(null);
+    }
+  };
 
   useEffect(() => {
     if (typeof principalId !== "string" || !principalId) return;
 
     setName("");
-    setCandid("");
-    setBindings(null);
+    let newCandid = "";
+    if (candidOverride) {
+      try {
+        newCandid = window.atob(candidOverride);
+      } catch (error) {
+        console.warn("invalid candid attached");
+      }
+    }
+    setCandidAndBindings(newCandid);
 
     try {
       Principal.fromText(principalId);
@@ -32,34 +58,41 @@ const PrincipalPage = () => {
       return;
     }
 
+    (async () => {
+      if (candid) return;
+
+      const actor = Actor.createActor(CandidService, {
+        agent,
+        canisterId: principalId,
+      });
+
+      try {
+        const foundCandid =
+          (await actor.__get_candid_interface_tmp_hack()) as string;
+        setCandidAndBindings(foundCandid);
+      } catch (error) {}
+    })();
+
     fetch("/interfaces/canisters.json")
       .then((res) => res.json())
       .then((json) => {
         const name = json[principalId];
         setName(name);
-
-        if (name) {
+        if (name && !candidOverride) {
           fetch(`/interfaces/${name}.did`)
             .then((res) => {
               if (!res.ok) {
-                setCandid("");
                 throw res.statusText;
               }
               return res.text();
             })
             .then((data) => {
-              setCandid(data);
-              didc.then((mod) => {
-                const gen = mod.generate(data);
-                setBindings(gen);
-              });
+              setCandidAndBindings(data);
             })
-            .catch(console.error);
-        } else {
-          setCandid("");
+            .catch((e) => {});
         }
       });
-  }, [principalId]);
+  }, [principalId, candidOverride]);
 
   return isValid ? (
     <div className="py-16">
@@ -69,14 +102,24 @@ const PrincipalPage = () => {
       </h1>
       {isValid && (
         <PrincipalDetails
-          candid={candid}
           canisterId={principalId}
           canisterName={name}
           className="mb-8"
         />
       )}
       {candid && (
-        <CodeBlock candid={candid} bindings={bindings} className="mb-8" />
+        <>
+          {bindings && (
+            <CandidUI
+              candid={candid}
+              canisterId={principalId}
+              jsBindings={bindings.js}
+              className="mb-8"
+              isAttached={!!candidOverride}
+            />
+          )}
+          <CodeBlock candid={candid} bindings={bindings} />
+        </>
       )}
     </div>
   ) : (

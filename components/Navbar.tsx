@@ -28,7 +28,7 @@ export default function Nav() {
             <ActiveLink href="/interfaces">Interfaces</ActiveLink>
           </li>
           <li className="pr-4">
-            <ActiveLink href="/canister">Canisters</ActiveLink>
+            <ActiveLink href="/canisters">Canisters</ActiveLink>
           </li>
         </ul>
 

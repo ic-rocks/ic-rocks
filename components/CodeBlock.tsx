@@ -6,8 +6,8 @@ import javascript from "react-syntax-highlighter/dist/cjs/languages/hljs/javascr
 import typescript from "react-syntax-highlighter/dist/cjs/languages/hljs/typescript";
 import { monokai } from "react-syntax-highlighter/dist/cjs/styles/hljs";
 import { useClipboard } from "use-clipboard-copy";
-import candid from "../lib/candid";
 import { Bindings } from "../lib/didc-js/didc_js";
+import candid from "../lib/syntax/candid";
 
 SyntaxHighlighter.registerLanguage("javascript", javascript);
 SyntaxHighlighter.registerLanguage("typescript", typescript);

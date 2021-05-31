@@ -10,19 +10,15 @@ import { sha224 } from "@dfinity/agent/lib/cjs/utils/sha224.js";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 
-const CANDID_UI_URL = "https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.ic0.app/";
-
 type Type = "Canister" | "User" | "Anonymous" | "Derived";
 
 export default function PrincipalDetails({
   className,
   canisterId,
-  candid,
   canisterName,
 }: {
   className?: string;
   canisterId: string;
-  candid?: string;
   canisterName?: string;
 }) {
   const [data, setData] = useState(null);
@@ -103,8 +99,6 @@ export default function PrincipalDetails({
   if (typeof window === "undefined") {
     return null;
   }
-
-  const candidEncoded = candid ? encodeURIComponent(window.btoa(candid)) : null;
 
   return (
     <div className={className}>
@@ -192,19 +186,6 @@ export default function PrincipalDetails({
               </span>
             </td>
           </tr>
-          {candidEncoded && (
-            <tr>
-              <td colSpan={2} className="px-2 py-1 text-sm">
-                <a
-                  className="hover:underline text-blue-600"
-                  href={`${CANDID_UI_URL}?id=${canisterId}&did=${candidEncoded}`}
-                  target="_blank"
-                >
-                  Go to Candid UI
-                </a>
-              </td>
-            </tr>
-          )}
         </tbody>
       </table>
     </div>

@@ -7,6 +7,7 @@ import React, { useEffect, useState } from "react";
 import { BiPencil } from "react-icons/bi";
 import { FiFilePlus } from "react-icons/fi";
 import ActiveLink from "../../components/ActiveLink";
+import CandidAttach from "../../components/CandidAttach";
 import CodeBlock from "../../components/CodeBlock";
 import MatchingCanistersList from "../../components/MatchingCanistersList";
 import { MetaTitle } from "../../components/MetaTags";
@@ -157,6 +158,7 @@ const Interfaces = ({ current, children }) => {
       ) : (
         <>
           <MatchingCanistersList canisterIds={matches} />
+          <CandidAttach candid={candid} />
           <CodeBlock candid={candid} bindings={bindings} className="mb-8" />
           <a
             className="inline-flex items-center text-blue-600 hover:underline"
