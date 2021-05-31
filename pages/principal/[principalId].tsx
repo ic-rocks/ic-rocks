@@ -1,4 +1,4 @@
-import { Principal } from "@dfinity/agent";
+import { Actor, HttpAgent, Principal } from "@dfinity/agent";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import CandidUI from "../../components/CandidUI";
@@ -6,8 +6,11 @@ import CodeBlock from "../../components/CodeBlock";
 import { MetaTitle } from "../../components/MetaTags";
 import PrincipalDetails from "../../components/PrincipalDetails";
 import Search404 from "../../components/Search404";
+import CandidService from "../../lib/canisters/get-candid.did";
 
 const didc = import("../../lib/didc-js/didc_js");
+
+const agent = new HttpAgent({ host: "https://ic0.app" });
 
 const PrincipalPage = () => {
   const router = useRouter();
@@ -33,6 +36,25 @@ const PrincipalPage = () => {
       return;
     }
 
+    (async () => {
+      if (candid) return;
+
+      const actor = Actor.createActor(CandidService, {
+        agent,
+        canisterId: principalId,
+      });
+
+      try {
+        const foundCandid =
+          (await actor.__get_candid_interface_tmp_hack()) as string;
+        setCandid(foundCandid);
+        didc.then((mod) => {
+          const gen = mod.generate(foundCandid);
+          setBindings(gen);
+        });
+      } catch (error) {}
+    })();
+
     fetch("/interfaces/canisters.json")
       .then((res) => res.json())
       .then((json) => {
@@ -55,7 +77,7 @@ const PrincipalPage = () => {
                 setBindings(gen);
               });
             })
-            .catch(console.error);
+            .catch((e) => {});
         } else {
           setCandid("");
         }
