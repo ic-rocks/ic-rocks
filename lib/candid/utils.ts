@@ -65,7 +65,7 @@ export function getShortname(type: IDL.Type): string {
     )}}`;
   }
   if (type instanceof IDL.OptClass) return `opt ${getShortname(type["_type"])}`;
-  return type.name;
+  return type?.name;
 }
 
 /**

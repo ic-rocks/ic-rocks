@@ -1,12 +1,15 @@
 import { Actor, HttpAgent, IDL } from "@dfinity/agent";
 import classNames from "classnames";
+import Link from "next/link";
 import { del, set } from "object-path-immutable";
 import React, { useCallback, useEffect, useReducer, useState } from "react";
 import { BsArrowReturnRight } from "react-icons/bs";
 import { CgSpinner } from "react-icons/cg";
+import { FaTimes } from "react-icons/fa";
 import { FiExternalLink } from "react-icons/fi";
 import { any, getShortname, validate } from "../lib/candid/utils";
 import { Bindings } from "../lib/didc-js/didc_js";
+import { pluralize } from "../lib/strings";
 import { DELETE_ITEM, Input, Output, OUTPUT_DISPLAYS } from "./candid/Elements";
 
 const CANDID_UI_URL = "https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.ic0.app/";
@@ -82,11 +85,13 @@ export default function CandidUI({
   canisterId,
   candid,
   jsBindings,
+  isAttached = false,
 }: {
   className?: string;
   canisterId: string;
   candid: string;
   jsBindings: Bindings["js"];
+  isAttached?: boolean;
 }) {
   const [methods, setMethods] = useState<IDL.ServiceClass["_fields"]>([]);
   const [actor, setActor] = useState(null);
@@ -139,7 +144,7 @@ export default function CandidUI({
           }
         });
     })();
-  }, []);
+  }, [jsBindings]);
 
   const call = useCallback(
     async (funcName: string, func: IDL.FuncClass, inputs = []) => {
@@ -174,7 +179,26 @@ export default function CandidUI({
   return (
     <div className={className}>
       <div className="px-2 py-2 bg-gray-100 dark:bg-gray-800 flex justify-between items-baseline">
-        <span className="font-bold">Canister Methods</span>
+        <div>
+          <span className="font-bold">
+            {methods.length} {pluralize("Canister Method", methods.length)}
+          </span>
+          {isAttached && (
+            <div className="inline-flex items-stretch">
+              <label className="rounded-l text-xs py-1 px-2 bg-yellow-200 dark:text-black ml-2">
+                Attached
+              </label>
+              <Link href={`/principal/${canisterId}`}>
+                <a
+                  className="rounded-r cursor-pointer py-1.5 px-2 text-xs bg-yellow-200 hover:bg-yellow-400 transition-colors dark:text-black"
+                  title="Remove attached candid"
+                >
+                  <FaTimes />
+                </a>
+              </Link>
+            </div>
+          )}
+        </div>
         <a
           className="hover:underline text-blue-600 flex items-center text-xs"
           href={`${CANDID_UI_URL}?id=${canisterId}&did=${encodeURIComponent(

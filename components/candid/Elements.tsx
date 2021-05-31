@@ -1,5 +1,6 @@
 import { IDL } from "@dfinity/agent";
 import classNames from "classnames";
+import { useRouter } from "next/router";
 import { get } from "object-path-immutable";
 import React, { useEffect, useState } from "react";
 import { BiMinus, BiPlus } from "react-icons/bi";
@@ -381,6 +382,10 @@ export const Output = ({
     return <OutputWrapper force={true} value={err} className="text-red-500" />;
   }
 
+  if (!type) {
+    return <EmptyOutput />;
+  }
+
   if (display === "Candid") {
     return (
       <OutputWrapper
@@ -605,16 +610,22 @@ export const Output = ({
     );
   } else if (type instanceof IDL.PrincipalClass) {
     const principal = res.toText();
+    const router = useRouter();
+    const { principalId } = router.query;
     return (
       <div>
         {label}
-        <a
-          href={`/principal/${principal}`}
-          target="_blank"
-          className="text-blue-600 hover:underline"
-        >
-          {principal}
-        </a>
+        {principal !== principalId ? (
+          <a
+            href={`/principal/${principal}`}
+            target="_blank"
+            className="text-blue-600 hover:underline"
+          >
+            {principal}
+          </a>
+        ) : (
+          principal
+        )}
       </div>
     );
   } else {

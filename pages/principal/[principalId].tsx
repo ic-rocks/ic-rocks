@@ -18,14 +18,36 @@ const PrincipalPage = () => {
   const [isValid, setIsValid] = useState(true);
   const [candid, setCandid] = useState("");
   const [bindings, setBindings] = useState(null);
-  const { principalId } = router.query as { principalId: string };
+  const { principalId, candid: candidOverride } = router.query as {
+    principalId: string;
+    candid?: string;
+  };
+
+  const setCandidAndBindings = (newCandid) => {
+    setCandid(newCandid);
+    if (newCandid) {
+      didc.then((mod) => {
+        const gen = mod.generate(newCandid);
+        setBindings(gen);
+      });
+    } else {
+      setBindings(null);
+    }
+  };
 
   useEffect(() => {
     if (typeof principalId !== "string" || !principalId) return;
 
     setName("");
-    setCandid("");
-    setBindings(null);
+    let newCandid = "";
+    if (candidOverride) {
+      try {
+        newCandid = window.atob(candidOverride);
+      } catch (error) {
+        console.warn("invalid candid attached");
+      }
+    }
+    setCandidAndBindings(newCandid);
 
     try {
       Principal.fromText(principalId);
@@ -47,11 +69,7 @@ const PrincipalPage = () => {
       try {
         const foundCandid =
           (await actor.__get_candid_interface_tmp_hack()) as string;
-        setCandid(foundCandid);
-        didc.then((mod) => {
-          const gen = mod.generate(foundCandid);
-          setBindings(gen);
-        });
+        setCandidAndBindings(foundCandid);
       } catch (error) {}
     })();
 
@@ -60,29 +78,21 @@ const PrincipalPage = () => {
       .then((json) => {
         const name = json[principalId];
         setName(name);
-
-        if (name) {
+        if (name && !candidOverride) {
           fetch(`/interfaces/${name}.did`)
             .then((res) => {
               if (!res.ok) {
-                setCandid("");
                 throw res.statusText;
               }
               return res.text();
             })
             .then((data) => {
-              setCandid(data);
-              didc.then((mod) => {
-                const gen = mod.generate(data);
-                setBindings(gen);
-              });
+              setCandidAndBindings(data);
             })
             .catch((e) => {});
-        } else {
-          setCandid("");
         }
       });
-  }, [principalId]);
+  }, [principalId, candidOverride]);
 
   return isValid ? (
     <div className="py-16">
@@ -105,9 +115,10 @@ const PrincipalPage = () => {
               canisterId={principalId}
               jsBindings={bindings.js}
               className="mb-8"
+              isAttached={!!candidOverride}
             />
           )}
-          <CodeBlock candid={candid} bindings={bindings} className="mb-8" />
+          <CodeBlock candid={candid} bindings={bindings} />
         </>
       )}
     </div>
