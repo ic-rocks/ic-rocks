@@ -9,6 +9,7 @@ import {
   getShortname,
   stringify,
 } from "../../lib/candid/utils";
+import { maybeTimestamp } from "../../lib/numbers";
 import { isUrl, pluralize } from "../../lib/strings";
 
 export const DELETE_ITEM = Symbol("DELETE_ITEM");
@@ -373,7 +374,7 @@ export const Output = ({
   display,
 }: {
   type: IDL.Type;
-  argName?: string;
+  argName?: string | number;
   value: any;
   showLabel?: boolean;
   display: typeof OUTPUT_DISPLAYS[number];
@@ -578,10 +579,19 @@ export const Output = ({
     type instanceof IDL.NatClass ||
     type instanceof IDL.IntClass
   ) {
+    let ts;
+    if (typeof argName === "string" && argName.match(/time|date|seconds/i)) {
+      ts = maybeTimestamp(res);
+    }
     return (
       <div>
         {label}
         {res.toString()}
+        {!!ts && (
+          <Label className="inline ml-2">
+            ({ts.toString()} - {ts.toRelative()})
+          </Label>
+        )}
       </div>
     );
   } else if (type instanceof IDL.TextClass) {
