@@ -1,7 +1,7 @@
 import { IDL } from "@dfinity/agent";
 import classNames from "classnames";
 import { get } from "object-path-immutable";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { BiMinus, BiPlus } from "react-icons/bi";
 import {
   getDefaultValue,
@@ -13,7 +13,8 @@ import { isUrl, pluralize } from "../../lib/strings";
 export const DELETE_ITEM = Symbol("DELETE_ITEM");
 
 export const OUTPUT_DISPLAYS = ["Pretty", "JSON", "Candid", "Raw"] as const;
-export const BUFFER_DISPLAYS = ["Hex", "ASCII", "Raw"] as const;
+export const BUFFER_ENCODINGS = ["Hex", "UTF-8", "Base64"] as const;
+export const VEC_NAT8_FORMATS = ["Hex", "UTF-8", "Base64", "Raw"] as const;
 
 const Nested = ({ children }) => (
   <div className="pl-2 border-l border-gray-300 dark:border-gray-700">
@@ -34,6 +35,52 @@ const Label = ({
     {children}
   </label>
 );
+
+const BufferInput = ({
+  encoding = "utf-8",
+  value,
+  placeholder,
+  error,
+  onChange,
+}: {
+  encoding?: BufferEncoding;
+  value?: Buffer;
+  placeholder?: string;
+  error?: string;
+  onChange: (Buffer) => void;
+}) => {
+  const [currentValue, setCurrentValue] = useState("");
+  const [currentError, setCurrentError] = useState("");
+  useEffect(() => {
+    setCurrentError("");
+    setCurrentValue("");
+  }, [encoding]);
+
+  return (
+    <div className="flex flex-col">
+      <input
+        placeholder={placeholder}
+        className="px-2 py-1 bg-gray-100 dark:bg-gray-800 text-sm"
+        type="text"
+        onChange={(e) => {
+          setCurrentValue(e.target.value);
+          try {
+            const buf = Buffer.from(e.target.value, encoding);
+            onChange(buf);
+            setCurrentError("");
+          } catch (error) {
+            setCurrentError(error.message);
+          }
+        }}
+        value={currentError ? currentValue : value.toString(encoding)}
+      />
+      {currentError && (
+        <span className="text-xs text-red-500">{currentError}</span>
+      )}
+      {error && <span className="text-xs text-red-500">{error}</span>}
+    </div>
+  );
+};
 
 export const Input = ({
   argName,
@@ -90,47 +137,78 @@ export const Input = ({
 
   if (type instanceof IDL.VecClass) {
     const vec = get(inputs, path, []);
+    const isVecNat8 = type["_type"].name === "nat8";
+    const [vecInput, setVecInput] = useState<typeof VEC_NAT8_FORMATS[number]>(
+      VEC_NAT8_FORMATS[0]
+    );
     return (
       <div className={className}>
-        {label}
-        <Nested>
-          {vec.map((_, i) => (
-            <div className="flex items-start mb-1" key={i}>
+        <div className={classNames("flex items-center", { "mb-1": isVecNat8 })}>
+          {label}
+          {isVecNat8 && (
+            <div className="text-xs ml-2">
+              {VEC_NAT8_FORMATS.map((input) => (
+                <button
+                  key={input}
+                  type="button"
+                  className={classNames("px-1 py-0.5 btn-default", {
+                    "text-gray-500": input !== vecInput,
+                  })}
+                  onClick={() => setVecInput(input)}
+                >
+                  {input}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+        {!isVecNat8 || vecInput === "Raw" ? (
+          <Nested>
+            {vec.map((_, i) => (
+              <div className="flex items-start mb-1" key={i}>
+                <button
+                  type="button"
+                  className="p-1.5 mr-1 btn-default"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleInput(DELETE_ITEM, path.concat(i));
+                  }}
+                >
+                  <BiMinus />
+                </button>
+                <Input
+                  type={type["_type"]}
+                  argName={String(i)}
+                  path={path.concat([i])}
+                  showLabel={false}
+                  inputs={inputs}
+                  errors={errors}
+                  handleInput={handleInput}
+                />
+              </div>
+            ))}
+            <div className="flex items-center">
               <button
                 type="button"
                 className="p-1.5 mr-1 btn-default"
                 onClick={(e) => {
                   e.preventDefault();
-                  handleInput(DELETE_ITEM, path.concat(i));
+                  handleInput(undefined, path.concat(vec.length));
                 }}
               >
-                <BiMinus />
+                <BiPlus />
               </button>
-              <Input
-                type={type["_type"]}
-                argName={String(i)}
-                path={path.concat([i])}
-                showLabel={false}
-                inputs={inputs}
-                errors={errors}
-                handleInput={handleInput}
-              />
+              <Label>Add item</Label>
             </div>
-          ))}
-          <div className="flex items-center">
-            <button
-              type="button"
-              className="p-1.5 mr-1 btn-default"
-              onClick={(e) => {
-                e.preventDefault();
-                handleInput(undefined, path.concat(vec.length));
-              }}
-            >
-              <BiPlus />
-            </button>
-            <Label>Add item</Label>
-          </div>
-        </Nested>
+          </Nested>
+        ) : (
+          <BufferInput
+            placeholder={description}
+            onChange={(buf) => handleInput(Array.from(buf), path)}
+            encoding={vecInput as BufferEncoding}
+            value={Buffer.from(vec)}
+          />
+        )}
       </div>
     );
   }
@@ -270,7 +348,7 @@ const OutputWrapper = ({
   className?: string;
   force?: boolean;
 }) => {
-  if (force || value.length > 50) {
+  if (force || value.length >= 32) {
     return (
       <pre
         style={{ maxHeight: "12rem" }}
@@ -329,6 +407,8 @@ export const Output = ({
   const label = <Label>{description}</Label>;
 
   if (type instanceof IDL.VecClass) {
+    const length = res.length;
+    const lengthLabel = <Label className="ml-2">(len {length})</Label>;
     if (
       type["_type"] instanceof IDL.FixedNatClass ||
       type["_type"] instanceof IDL.FixedIntClass ||
@@ -336,45 +416,54 @@ export const Output = ({
       type["_type"] instanceof IDL.IntClass
     ) {
       if (type["_type"].name === "nat8") {
-        // buffer
         const [bufDisplay, setBufDisplay] =
-          useState<typeof BUFFER_DISPLAYS[number]>("Hex");
+          useState<typeof VEC_NAT8_FORMATS[number]>("Hex");
         const buf = Buffer.from(res);
         const out =
           bufDisplay === "Hex"
-            ? "0x" + buf.toString("hex")
-            : bufDisplay === "ASCII"
-            ? buf.toString("ascii")
-            : stringify(res);
+            ? "0x" + buf.toString(bufDisplay as BufferEncoding)
+            : bufDisplay === "Raw"
+            ? JSON.stringify(res)
+            : buf.toString(bufDisplay as BufferEncoding);
         return (
           <div>
-            <div className="flex items-center">
+            <div
+              className={classNames("flex items-center", {
+                "mb-1": length > 0,
+              })}
+            >
               {label}
-              {res.length > 0 && (
-                <div className="text-xs ml-2">
-                  {BUFFER_DISPLAYS.map((display) => (
-                    <button
-                      key={display}
-                      type="button"
-                      className={classNames("px-1 py-0.5 btn-default", {
-                        "text-gray-500": display !== bufDisplay,
-                      })}
-                      onClick={() => setBufDisplay(display)}
-                    >
-                      {display}
-                    </button>
-                  ))}
-                </div>
+              {length > 0 && (
+                <>
+                  <div className="text-xs ml-2">
+                    {VEC_NAT8_FORMATS.map((display) => (
+                      <button
+                        key={display}
+                        type="button"
+                        className={classNames("px-1 py-0.5 btn-default", {
+                          "text-gray-500": display !== bufDisplay,
+                        })}
+                        onClick={() => setBufDisplay(display)}
+                      >
+                        {display}
+                      </button>
+                    ))}
+                  </div>
+                  {lengthLabel}
+                </>
               )}
             </div>
-            {res.length ? <OutputWrapper value={out} /> : <EmptyOutput />}
+            {length ? <OutputWrapper value={out} /> : <EmptyOutput />}
           </div>
         );
       } else {
         return (
           <div>
-            {label}
-            {res.length ? (
+            <div className="flex">
+              {label}
+              {length > 0 && lengthLabel}
+            </div>
+            {length ? (
               <OutputWrapper value={stringify(res)} />
             ) : (
               <EmptyOutput />
@@ -383,10 +472,13 @@ export const Output = ({
         );
       }
     } else {
-      if (res.length) {
+      if (length) {
         return (
           <div>
-            {label}
+            <div className="flex">
+              {label}
+              {lengthLabel}
+            </div>
             <Nested>
               {res.map((r, i) => (
                 <div key={i} className="mb-2">
@@ -415,21 +507,24 @@ export const Output = ({
       type instanceof IDL.RecClass ? type["_type"]["_fields"] : type["_fields"];
     const isTuple = type instanceof IDL.TupleClass;
     return (
-      <Nested>
-        {fields.map(([fieldName, fieldType], i) => {
-          const key = isTuple ? i : fieldName;
-          return (
-            <div key={key}>
-              <Output
-                type={fieldType}
-                argName={key}
-                value={{ res: res[key] }}
-                display={display}
-              />
-            </div>
-          );
-        })}
-      </Nested>
+      <div>
+        {label}
+        <Nested>
+          {fields.map(([fieldName, fieldType], i) => {
+            const key = isTuple ? i : fieldName;
+            return (
+              <div key={key}>
+                <Output
+                  type={fieldType}
+                  argName={key}
+                  value={{ res: res[key] }}
+                  display={display}
+                />
+              </div>
+            );
+          })}
+        </Nested>
+      </div>
     );
   } else if (type instanceof IDL.VariantClass) {
     const selectedName = Object.keys(res)[0];
@@ -487,7 +582,10 @@ export const Output = ({
   } else if (type instanceof IDL.TextClass) {
     return (
       <div>
-        {label}
+        <div className="flex">
+          {label}
+          <Label className="ml-2">(len {res.length})</Label>
+        </div>
         {res.length ? (
           isUrl(res) ? (
             <a
@@ -498,7 +596,7 @@ export const Output = ({
               {res}
             </a>
           ) : (
-            res
+            <OutputWrapper value={res} />
           )
         ) : (
           <EmptyOutput />

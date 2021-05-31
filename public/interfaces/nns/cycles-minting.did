@@ -14,7 +14,11 @@ type TransactionNotification = record {
   amount : ICPTs;
   block_height : nat64;
 };
+type SetAuthorizedSubnetworkListArgs = record {
+  who : opt principal;
+  subnets : vec principal;
+};
 service : {
-  set_authorized_subnetwork_list : (opt principal, vec principal) -> ();
+  set_authorized_subnetwork_list : (SetAuthorizedSubnetworkListArgs) -> ();
   transaction_notification : (TransactionNotification) -> (Result);
 }
