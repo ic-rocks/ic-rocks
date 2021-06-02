@@ -140,7 +140,7 @@ const Account = () => {
   }, [accountId]);
 
   useEffect(() => {
-    fetch("/data/accounts.json")
+    fetch("/data/json/accounts.json")
       .then((res) => res.json())
       .then((json) => {
         setAccounts(json);
@@ -195,7 +195,7 @@ const Account = () => {
                   Unknown{" "}
                   <a
                     className="ml-2 inline-flex items-center text-blue-600 hover:underline"
-                    href={`${GITHUB_REPO}/edit/main/public/data/accounts.json`}
+                    href={`${GITHUB_REPO}/edit/main/public/data/json/accounts.json`}
                     target="_blank"
                   >
                     <BiPencil /> Edit

@@ -9,7 +9,7 @@ const Canisters = () => {
   const [canisters, setCanisters] = useState({});
 
   useEffect(() => {
-    fetch("/json/canisters.json")
+    fetch("/data/json/canisters.json")
       .then((res) => res.json())
       .then((json) => {
         setCanisters(json);
@@ -26,7 +26,7 @@ const Canisters = () => {
         <CanistersList canisters={canisters} className="mb-8" />
         <a
           className="inline-flex items-center text-blue-600 hover:underline"
-          href={`${GITHUB_REPO}/edit/main/public/json/canisters.json`}
+          href={`${GITHUB_REPO}/edit/main/public/data/json/canisters.json`}
           target="_blank"
         >
           <BiPencil className="mr-0.5" /> Edit canisters.json

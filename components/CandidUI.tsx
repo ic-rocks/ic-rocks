@@ -9,9 +9,9 @@ import { BsArrowReturnRight } from "react-icons/bs";
 import { FaTimes } from "react-icons/fa";
 import { FiExternalLink } from "react-icons/fi";
 import { getShortname, validate } from "../lib/candid/utils";
+import protobufJson from "../lib/canisters/proto.json";
 import { Bindings } from "../lib/didc-js/didc_js";
 import { pluralize } from "../lib/strings";
-import protobufJson from "../public/json/proto.json";
 import {
   CandidInput,
   CANDID_OUTPUT_DISPLAYS,

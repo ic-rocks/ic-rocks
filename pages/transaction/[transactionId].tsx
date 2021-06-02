@@ -101,7 +101,7 @@ const Transaction = () => {
   }, [transactionId]);
 
   useEffect(() => {
-    fetch("/data/accounts.json")
+    fetch("/data/json/accounts.json")
       .then((res) => res.json())
       .then((json) => {
         setAccounts(json);

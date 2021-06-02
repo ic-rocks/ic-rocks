@@ -75,13 +75,13 @@ const PrincipalPage = () => {
       } catch (error) {}
     })();
 
-    fetch("/json/canisters.json")
+    fetch("/data/json/canisters.json")
       .then((res) => res.json())
       .then((json) => {
         const name = json[principalId];
         setName(name);
         if (name && !candidOverride) {
-          fetch(`/interfaces/${name}.did`)
+          fetch(`/data/interfaces/${name}.did`)
             .then((res) => {
               if (!res.ok) {
                 throw res.statusText;
@@ -93,7 +93,7 @@ const PrincipalPage = () => {
             })
             .catch((e) => {});
 
-          fetch(`/interfaces/${name}.proto`)
+          fetch(`/data/interfaces/${name}.proto`)
             .then((res) => {
               if (!res.ok) {
                 throw res.statusText;

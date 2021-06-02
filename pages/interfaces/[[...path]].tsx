@@ -15,7 +15,7 @@ import { GITHUB_REPO } from "../../lib/constants";
 
 const didc = import("../../lib/didc-js/didc_js");
 export async function getStaticPaths() {
-  const base = `${process.cwd()}/public/interfaces`;
+  const base = `${process.cwd()}/public/data/interfaces`;
   const paths = glob
     .sync(`${base}/**/*`)
     .concat(glob.sync(`${base}/**/*/`))
@@ -34,7 +34,7 @@ export async function getStaticPaths() {
 
 export async function getStaticProps({ params: { path: path_ = "" } }) {
   const current = (typeof path_ === "string" ? [path_] : path_).join("/");
-  const base = `${process.cwd()}/public/interfaces/${current}`;
+  const base = `${process.cwd()}/public/data/interfaces/${current}`;
 
   // If directory, list children
   let children = null;
@@ -63,7 +63,7 @@ const Interfaces = ({ current, children }) => {
 
   useEffect(() => {
     if (current) {
-      fetch(`/interfaces/${current}`)
+      fetch(`/data/interfaces/${current}`)
         .then((res) => res.text())
         .then((data) => {
           if (current.endsWith(".did")) {
@@ -84,7 +84,7 @@ const Interfaces = ({ current, children }) => {
   }, [current]);
 
   useEffect(() => {
-    fetch("/json/canisters.json")
+    fetch("/data/json/canisters.json")
       .then((res) => res.json())
       .then((json) => {
         setCanisters(json);
@@ -152,7 +152,7 @@ const Interfaces = ({ current, children }) => {
           </ul>
           <a
             className="inline-flex items-center text-blue-600 hover:underline"
-            href={`${GITHUB_REPO}/new/main/public/interfaces/${current}?filename=newfile.did&value=%2F%2F%20Candid%20file%20here`}
+            href={`${GITHUB_REPO}/new/main/public/data/interfaces/${current}?filename=newfile.did&value=%2F%2F%20Candid%20file%20here`}
             target="_blank"
           >
             <FiFilePlus className="mr-0.5" />
@@ -172,7 +172,7 @@ const Interfaces = ({ current, children }) => {
           />
           <a
             className="inline-flex items-center text-blue-600 hover:underline"
-            href={`${GITHUB_REPO}/edit/main/public/interfaces/${current}`}
+            href={`${GITHUB_REPO}/edit/main/public/data/interfaces/${current}`}
             target="_blank"
           >
             <BiPencil className="mr-0.5" /> Edit {current}
