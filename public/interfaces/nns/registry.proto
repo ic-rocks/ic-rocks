@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+import "ic_registry_transport/pb/v1/transport.proto";
+
+service Registry {
+  rpc get_changes_since (ic_registry_transport.pb.v1.RegistryGetChangesSinceRequest)
+  returns (ic_registry_transport.pb.v1.RegistryGetChangesSinceResponse) {
+    option annotation = query;
+  };
+
+  rpc get_certified_changes_since (ic_registry_transport.pb.v1.RegistryGetChangesSinceRequest)
+  returns (ic_registry_transport.pb.v1.CertifiedResponse) {
+    option annotation = query;
+  };
+
+  rpc get_value (ic_registry_transport.pb.v1.RegistryGetValueRequest)
+  returns (ic_registry_transport.pb.v1.RegistryGetValueResponse) {
+    option annotation = query;
+  };
+
+  rpc get_latest_version (google.protobuf.Empty)
+  returns (ic_registry_transport.pb.v1.RegistryGetLatestVersionResponse) {
+    option annotation = query;
+  };
+
+  rpc get_certified_latest_version (google.protobuf.Empty)
+  returns (ic_registry_transport.pb.v1.CertifiedResponse) {
+    option annotation = query;
+  };
+
+  rpc atomic_mutate (ic_registry_transport.pb.v1.RegistryAtomicMutateRequest)
+  returns (ic_registry_transport.pb.v1.RegistryAtomicMutateResponse) {
+    option annotation = update;
+  };
+}

@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+import "ic_ledger/pb/v1/types.proto";
+
+service Ledger {
+  rpc send_pb (ic_ledger.pb.v1.SendRequest)
+  returns (ic_ledger.pb.v1.SendResponse) {
+    option annotation = update;
+  };
+
+  rpc notify_pb (ic_ledger.pb.v1.NotifyRequest)
+  returns (ic_ledger.pb.v1.NotifyResponse) {
+    option annotation = update;
+  };
+
+  rpc block_pb (ic_ledger.pb.v1.BlockRequest)
+  returns (ic_ledger.pb.v1.BlockResponse) {
+    option annotation = query;
+  };
+
+  rpc tip_of_chain_pb (ic_ledger.pb.v1.TipOfChainRequest)
+  returns (ic_ledger.pb.v1.TipOfChainResponse) {
+    option annotation = query;
+  };
+
+  rpc get_archive_index_pb (google.protobuf.Empty)
+  returns (ic_ledger.pb.v1.ArchiveIndexResponse) {
+    option annotation = query;
+  };
+
+  rpc account_balance_pb (ic_ledger.pb.v1.AccountBalanceRequest)
+  returns (ic_ledger.pb.v1.AccountBalanceResponse) {
+    option annotation = query;
+  };
+
+  rpc total_supply_pb (ic_ledger.pb.v1.TotalSupplyRequest)
+  returns (ic_ledger.pb.v1.ICPTs) {
+    option annotation = query;
+  };
+
+  rpc iter_blocks_pb (ic_ledger.pb.v1.IterBlocksRequest)
+  returns (ic_ledger.pb.v1.IterBlocksResponse) {
+    option annotation = query;
+  };
+
+  rpc get_blocks_pb (ic_ledger.pb.v1.GetBlocksRequest)
+  returns (ic_ledger.pb.v1.GetBlocksResponse) {
+    option annotation = query;
+  };
+
+}

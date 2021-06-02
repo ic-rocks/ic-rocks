@@ -17,14 +17,11 @@ const didc = import("../../lib/didc-js/didc_js");
 export async function getStaticPaths() {
   const base = `${process.cwd()}/public/interfaces`;
   const paths = glob
-    .sync(`${base}/**/*.did`)
+    .sync(`${base}/**/*`)
     .concat(glob.sync(`${base}/**/*/`))
-    .map((did) => ({
+    .map((file) => ({
       params: {
-        path: path
-          .relative(base, did)
-          .replace(/\.did$/, "")
-          .split("/"),
+        path: path.relative(base, file).split("/"),
       },
     }))
     .concat([{ params: { path: null } }]); // root path
@@ -43,8 +40,8 @@ export async function getStaticProps({ params: { path: path_ = "" } }) {
   let children = null;
   if (fs.existsSync(base) && fs.lstatSync(base).isDirectory()) {
     children = glob
-      .sync(`${base}/**/*.did`)
-      .map((did) => path.relative(base, did).replace(/\.did$/, ""));
+      .sync(`${base}/**/*.*`)
+      .map((file) => path.relative(base, file));
   }
 
   return {
@@ -60,28 +57,34 @@ const Interfaces = ({ current, children }) => {
   const [canisters, setCanisters] = useState({});
   const [matches, setMatches] = useState([]);
   const [candid, setCandid] = useState("");
+  const [protobuf, setProtobuf] = useState("");
   const [bindings, setBindings] = useState(null);
   const { path: path_ } = router.query;
 
   useEffect(() => {
     if (current) {
-      fetch(`/interfaces/${current}.did`)
+      fetch(`/interfaces/${current}`)
         .then((res) => res.text())
         .then((data) => {
-          setCandid(data);
-          didc.then((mod) => {
-            const gen = mod.generate(data);
-            setBindings(gen);
-          });
+          if (current.endsWith(".did")) {
+            setCandid(data);
+            didc.then((mod) => {
+              const gen = mod.generate(data);
+              setBindings(gen);
+            });
+          } else {
+            setProtobuf(data);
+          }
         })
         .catch(console.error);
     } else {
       setCandid("");
+      setProtobuf("");
     }
   }, [current]);
 
   useEffect(() => {
-    fetch("/interfaces/canisters.json")
+    fetch("/json/canisters.json")
       .then((res) => res.json())
       .then((json) => {
         setCanisters(json);
@@ -90,9 +93,10 @@ const Interfaces = ({ current, children }) => {
 
   useEffect(() => {
     if (current) {
+      const basename = current.replace(/\.\w+/, "");
       const keys = Object.keys(canisters);
       if (keys.length) {
-        setMatches(keys.filter((key) => canisters[key] === current));
+        setMatches(keys.filter((key) => canisters[key] === basename));
       }
     } else {
       setMatches([]);
@@ -158,14 +162,20 @@ const Interfaces = ({ current, children }) => {
       ) : (
         <>
           <MatchingCanistersList canisterIds={matches} />
-          <CandidAttach candid={candid} />
-          <CodeBlock candid={candid} bindings={bindings} className="mb-8" />
+          {candid && <CandidAttach candid={candid} />}
+          <CodeBlock
+            key={candid}
+            candid={candid}
+            bindings={bindings}
+            className="mb-8"
+            protobuf={protobuf}
+          />
           <a
             className="inline-flex items-center text-blue-600 hover:underline"
-            href={`${GITHUB_REPO}/edit/main/public/interfaces/${current}.did`}
+            href={`${GITHUB_REPO}/edit/main/public/interfaces/${current}`}
             target="_blank"
           >
-            <BiPencil className="mr-0.5" /> Edit {current}.did
+            <BiPencil className="mr-0.5" /> Edit {current}
           </a>
         </>
       )}

@@ -1,4 +1,6 @@
 import { IDL, Principal } from "@dfinity/agent";
+import protobuf from "protobufjs";
+import { isNumberType } from "../../components/CanisterUI/ProtobufElements";
 import { pluralize } from "../strings";
 
 export const any = (arr: any[]): boolean =>
@@ -70,20 +72,81 @@ export function getShortname(type: IDL.Type): string {
 
 /**
  * Attempt to coerce an arbitrary input according to the desired type
- * @param type The type
+ * @param type The candid or protobuf type
  * @param input The value
  * @returns A tuple of [coerced value, error]
  */
-export function validate(type: IDL.Type, input: any): [any, any] {
+export const validate = (type: IDL.Type | protobuf.Type, input: any) =>
+  type instanceof IDL.Type
+    ? validateCandid(type, input)
+    : validateProtobuf(type, input || {});
+
+function convertProtobufType(type: string, input: any): any {}
+
+function validateProtobuf(
+  type: protobuf.Type | string,
+  input: any
+): [any, any] {
+  if (type instanceof protobuf.Type) {
+    type.resolveAll();
+    const fields = type.fieldsArray.filter(
+      (field) => field.required || !!input[field.name]
+    );
+    if (fields.length) {
+      const validated = fields.map((field) => {
+        const type = field.resolvedType
+          ? (field.resolvedType as protobuf.Type)
+          : field.type;
+        if (field.repeated && Array.isArray(input[field.name])) {
+          const validated = input[field.name].map((item) =>
+            validateProtobuf(type, item)
+          );
+          const errs = validated.map(([_, err]) => err);
+          return [
+            field.name,
+            validated.map(([res]) => res),
+            errs.some(Boolean) ? errs : null,
+          ];
+        }
+        return [field.name, ...validateProtobuf(type, input[field.name])];
+      });
+      if (validated.some(([_, __, err]) => err)) {
+        return [
+          null,
+          Object.fromEntries(validated.map(([name, _, err]) => [name, err])),
+        ];
+      } else {
+        return [
+          Object.fromEntries(validated.map(([name, res]) => [name, res])),
+          null,
+        ];
+      }
+    }
+
+    const err = type.verify(input);
+    return err ? [null, err] : [input, null];
+  }
+
+  // basic type
+  if (type === "bytes")
+    return [typeof input === "string" ? Buffer.from(input) : input, null];
+  else if (isNumberType(type)) return [Number(input), null];
+  else return [input, null];
+}
+
+function validateCandid(type: IDL.Type, input: any): [any, any] {
   if (type instanceof IDL.RecordClass || type instanceof IDL.RecClass) {
     const inputOrDefault = input || getDefaultValue(type);
     if (type instanceof IDL.TupleClass) {
       if (Array.isArray(input)) {
         const validated = type["_fields"].map(([_, fieldType], i) =>
-          validate(fieldType, input[i])
+          validateCandid(fieldType, input[i])
         );
         const errs = validated.map(([_, err]) => err);
-        return [validated.map(([res]) => res), any(errs) ? errs : null];
+        return [
+          validated.map(([res]) => res),
+          errs.some(Boolean) ? errs : null,
+        ];
       } else {
         const error = "invalid tuple";
         console.warn(error, inputOrDefault);
@@ -98,7 +161,7 @@ export function validate(type: IDL.Type, input: any): [any, any] {
       const errors = {};
       let hasError = false;
       fields.forEach(([name, type]) => {
-        const [res, err] = validate(type, inputOrDefault[name]);
+        const [res, err] = validateCandid(type, inputOrDefault[name]);
         validated[name] = res;
         hasError = hasError || err;
         err && (errors[name] = err);
@@ -111,9 +174,11 @@ export function validate(type: IDL.Type, input: any): [any, any] {
     }
   } else if (type instanceof IDL.VecClass) {
     if (Array.isArray(input)) {
-      const validated = input.map((arg) => validate(type["_type"], arg));
+      const validated = input
+        .filter((arg) => arg !== undefined)
+        .map((arg) => validateCandid(type["_type"], arg));
       const errs = validated.map(([_, err]) => err);
-      return [validated.map(([res]) => res), any(errs) ? errs : null];
+      return [validated.map(([res]) => res), errs.some(Boolean) ? errs : null];
     } else {
       return [[], null];
     }
@@ -125,7 +190,10 @@ export function validate(type: IDL.Type, input: any): [any, any] {
         const [_, selectedType] = type["_fields"].find(
           ([name]) => name === selectedName
         );
-        const [res, err] = validate(selectedType, inputOrDefault[selectedName]);
+        const [res, err] = validateCandid(
+          selectedType,
+          inputOrDefault[selectedName]
+        );
         return err == null
           ? [{ [selectedName]: res }, null]
           : [null, { [selectedName]: err }];
@@ -143,7 +211,7 @@ export function validate(type: IDL.Type, input: any): [any, any] {
     if (!input) {
       return [[], null];
     } else {
-      const [res, err] = validate(type["_type"], input);
+      const [res, err] = validateCandid(type["_type"], input);
       return [err == null ? [res] : null, err];
     }
   } else if (type instanceof IDL.TextClass) {

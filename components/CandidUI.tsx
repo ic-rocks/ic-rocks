@@ -1,21 +1,38 @@
 import { Actor, HttpAgent, IDL } from "@dfinity/agent";
+import extendProtobuf from "agent-pb";
 import classNames from "classnames";
 import Link from "next/link";
 import { del, set } from "object-path-immutable";
+import protobuf, { Method } from "protobufjs/light";
 import React, { useCallback, useEffect, useReducer, useState } from "react";
 import { BsArrowReturnRight } from "react-icons/bs";
-import { CgSpinner } from "react-icons/cg";
 import { FaTimes } from "react-icons/fa";
 import { FiExternalLink } from "react-icons/fi";
-import { any, getShortname, validate } from "../lib/candid/utils";
+import { getShortname, validate } from "../lib/candid/utils";
 import { Bindings } from "../lib/didc-js/didc_js";
 import { pluralize } from "../lib/strings";
-import { DELETE_ITEM, Input, Output, OUTPUT_DISPLAYS } from "./candid/Elements";
+import protobufJson from "../public/json/proto.json";
+import {
+  CandidInput,
+  CANDID_OUTPUT_DISPLAYS,
+} from "./CanisterUI/CandidElements";
+import {
+  Message as PbMessage,
+  PROTOBUF_OUTPUT_DISPLAYS,
+} from "./CanisterUI/ProtobufElements";
+import { DELETE_ITEM, Output, QueryButton } from "./CanisterUI/Shared";
 
+const root = protobuf.Root.fromJSON(protobufJson as protobuf.INamespace);
 const CANDID_UI_URL = "https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.ic0.app/";
 const agent = new HttpAgent({ host: "https://ic0.app" });
 
 export type Type = "loading" | "input" | "output" | "error" | "outputDisplay";
+type CanisterMethod = Record<string, IDL.FuncClass | Method>;
+
+const methodCmp = (a, b) => (a[0] > b[0] ? 1 : -1);
+
+const isProtobufMethod = (method: any): method is Method =>
+  method instanceof Method;
 
 function reducer(
   state,
@@ -61,6 +78,7 @@ function reducer(
         payload === DELETE_ITEM
           ? del(state.inputs[func], path)
           : set(state.inputs[func], path, payload);
+      console.log(path, payload, data, state.inputs[func]);
       return {
         ...state,
         inputs: {
@@ -85,15 +103,17 @@ export default function CandidUI({
   canisterId,
   candid,
   jsBindings,
+  protobuf,
   isAttached = false,
 }: {
   className?: string;
   canisterId: string;
   candid: string;
   jsBindings: Bindings["js"];
+  protobuf?: string;
   isAttached?: boolean;
 }) {
-  const [methods, setMethods] = useState<IDL.ServiceClass["_fields"]>([]);
+  const [methods, setMethods] = useState<CanisterMethod>({});
   const [actor, setActor] = useState(null);
   const [state, dispatch] = useReducer(reducer, {
     isLoading: {},
@@ -103,6 +123,43 @@ export default function CandidUI({
     outputDisplays: {},
     history: [],
   });
+
+  useEffect(() => {
+    if (!actor || !protobuf) return;
+
+    const service = protobuf.match(/service\s*(\w+)/)[1];
+    if (!service) return;
+
+    const serviceDef = root.lookupService(service);
+    serviceDef.resolveAll();
+    extendProtobuf(actor, serviceDef);
+    setMethods((methods) => ({
+      ...methods,
+      ...Object.fromEntries(
+        serviceDef.methodsArray.map((method) => [method.name, method])
+      ),
+    }));
+    serviceDef.methodsArray
+      .filter(
+        (method) =>
+          method.getOption("annotation") === "query" &&
+          !method.resolvedRequestType.fieldsArray.length
+      )
+      .forEach(async (method) => {
+        dispatch({ type: "loading", func: method.name, payload: true });
+        try {
+          const res = await actor[method.name]({});
+          dispatch({ type: "output", func: method.name, payload: { res } });
+        } catch (error) {
+          console.warn(error);
+          dispatch({
+            type: "output",
+            func: method.name,
+            payload: { err: error.message },
+          });
+        }
+      });
+  }, [actor, protobuf]);
 
   useEffect(() => {
     (async () => {
@@ -121,16 +178,17 @@ export default function CandidUI({
         canisterId,
       });
       setActor(actor_);
-      const sortedMethods = Actor.interfaceOf(actor_)._fields.sort(([a], [b]) =>
-        a > b ? 1 : -1
-      );
-      setMethods(sortedMethods);
-      sortedMethods
+      const candidMethods = Actor.interfaceOf(actor_)._fields;
+      setMethods((methods) => ({
+        ...methods,
+        ...Object.fromEntries(candidMethods),
+      }));
+      candidMethods
         .filter(
           ([_, func]) =>
             func.annotations[0] === "query" && !func.argTypes.length
         )
-        .forEach(async ([name, func]) => {
+        .forEach(async ([name, _]) => {
           dispatch({ type: "loading", func: name, payload: true });
           try {
             const res = await actor_[name]();
@@ -147,13 +205,22 @@ export default function CandidUI({
   }, [jsBindings]);
 
   const call = useCallback(
-    async (funcName: string, func: IDL.FuncClass, inputs = []) => {
-      const validated = func.argTypes.map((type, i) =>
-        validate(type, inputs[i])
-      );
-      const args = validated.map(([res]) => res);
-      const errors = validated.map(([_, err]) => err);
-      if (any(errors)) {
+    async (funcName: string, func: IDL.FuncClass | Method, inputs = []) => {
+      let args = [],
+        errors = [];
+      if (isProtobufMethod(func)) {
+        func.resolve();
+        const validated = validate(func.resolvedRequestType, inputs[0]);
+        args = [validated[0]];
+        errors = [validated[1]];
+      } else {
+        const validated = func.argTypes.map((type, i) =>
+          validate(type, inputs[i])
+        );
+        args = validated.map(([res]) => res);
+        errors = validated.map(([_, err]) => err);
+      }
+      if (errors.some(Boolean)) {
         console.warn(errors);
         dispatch({ type: "error", func: funcName, payload: errors });
       } else {
@@ -176,12 +243,15 @@ export default function CandidUI({
     [actor]
   );
 
+  const sortedMethods = Object.entries(methods).sort(methodCmp);
+
   return (
     <div className={className}>
       <div className="px-2 py-2 bg-gray-100 dark:bg-gray-800 flex justify-between items-baseline">
         <div>
           <span className="font-bold">
-            {methods.length} {pluralize("Canister Method", methods.length)}
+            {sortedMethods.length}{" "}
+            {pluralize("Canister Method", sortedMethods.length)}
           </span>
           {isAttached && (
             <div className="inline-flex items-stretch">
@@ -209,8 +279,63 @@ export default function CandidUI({
           Go to Candid UI <FiExternalLink className="ml-1" />
         </a>
       </div>
-      {methods.map(([funcName, func]) => {
-        const isQuery = func.annotations[0] === "query";
+      {sortedMethods.map(([funcName, method]) => {
+        let isPb, isQuery, inputs, responseTypes;
+        if (isProtobufMethod(method)) {
+          isPb = true;
+          funcName = method.name;
+          isQuery = method.getOption("annotation") === "query";
+          inputs = (
+            <PbMessage
+              objectName={method.requestType}
+              type={method.resolvedRequestType}
+              inputs={state.inputs[funcName]}
+              errors={state.errors[funcName]}
+              path={[0]}
+              handleInput={(payload, path) =>
+                dispatch({
+                  type: "input",
+                  func: funcName,
+                  path,
+                  payload,
+                })
+              }
+              isInput={true}
+            />
+          );
+          responseTypes = method.responseType;
+        } else {
+          isPb = false;
+          isQuery = method.annotations[0] === "query";
+          if (method.argTypes.length > 0) {
+            inputs = method.argTypes.map((arg, i) => {
+              return (
+                <CandidInput
+                  key={`${funcName}-${i}`}
+                  type={arg}
+                  inputs={state.inputs[funcName]}
+                  errors={state.errors[funcName]}
+                  path={[i]}
+                  handleInput={(payload, path) =>
+                    dispatch({
+                      type: "input",
+                      func: funcName,
+                      path,
+                      payload,
+                    })
+                  }
+                />
+              );
+            });
+          }
+          responseTypes = method.retTypes.length
+            ? getShortname(method.retTypes[0])
+            : "()";
+        }
+
+        const OUTPUT_DISPLAYS = isPb
+          ? PROTOBUF_OUTPUT_DISPLAYS
+          : CANDID_OUTPUT_DISPLAYS;
         const outputDisplay =
           state.outputDisplays[funcName] || OUTPUT_DISPLAYS[0];
 
@@ -220,52 +345,33 @@ export default function CandidUI({
             className="border border-gray-300 dark:border-gray-700 mt-2"
             onSubmit={(e) => {
               e.preventDefault();
-              call(funcName, func, state.inputs[funcName]);
+              call(funcName, method, state.inputs[funcName]);
             }}
           >
-            <div className="px-2 py-2 bg-gray-100 dark:bg-gray-800">
+            <div className="px-2 py-2 bg-gray-100 dark:bg-gray-800 flex justify-between items-center">
               {funcName}
-            </div>
-            <div key={funcName} className="px-2 py-2">
-              {func.argTypes.length > 0
-                ? func.argTypes.map((arg, i) => {
-                    const id = `${funcName}-${i}`;
-                    return (
-                      <div key={id} className="flex flex-col py-1">
-                        <Input
-                          type={arg}
-                          inputs={state.inputs[funcName]}
-                          errors={state.errors[funcName]}
-                          path={[i]}
-                          handleInput={(payload, path) =>
-                            dispatch({
-                              type: "input",
-                              func: funcName,
-                              path,
-                              payload,
-                            })
-                          }
-                        />
-                      </div>
-                    );
-                  })
-                : null}
-              <button
-                className="mt-2 w-16 py-1 text-center btn-default"
-                disabled={state.isLoading[funcName]}
-              >
-                {state.isLoading[funcName] ? (
-                  <CgSpinner className="inline-block animate-spin" />
-                ) : isQuery ? (
-                  "Query"
-                ) : (
-                  "Call"
+              <label
+                className={classNames(
+                  "rounded text-xs py-1 px-2 dark:text-black ml-2",
+                  {
+                    "bg-red-400": isPb,
+                    "bg-blue-400": !isPb,
+                  }
                 )}
-              </button>
+              >
+                {isPb ? "protobuf" : "candid"}
+              </label>
+            </div>
+            <div className="px-2 py-2">
+              {inputs}
+              <QueryButton
+                isLoading={state.isLoading[funcName]}
+                isQuery={isQuery}
+              />
               <div className="mt-2 flex items-center">
                 <span className="text-xs italic text-gray-500">
                   <BsArrowReturnRight className="inline" />
-                  {func.retTypes.length ? getShortname(func.retTypes[0]) : "()"}
+                  {responseTypes}
                 </span>
                 {state.outputs[funcName] && !state.outputs[funcName].err && (
                   <div className="text-xs ml-2">
@@ -293,8 +399,13 @@ export default function CandidUI({
               {state.outputs[funcName] ? (
                 <div className="mt-1">
                   <Output
+                    format={isPb ? "protobuf" : "candid"}
                     display={outputDisplay}
-                    type={func.retTypes[0]}
+                    type={
+                      isPb
+                        ? (method as Method).resolvedResponseType
+                        : (method as IDL.FuncClass).retTypes[0]
+                    }
                     value={state.outputs[funcName]}
                   />
                 </div>

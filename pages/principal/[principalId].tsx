@@ -18,6 +18,7 @@ const PrincipalPage = () => {
   const [isValid, setIsValid] = useState(true);
   const [candid, setCandid] = useState("");
   const [bindings, setBindings] = useState(null);
+  const [protobuf, setProtobuf] = useState("");
   const { principalId, candid: candidOverride } = router.query as {
     principalId: string;
     candid?: string;
@@ -48,6 +49,7 @@ const PrincipalPage = () => {
       }
     }
     setCandidAndBindings(newCandid);
+    setProtobuf("");
 
     try {
       Principal.fromText(principalId);
@@ -73,7 +75,7 @@ const PrincipalPage = () => {
       } catch (error) {}
     })();
 
-    fetch("/interfaces/canisters.json")
+    fetch("/json/canisters.json")
       .then((res) => res.json())
       .then((json) => {
         const name = json[principalId];
@@ -88,6 +90,18 @@ const PrincipalPage = () => {
             })
             .then((data) => {
               setCandidAndBindings(data);
+            })
+            .catch((e) => {});
+
+          fetch(`/interfaces/${name}.proto`)
+            .then((res) => {
+              if (!res.ok) {
+                throw res.statusText;
+              }
+              return res.text();
+            })
+            .then((data) => {
+              setProtobuf(data);
             })
             .catch((e) => {});
         }
@@ -114,11 +128,12 @@ const PrincipalPage = () => {
               candid={candid}
               canisterId={principalId}
               jsBindings={bindings.js}
+              protobuf={protobuf}
               className="mb-8"
               isAttached={!!candidOverride}
             />
           )}
-          <CodeBlock candid={candid} bindings={bindings} />
+          <CodeBlock candid={candid} bindings={bindings} protobuf={protobuf} />
         </>
       )}
     </div>
