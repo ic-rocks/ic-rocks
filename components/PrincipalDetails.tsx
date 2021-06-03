@@ -9,20 +9,24 @@ import { getCrc32 } from "@dfinity/agent/lib/cjs/utils/getCrc.js";
 import { sha224 } from "@dfinity/agent/lib/cjs/utils/sha224.js";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
-
-type Type = "Canister" | "User" | "Anonymous" | "Derived";
+import { PrincipalType } from "../pages/principal/[principalId]";
 
 export default function PrincipalDetails({
   className,
-  canisterId,
+  principalId,
   canisterName,
+  type,
 }: {
   className?: string;
-  canisterId: string;
+  principalId: string;
   canisterName?: string;
+  type: PrincipalType;
 }) {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   const [data, setData] = useState(null);
-  const [type, setType] = useState<Type>("Canister");
   const [subaccounts, setSubaccounts] = useState([]);
   const [showSubaccounts, setShowSubaccounts] = useState(false);
 
@@ -32,42 +36,25 @@ export default function PrincipalDetails({
 
     let principal;
     try {
-      principal = Principal.fromText(canisterId).toBlob();
+      principal = Principal.fromText(principalId).toBlob();
     } catch (error) {
       return;
     }
 
-    let type_ = "Canister";
-    switch (principal.slice(-1)[0]) {
-      case 1:
-        type_ = "Canister";
-        break;
-      case 2:
-        type_ = "User";
-        break;
-      case 3:
-        type_ = "Derived";
-        break;
-      case 4:
-        type_ = "Anonymous";
-        break;
-    }
-    setType(type_ as Type);
-
-    if (type_ == "Canister") {
+    if (type == "Canister") {
       (async () => {
         const pathCommon = [blobFromText("canister"), principal];
         const pathModuleHash = pathCommon.concat(blobFromText("module_hash"));
         const pathController = pathCommon.concat(blobFromText("controller"));
         const agent = new HttpAgent({ host: "https://ic0.app" });
         try {
-          const res = await agent.readState(canisterId, {
+          const res = await agent.readState(principalId, {
             paths: [pathModuleHash, pathController],
           });
           const cert = new Certificate(res, agent);
           if (await cert.verify()) {
             const subnet = cert["cert"].delegation
-              ? cert["cert"].delegation.subnet_id.toString("hex")
+              ? Principal.fromBlob(cert["cert"].delegation.subnet_id).toText()
               : null;
             const moduleHash = cert.lookup(pathModuleHash).toString("hex");
             const controller = Principal.fromBlob(
@@ -94,11 +81,7 @@ export default function PrincipalDetails({
         return Buffer.concat([crc32Buf, aId]).toString("hex");
       })
     );
-  }, [canisterId]);
-
-  if (typeof window === "undefined") {
-    return null;
-  }
+  }, [type, principalId]);
 
   return (
     <div className={className}>
@@ -130,7 +113,15 @@ export default function PrincipalDetails({
               <tr>
                 <td className="px-2 py-2 w-1/6">Subnet</td>
                 <td className="px-2 py-2 w-5/6 overflow-hidden overflow-ellipsis">
-                  {data?.subnet || "-"}
+                  {data?.subnet ? (
+                    <Link href={`/subnet/${data?.subnet}`}>
+                      <a className="hover:underline text-blue-600">
+                        {data?.subnet}
+                      </a>
+                    </Link>
+                  ) : (
+                    "-"
+                  )}
                 </td>
               </tr>
               <tr>

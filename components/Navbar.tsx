@@ -22,6 +22,9 @@ export default function Nav() {
             </a>
           </li>
           <li className="pr-4">
+            <ActiveLink href="/network">Network</ActiveLink>
+          </li>
+          <li className="pr-4">
             <ActiveLink href="/icp">ICP</ActiveLink>
           </li>
           <li className="pr-4">

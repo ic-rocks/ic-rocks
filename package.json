@@ -4,9 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "npm run sync",
     "build": "next build",
     "start": "next start",
-    "export": "next export"
+    "export": "next export",
+    "sync": "node scripts/syncSystemData"
   },
   "dependencies": {
     "@dfinity/agent": "^0.8.9",
