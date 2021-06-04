@@ -1,0 +1,21 @@
+svg .link {
+  @apply opacity-100 text-gray-300 dark:text-gray-700;
+}
+svg .link.inactive {
+  @apply opacity-5;
+}
+svg .link.active {
+  @apply text-gray-600 dark:text-gray-400;
+}
+svg .node.inactive {
+  @apply opacity-5;
+}
+svg .node text {
+  @apply opacity-0 text-gray-500;
+}
+svg .node.active text {
+  @apply opacity-100;
+}
+svg .node.active.selected text {
+  @apply text-black dark:text-white;
+}
