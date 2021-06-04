@@ -3,6 +3,7 @@ import extendProtobuf from "agent-pb";
 import Link from "next/link";
 import protobuf from "protobufjs";
 import React from "react";
+import NetworkGraph from "../../components/Charts/NetworkGraph";
 import { MetaTitle } from "../../components/MetaTags";
 import subnetsJson from "../../generated/subnets.json";
 import protobufJson from "../../lib/canisters/proto.json";
@@ -109,6 +110,7 @@ const NodePage = ({ nodeId, nodeRecord, subnets }) => {
           </tr>
         </tbody>
       </table>
+      <NetworkGraph activeId={nodeId} activeType="Node" />
     </div>
   );
 };

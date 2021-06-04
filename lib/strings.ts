@@ -27,3 +27,11 @@ export const guessEncoding = (string: string): [Buffer, BufferEncoding] => {
   }
   return [Buffer.from(string, "utf-8"), "utf-8"];
 };
+
+export const shortPrincipal = (principal: string) => {
+  const parts = principal.split("-");
+  return `${parts[0]}...${parts.slice(-1)[0]}`;
+};
+
+export const capitalize = (string: string) =>
+  string[0].toUpperCase() + string.slice(1);

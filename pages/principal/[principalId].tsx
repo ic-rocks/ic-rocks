@@ -2,6 +2,7 @@ import { Actor, HttpAgent, Principal } from "@dfinity/agent";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import CandidUI from "../../components/CandidUI";
+import NetworkGraph from "../../components/Charts/NetworkGraph";
 import CodeBlock from "../../components/CodeBlock";
 import { MetaTitle } from "../../components/MetaTags";
 import { PrincipalNodesList } from "../../components/NodeList";
@@ -185,7 +186,10 @@ const PrincipalPage = () => {
         </>
       )}
       {nodes ? (
-        <PrincipalNodesList type={nodes.type} nodes={nodes.nodes} />
+        <>
+          <NetworkGraph activeId={principalId} activeType="Principal" />
+          <PrincipalNodesList type={nodes.type} nodes={nodes.nodes} />
+        </>
       ) : null}
     </div>
   ) : (

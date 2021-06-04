@@ -1,5 +1,6 @@
 import Link from "next/link";
 import React from "react";
+import NetworkGraph from "../../components/Charts/NetworkGraph";
 import { MetaTitle } from "../../components/MetaTags";
 import subnetsJson from "../../generated/subnets.json";
 import { countBy } from "../../lib/arrays";
@@ -102,6 +103,8 @@ const Subnet = ({
           </tr>
         </tbody>
       </table>
+
+      <NetworkGraph activeId={subnetId} activeType="Subnet" />
 
       <table className="w-full mt-8">
         <thead className="bg-gray-100 dark:bg-gray-800">

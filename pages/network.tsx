@@ -1,5 +1,6 @@
 import Link from "next/link";
 import React from "react";
+import NetworkGraph from "../components/Charts/NetworkGraph";
 import { MetaTitle } from "../components/MetaTags";
 import subnetsJson from "../generated/subnets.json";
 import { getSubnetType } from "../lib/network";
@@ -12,6 +13,7 @@ const Network = () => {
     <div className="py-16">
       <MetaTitle title={title} />
       <h1 className="text-3xl mb-8">{title}</h1>
+      <NetworkGraph />
       <section>
         <table className="w-full mt-8">
           <thead className="bg-gray-100 dark:bg-gray-800">
