@@ -16,11 +16,13 @@ export default function PrincipalDetails({
   principalId,
   canisterName,
   type,
+  nodesType,
 }: {
   className?: string;
   principalId: string;
   canisterName?: string;
   type: PrincipalType;
+  nodesType?: string;
 }) {
   if (typeof window === "undefined") {
     return null;
@@ -106,7 +108,14 @@ export default function PrincipalDetails({
           </tr>
           <tr>
             <td className="px-2 py-2 w-1/6">Type</td>
-            <td className="px-2 py-2 w-5/6">{type}</td>
+            <td className="px-2 py-2 w-5/6">
+              {type}
+              {nodesType
+                ? nodesType === "operator"
+                  ? " (Node Operator)"
+                  : " (Node Provider)"
+                : null}
+            </td>
           </tr>
           {type == "Canister" && (
             <>

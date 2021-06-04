@@ -4,7 +4,8 @@ const { Actor, HttpAgent, IDL, Principal } = require("@dfinity/agent");
 const extendProtobuf = require("agent-pb").default;
 const protobuf = require("protobufjs");
 const protobufJson = require("../lib/canisters/proto.json");
-global.fetch = require("node-fetch");
+const fetch = require("node-fetch");
+global.fetch = fetch;
 
 const root = protobuf.Root.fromJSON(protobufJson);
 const agent = new HttpAgent({ host: "https://ic0.app" });
@@ -22,18 +23,18 @@ async function syncSystemData() {
   const record = root
     .lookupType("SubnetListRecord")
     .decode(subnetListValue.value);
-  const subnets = record.subnets.map((subnet) =>
-    Principal.fromBlob(subnet).toText()
-  );
+  const sortedSubnetsList = record.subnets
+    .map((subnet) => Principal.fromBlob(subnet).toText())
+    .sort();
   console.log(
     "version:",
     subnetListValue.version.toString(),
     "subnets:",
-    subnets.length
+    sortedSubnetsList.length
   );
 
-  const subnetEntries = await Promise.all(
-    subnets.map(async (subnet) => {
+  const sortedSubnetsEntries = await Promise.all(
+    sortedSubnetsList.map(async (subnet) => {
       const { version, value } = await registry.get_value({
         key: Buffer.from("subnet_record_" + subnet),
       });
@@ -54,64 +55,67 @@ async function syncSystemData() {
     })
   );
 
-  const nodesEntries = await Promise.all(
-    subnetEntries.flatMap(([subnet, record]) => {
-      return record.membership.map(async (nodeId) => {
-        const nodeValue = await registry.get_value({
-          key: Buffer.from("node_record_" + nodeId),
-        });
-        const nodeRecord = root
-          .lookupType("NodeRecord")
-          .decode(nodeValue.value)
-          .toJSON();
-        const nodeOperatorId = Principal.fromBlob(
-          Buffer.from(nodeRecord.nodeOperatorId, "base64")
-        ).toText();
+  const sortedNodesEntries = (
+    await Promise.all(
+      sortedSubnetsEntries.flatMap(([subnet, record]) => {
+        return record.membership.map(async (nodeId) => {
+          const nodeValue = await registry.get_value({
+            key: Buffer.from("node_record_" + nodeId),
+          });
+          const nodeRecord = root
+            .lookupType("NodeRecord")
+            .decode(nodeValue.value)
+            .toJSON();
+          const nodeOperatorId = Principal.fromBlob(
+            Buffer.from(nodeRecord.nodeOperatorId, "base64")
+          ).toText();
 
-        const nodeOperatorValue = await registry.get_value({
-          key: Buffer.from("node_operator_record_" + nodeOperatorId),
-        });
-        const nodeOperatorRecord = root
-          .lookupType("NodeOperatorRecord")
-          .decode(nodeOperatorValue.value)
-          .toJSON();
-        const nodeOperator = {
-          ...nodeOperatorRecord,
-          nodeOperatorPrincipalId: Principal.fromBlob(
-            Buffer.from(nodeOperatorRecord.nodeOperatorPrincipalId, "base64")
-          ).toText(),
-          nodeProviderPrincipalId: Principal.fromBlob(
-            Buffer.from(nodeOperatorRecord.nodeProviderPrincipalId, "base64")
-          ).toText(),
-        };
-        if (nodeOperatorId !== nodeOperator.nodeOperatorPrincipalId) {
-          console.warn(
-            "node record has operator",
-            nodeOperatorId,
-            "but operator record is",
-            nodeOperator.nodeOperatorPrincipalId
-          );
-        }
+          const nodeOperatorValue = await registry.get_value({
+            key: Buffer.from("node_operator_record_" + nodeOperatorId),
+          });
+          const nodeOperatorRecord = root
+            .lookupType("NodeOperatorRecord")
+            .decode(nodeOperatorValue.value)
+            .toJSON();
+          const nodeOperator = {
+            ...nodeOperatorRecord,
+            nodeOperatorPrincipalId: Principal.fromBlob(
+              Buffer.from(nodeOperatorRecord.nodeOperatorPrincipalId, "base64")
+            ).toText(),
+            nodeProviderPrincipalId: Principal.fromBlob(
+              Buffer.from(nodeOperatorRecord.nodeProviderPrincipalId, "base64")
+            ).toText(),
+          };
+          if (nodeOperatorId !== nodeOperator.nodeOperatorPrincipalId) {
+            console.warn(
+              "node record has operator",
+              nodeOperatorId,
+              "but operator record is",
+              nodeOperator.nodeOperatorPrincipalId
+            );
+          }
 
-        return [
-          nodeId,
-          {
-            // node: { version: nodeValue.version.toString(), value: node },
-            nodeOperator: {
-              version: nodeOperatorValue.version.toString(),
-              value: nodeOperator,
+          return [
+            nodeId,
+            {
+              // node: { version: nodeValue.version.toString(), value: node },
+              nodeOperator: {
+                version: nodeOperatorValue.version.toString(),
+                value: nodeOperator,
+              },
             },
-          },
-        ];
-      });
-    })
-  );
-  console.log("nodes:", nodesEntries.length);
+          ];
+        });
+      })
+    )
+  ).sort(([a], [b]) => (a > b ? 1 : -1));
+  console.log("nodes:", sortedNodesEntries.length);
 
+  const nodesFullMap = Object.fromEntries(sortedNodesEntries);
   const subnetsJson = {
     version: subnetListValue.version.toString(),
-    subnets: Object.fromEntries(subnetEntries),
-    nodes: Object.fromEntries(nodesEntries),
+    subnets: Object.fromEntries(sortedSubnetsEntries),
+    nodes: nodesFullMap,
   };
 
   const subnetsJsonFilename = path.resolve(
@@ -120,37 +124,85 @@ async function syncSystemData() {
   fs.writeFileSync(subnetsJsonFilename, JSON.stringify(subnetsJson));
   console.log("wrote subnets to", subnetsJsonFilename);
 
-  const nodesOperatorMap = nodesEntries.reduce((acc, [nodeId, record]) => {
-    const key = record.nodeOperator.value.nodeOperatorPrincipalId;
-    if (!acc[key]) {
-      acc[key] = [];
-    }
-    acc[key].push(nodeId);
-    return acc;
-  }, {});
-  const nodeProviderMap = nodesEntries.reduce((acc, [nodeId, record]) => {
-    const key = record.nodeOperator.value.nodeProviderPrincipalId;
-    if (!acc[key]) {
-      acc[key] = [];
-    }
-    acc[key].push(nodeId);
-    return acc;
-  }, {});
+  // const locations = await fetch('https://ic-api.internetcomputer.org/api/locations').then(res => res.json())
+
+  const principalsMap = sortedNodesEntries.reduce(
+    (acc, [nodeId, record], idx) => {
+      const keyOp = record.nodeOperator.value.nodeOperatorPrincipalId;
+      if (!acc[keyOp]) {
+        acc[keyOp] = {};
+      }
+      if (!acc[keyOp].operator) {
+        acc[keyOp].operator = [];
+      }
+      acc[keyOp].operator.push(idx);
+
+      const keyPr = record.nodeOperator.value.nodeProviderPrincipalId;
+      if (!acc[keyPr]) {
+        acc[keyPr] = {};
+      }
+      if (!acc[keyPr].provider) {
+        acc[keyPr].provider = [];
+      }
+      acc[keyPr].provider.push(idx);
+      return acc;
+    },
+    {}
+  );
+  const sortedPrincipals = Object.keys(principalsMap).sort();
+
   console.log(
+    "unique principals:",
+    sortedPrincipals.length,
     "operators:",
-    Object.keys(nodesOperatorMap).length,
+    Object.values(principalsMap).filter((p) => !!p.operator).length,
     "providers:",
-    Object.keys(nodeProviderMap).length
+    Object.values(principalsMap).filter((p) => !!p.provider).length
   );
 
-  const nodePrincipalsJson = {
-    nodesOperator: nodesOperatorMap,
-    nodeProvider: nodeProviderMap,
+  const nodesMap = sortedSubnetsEntries.reduce(
+    (acc, [subnetId, record], idx) => {
+      return {
+        ...acc,
+        ...Object.fromEntries(
+          record.membership.map((nodeId) => {
+            const provider = sortedPrincipals.findIndex(
+              (p) =>
+                p ===
+                nodesFullMap[nodeId].nodeOperator.value.nodeProviderPrincipalId
+            );
+            const operator = sortedPrincipals.findIndex(
+              (p) =>
+                p ===
+                nodesFullMap[nodeId].nodeOperator.value.nodeOperatorPrincipalId
+            );
+
+            return [
+              nodeId,
+              {
+                subnet: idx,
+                provider,
+                operator,
+              },
+            ];
+          })
+        ),
+      };
+    },
+    {}
+  );
+
+  const nodesJson = {
+    nodesList: sortedNodesEntries.map(([nodeId]) => nodeId),
+    subnetsList: sortedSubnetsEntries.map(([subnetId]) => subnetId),
+    principalsList: sortedPrincipals,
+    nodesMap,
+    principalsMap,
   };
   const principalsFilename = path.resolve(
-    `${__dirname}/../public/data/generated/principals.json`
+    `${__dirname}/../public/data/generated/nodes.json`
   );
-  fs.writeFileSync(principalsFilename, JSON.stringify(nodePrincipalsJson));
+  fs.writeFileSync(principalsFilename, JSON.stringify(nodesJson));
   console.log("wrote node principals to", principalsFilename);
 }
 

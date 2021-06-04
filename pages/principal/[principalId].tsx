@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import CandidUI from "../../components/CandidUI";
 import CodeBlock from "../../components/CodeBlock";
 import { MetaTitle } from "../../components/MetaTags";
-import { NodeList } from "../../components/NodeList";
+import { PrincipalNodesList } from "../../components/NodeList";
 import PrincipalDetails from "../../components/PrincipalDetails";
 import Search404 from "../../components/Search404";
 import CandidService from "../../lib/canisters/get-candid.did";
@@ -133,18 +133,23 @@ const PrincipalPage = () => {
           }
         });
     } else {
-      fetch("/data/generated/principals.json")
+      fetch("/data/generated/nodes.json")
         .then((res) => res.json())
         .then((json) => {
-          if (json.nodesOperator[principalId]) {
+          if (json.principalsMap && json.principalsMap[principalId]) {
+            const type = Object.keys(json.principalsMap[principalId])[0];
             setNodes({
-              type: "Operator",
-              nodes: json.nodesOperator[principalId],
-            });
-          } else if (json.nodeProvider[principalId]) {
-            setNodes({
-              type: "Provider",
-              nodes: json.nodeProvider[principalId],
+              type,
+              nodes: json.principalsMap[principalId][type].map((nodeIdx) => {
+                const nodeId = json.nodesList[nodeIdx];
+                const nodeData = json.nodesMap[nodeId];
+                return {
+                  nodeId,
+                  subnet: json.subnetsList[nodeData.subnet],
+                  provider: json.principalsList[nodeData.provider],
+                  operator: json.principalsList[nodeData.operator],
+                };
+              }),
             });
           }
         });
@@ -160,6 +165,7 @@ const PrincipalPage = () => {
       <PrincipalDetails
         principalId={principalId}
         type={type}
+        nodesType={nodes?.type}
         canisterName={name}
         className="mb-8"
       />
@@ -179,10 +185,7 @@ const PrincipalPage = () => {
         </>
       )}
       {nodes ? (
-        <NodeList
-          title={`Nodes as ${nodes.type} (${nodes.nodes.length})`}
-          nodes={nodes.nodes}
-        />
+        <PrincipalNodesList type={nodes.type} nodes={nodes.nodes} />
       ) : null}
     </div>
   ) : (
