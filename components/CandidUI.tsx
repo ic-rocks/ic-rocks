@@ -2,6 +2,7 @@ import { Actor, HttpAgent } from "@dfinity/agent";
 import { IDL } from "@dfinity/candid";
 import extendProtobuf from "agent-pb";
 import classNames from "classnames";
+import { Bindings } from "didc";
 import Link from "next/link";
 import { del, set } from "object-path-immutable";
 import protobuf, { Method } from "protobufjs/light";
@@ -11,7 +12,6 @@ import { FaTimes } from "react-icons/fa";
 import { FiExternalLink } from "react-icons/fi";
 import { getShortname, validate } from "../lib/candid/utils";
 import protobufJson from "../lib/canisters/proto.json";
-import { Bindings } from "../lib/didc-js/didc_js";
 import { pluralize } from "../lib/strings";
 import {
   CandidInput,

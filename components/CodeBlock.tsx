@@ -1,4 +1,5 @@
 import classnames from "classnames";
+import { Bindings } from "didc";
 import React, { useCallback, useState } from "react";
 import { BsCheck, BsClipboard } from "react-icons/bs";
 import { Light as SyntaxHighlighter } from "react-syntax-highlighter";
@@ -7,15 +8,22 @@ import protobuf from "react-syntax-highlighter/dist/cjs/languages/hljs/protobuf"
 import typescript from "react-syntax-highlighter/dist/cjs/languages/hljs/typescript";
 import { monokai } from "react-syntax-highlighter/dist/cjs/styles/hljs";
 import { useClipboard } from "use-clipboard-copy";
-import { Bindings } from "../lib/didc-js/didc_js";
 import candid from "../lib/syntax/candid";
+import motoko from "../lib/syntax/motoko";
 
 SyntaxHighlighter.registerLanguage("javascript", javascript);
 SyntaxHighlighter.registerLanguage("typescript", typescript);
 SyntaxHighlighter.registerLanguage("candid", candid);
 SyntaxHighlighter.registerLanguage("protobuf", protobuf);
+SyntaxHighlighter.registerLanguage("motoko", motoko);
 
-const LANGUAGES = ["candid", "javascript", "typescript", "protobuf"] as const;
+const LANGUAGES = [
+  "candid",
+  "motoko",
+  "javascript",
+  "typescript",
+  "protobuf",
+] as const;
 
 export default function CodeBlock({
   className,
@@ -35,6 +43,8 @@ export default function CodeBlock({
   const displayCode =
     language === "candid"
       ? candid
+      : language === "motoko"
+      ? bindings.motoko || ""
       : language === "javascript"
       ? bindings.js || ""
       : language === "typescript"

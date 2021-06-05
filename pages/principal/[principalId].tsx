@@ -11,7 +11,7 @@ import PrincipalDetails from "../../components/PrincipalDetails";
 import Search404 from "../../components/Search404";
 import CandidService from "../../lib/canisters/get-candid.did";
 
-const didc = import("../../lib/didc-js/didc_js");
+const didc = import("didc");
 
 export type PrincipalType = "Canister" | "User" | "Anonymous" | "Derived" | "";
 

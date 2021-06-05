@@ -13,7 +13,8 @@ import MatchingCanistersList from "../../components/MatchingCanistersList";
 import { MetaTitle } from "../../components/MetaTags";
 import { GITHUB_REPO } from "../../lib/constants";
 
-const didc = import("../../lib/didc-js/didc_js");
+const didc = import("didc");
+
 export async function getStaticPaths() {
   const base = `${process.cwd()}/public/data/interfaces`;
   const paths = glob
