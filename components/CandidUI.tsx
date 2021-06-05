@@ -1,4 +1,5 @@
-import { Actor, HttpAgent, IDL } from "@dfinity/agent";
+import { Actor, HttpAgent } from "@dfinity/agent";
+import { IDL } from "@dfinity/candid";
 import extendProtobuf from "agent-pb";
 import classNames from "classnames";
 import Link from "next/link";

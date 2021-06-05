@@ -1,4 +1,4 @@
-import { IDL } from "@dfinity/agent";
+import { IDL } from "@dfinity/candid";
 import { useRouter } from "next/router";
 import { get } from "object-path-immutable";
 import React, { useState } from "react";

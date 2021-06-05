@@ -1,4 +1,5 @@
-import { Actor, HttpAgent, Principal } from "@dfinity/agent";
+import { Actor, HttpAgent } from "@dfinity/agent";
+import { Principal } from "@dfinity/principal";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import CandidUI from "../../components/CandidUI";
@@ -60,7 +61,7 @@ const PrincipalPage = () => {
 
     let principal;
     try {
-      principal = Principal.fromText(principalId).toBlob();
+      principal = Principal.fromText(principalId).toUint8Array();
       setIsValid(true);
     } catch (error) {
       setIsValid(false);

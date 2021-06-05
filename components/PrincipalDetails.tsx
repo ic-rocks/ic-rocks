@@ -1,12 +1,8 @@
-import {
-  blobFromBuffer,
-  blobFromText,
-  Certificate,
-  HttpAgent,
-  Principal,
-} from "@dfinity/agent";
-import { getCrc32 } from "@dfinity/agent/lib/cjs/utils/getCrc.js";
-import { sha224 } from "@dfinity/agent/lib/cjs/utils/sha224.js";
+import { Certificate, HttpAgent } from "@dfinity/agent";
+import { Principal } from "@dfinity/principal";
+import { getCrc32 } from "@dfinity/principal/lib/cjs/utils/getCrc.js";
+import { sha224 } from "@dfinity/principal/lib/cjs/utils/sha224.js";
+import { Buffer } from "buffer/";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { PrincipalType } from "../pages/principal/[principalId]";
@@ -38,16 +34,16 @@ export default function PrincipalDetails({
 
     let principal;
     try {
-      principal = Principal.fromText(principalId).toBlob();
+      principal = Buffer.from(Principal.fromText(principalId).toUint8Array());
     } catch (error) {
       return;
     }
 
     if (type == "Canister") {
       (async () => {
-        const pathCommon = [blobFromText("canister"), principal];
-        const pathModuleHash = pathCommon.concat(blobFromText("module_hash"));
-        const pathController = pathCommon.concat(blobFromText("controller"));
+        const pathCommon = [Buffer.from("canister"), principal];
+        const pathModuleHash = pathCommon.concat(Buffer.from("module_hash"));
+        const pathController = pathCommon.concat(Buffer.from("controller"));
         const agent = new HttpAgent({ host: "https://ic0.app" });
         try {
           const res = await agent.readState(principalId, {
@@ -56,11 +52,13 @@ export default function PrincipalDetails({
           const cert = new Certificate(res, agent);
           if (await cert.verify()) {
             const subnet = cert["cert"].delegation
-              ? Principal.fromBlob(cert["cert"].delegation.subnet_id).toText()
+              ? Principal.fromUint8Array(
+                  cert["cert"].delegation.subnet_id
+                ).toText()
               : null;
             const moduleHash = cert.lookup(pathModuleHash).toString("hex");
-            const controller = Principal.fromBlob(
-              blobFromBuffer(cert.lookup(pathController))
+            const controller = Principal.fromUint8Array(
+              cert.lookup(pathController)
             ).toText();
             setData({ subnet, moduleHash, controller });
           }
@@ -75,11 +73,17 @@ export default function PrincipalDetails({
       Array.from({ length: 10 }).map((_, i) => {
         const subaccount = Buffer.alloc(32);
         subaccount[31] = i;
-        const aId = sha224(
-          Buffer.concat([Buffer.from("\x0Aaccount-id"), principal, subaccount])
+        const aId = Buffer.from(
+          sha224(
+            Buffer.concat([
+              Buffer.from("\x0Aaccount-id"),
+              principal,
+              subaccount,
+            ])
+          )
         );
         const crc32Buf = Buffer.alloc(4);
-        crc32Buf.writeUInt32BE(getCrc32(aId));
+        crc32Buf.writeUInt32BE(getCrc32(aId), 0);
         return Buffer.concat([crc32Buf, aId]).toString("hex");
       })
     );

@@ -1,5 +1,5 @@
-import { Actor, blobFromHex, HttpAgent } from "@dfinity/agent";
-import { getCrc32 } from "@dfinity/agent/lib/cjs/utils/getCrc";
+import { Actor, HttpAgent } from "@dfinity/agent";
+import { getCrc32 } from "@dfinity/principal/lib/cjs/utils/getCrc";
 import classnames from "classnames";
 import { DateTime } from "luxon";
 import Link from "next/link";
@@ -48,7 +48,7 @@ const Account = () => {
 
     let valid = false;
     try {
-      const blob = blobFromHex(accountId);
+      const blob = Buffer.from(accountId, "hex");
       const crc32Buf = Buffer.alloc(4);
       crc32Buf.writeUInt32BE(getCrc32(blob.slice(4)));
       valid = blob.slice(0, 4).toString() === crc32Buf.toString();

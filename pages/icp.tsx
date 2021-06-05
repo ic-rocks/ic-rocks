@@ -1,11 +1,12 @@
-import { Actor, HttpAgent, IDL } from "@dfinity/agent";
+import { Actor, HttpAgent } from "@dfinity/agent";
+import { IDL } from "@dfinity/candid";
+import { Buffer } from "buffer/";
 import { DateTime } from "luxon";
 import React, { useEffect, useState } from "react";
 import { MetaTitle } from "../components/MetaTags";
 import governanceIdl from "../lib/canisters/governance.did";
 import nnsUiIdl from "../lib/canisters/nns-ui.did";
 import useInterval from "../lib/useInterval";
-declare const Buffer;
 
 const UpdateIcpXdrConversionRatePayload = (IDL) =>
   IDL.Record({

@@ -11,7 +11,7 @@
     "sync": "node scripts/syncSystemData"
   },
   "dependencies": {
-    "@dfinity/agent": "^0.8.9",
+    "@dfinity/agent": "^0.9.0",
     "agent-pb": "github:ic-cubes/agent-pb",
     "classnames": "^2.2.6",
     "d3": "^6.7.0",

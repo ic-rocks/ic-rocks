@@ -1,4 +1,5 @@
-import { Actor, HttpAgent, IDL } from "@dfinity/agent";
+import { Actor, HttpAgent } from "@dfinity/agent";
+import { IDL } from "@dfinity/candid";
 import extendProtobuf from "agent-pb";
 import Link from "next/link";
 import protobuf from "protobufjs";
@@ -7,7 +8,6 @@ import NetworkGraph from "../../components/Charts/NetworkGraph";
 import { MetaTitle } from "../../components/MetaTags";
 import subnetsJson from "../../generated/subnets.json";
 import protobufJson from "../../lib/canisters/proto.json";
-declare const Buffer;
 
 const root = protobuf.Root.fromJSON(protobufJson as protobuf.INamespace);
 const agent = new HttpAgent({ host: "https://ic0.app" });

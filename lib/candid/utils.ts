@@ -1,4 +1,5 @@
-import { IDL, Principal } from "@dfinity/agent";
+import { IDL } from "@dfinity/candid";
+import { Principal } from "@dfinity/principal";
 import protobuf from "protobufjs";
 import { isNumberType } from "../../components/CanisterUI/ProtobufElements";
 import { pluralize } from "../strings";

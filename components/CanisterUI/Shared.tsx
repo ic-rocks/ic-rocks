@@ -1,4 +1,4 @@
-import { IDL } from "@dfinity/agent";
+import { IDL } from "@dfinity/candid";
 import classNames from "classnames";
 import protobuf from "protobufjs";
 import React, { useEffect, useState } from "react";

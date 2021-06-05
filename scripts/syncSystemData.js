@@ -1,6 +1,8 @@
 const fs = require("fs");
 const path = require("path");
-const { Actor, HttpAgent, IDL, Principal } = require("@dfinity/agent");
+const { Actor, HttpAgent } = require("@dfinity/agent");
+const { IDL } = require("@dfinity/candid");
+const { Principal } = require("@dfinity/principal");
 const extendProtobuf = require("agent-pb").default;
 const protobuf = require("protobufjs");
 const protobufJson = require("../lib/canisters/proto.json");
@@ -24,7 +26,7 @@ async function syncSystemData() {
     .lookupType("SubnetListRecord")
     .decode(subnetListValue.value);
   const sortedSubnetsList = record.subnets
-    .map((subnet) => Principal.fromBlob(subnet).toText())
+    .map((subnet) => Principal.fromUint8Array(subnet).toText())
     .sort();
   console.log(
     "version:",
@@ -47,7 +49,7 @@ async function syncSystemData() {
         {
           ...subnetRecord,
           membership: subnetRecord.membership.map((nodeId) =>
-            Principal.fromBlob(Buffer.from(nodeId, "base64")).toText()
+            Principal.fromUint8Array(Buffer.from(nodeId, "base64")).toText()
           ),
           version: version.toString(),
         },
@@ -66,7 +68,7 @@ async function syncSystemData() {
             .lookupType("NodeRecord")
             .decode(nodeValue.value)
             .toJSON();
-          const nodeOperatorId = Principal.fromBlob(
+          const nodeOperatorId = Principal.fromUint8Array(
             Buffer.from(nodeRecord.nodeOperatorId, "base64")
           ).toText();
 
@@ -79,10 +81,10 @@ async function syncSystemData() {
             .toJSON();
           const nodeOperator = {
             ...nodeOperatorRecord,
-            nodeOperatorPrincipalId: Principal.fromBlob(
+            nodeOperatorPrincipalId: Principal.fromUint8Array(
               Buffer.from(nodeOperatorRecord.nodeOperatorPrincipalId, "base64")
             ).toText(),
-            nodeProviderPrincipalId: Principal.fromBlob(
+            nodeProviderPrincipalId: Principal.fromUint8Array(
               Buffer.from(nodeOperatorRecord.nodeProviderPrincipalId, "base64")
             ).toText(),
           };
