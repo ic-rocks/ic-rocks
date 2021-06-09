@@ -245,6 +245,15 @@ export default function CandidUI({
   );
 
   const sortedMethods = Object.entries(methods).sort(methodCmp);
+  const appLink = methods.http_request ? (
+    <a
+      className="hover:underline text-blue-600 flex items-center text-xs"
+      href={`https://${canisterId}.raw.ic0.app`}
+      target="_blank"
+    >
+      Go to App <FiExternalLink className="ml-1" />
+    </a>
+  ) : null;
 
   return (
     <div className={className}>
@@ -270,15 +279,18 @@ export default function CandidUI({
             </div>
           )}
         </div>
-        <a
-          className="hover:underline text-blue-600 flex items-center text-xs"
-          href={`${CANDID_UI_URL}?id=${canisterId}&did=${encodeURIComponent(
-            window.btoa(candid)
-          )}`}
-          target="_blank"
-        >
-          Go to Candid UI <FiExternalLink className="ml-1" />
-        </a>
+        <div className="flex gap-2">
+          {appLink}
+          <a
+            className="hover:underline text-blue-600 flex items-center text-xs"
+            href={`${CANDID_UI_URL}?id=${canisterId}&did=${encodeURIComponent(
+              window.btoa(candid)
+            )}`}
+            target="_blank"
+          >
+            Go to Candid UI <FiExternalLink className="ml-1" />
+          </a>
+        </div>
       </div>
       {sortedMethods.map(([funcName, method]) => {
         let isPb, isQuery, inputs, responseTypes;
