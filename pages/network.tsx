@@ -1,13 +1,56 @@
 import Link from "next/link";
-import React from "react";
+import React, { useMemo } from "react";
 import NetworkGraph from "../components/Charts/NetworkGraph";
 import { MetaTitle } from "../components/MetaTags";
+import { Table } from "../components/Table";
 import subnetsJson from "../generated/subnets.json";
 import { getSubnetType } from "../lib/network";
+import { formatNumber } from "../lib/numbers";
 
 const Network = () => {
-  const subnets = Object.entries(subnetsJson.subnets);
+  const subnets = useMemo(
+    () =>
+      Object.entries(subnetsJson.subnets).map(
+        ([id, { membership, subnetType }]) => ({
+          id,
+          nodeCount: membership.length,
+          subnetType,
+        })
+      ),
+    []
+  );
   const title = "Network";
+
+  const columns = useMemo(
+    () => [
+      {
+        Header: "Type",
+        accessor: "subnetType",
+        Cell: ({ value }) => getSubnetType(value),
+        className: "px-2 w-40",
+      },
+      {
+        Header: `Subnet (${subnets.length})`,
+        accessor: "id",
+        Cell: ({ value }) => (
+          <Link href={`/subnet/${value}`}>
+            <a className="link-overflow">{value}</a>
+          </Link>
+        ),
+        className: "px-2 flex flex-1 whitespace-nowrap overflow-hidden",
+      },
+      {
+        Header: "Nodes",
+        accessor: "nodeCount",
+        sortDescFirst: true,
+        Cell: ({ value }) => formatNumber(value),
+        className: "px-2 w-24 text-right",
+      },
+    ],
+    []
+  );
+
+  const initialSort = useMemo(() => [{ id: "subnetType", desc: false }], []);
 
   return (
     <div className="py-16">
@@ -15,32 +58,14 @@ const Network = () => {
       <h1 className="text-3xl mb-8">{title}</h1>
       <NetworkGraph />
       <section>
-        <table className="w-full mt-8">
-          <thead className="bg-gray-100 dark:bg-gray-800">
-            <tr>
-              <th className="text-left px-2 py-2">
-                Subnets ({subnets.length})
-              </th>
-              <th className="text-left px-2 py-2">Type</th>
-              <th className="text-left px-2 py-2">Nodes</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-300 dark:divide-gray-700">
-            {subnets.map(([subnetId, { membership, subnetType }]) => {
-              return (
-                <tr key={subnetId}>
-                  <td className="px-2 py-1 overflow-hidden overflow-ellipsis text-blue-600">
-                    <Link href={`/subnet/${subnetId}`}>
-                      <a className="hover:underline">{subnetId}</a>
-                    </Link>
-                  </td>
-                  <td className="px-2 py-1">{getSubnetType(subnetType)}</td>
-                  <td className="px-2 py-1">{membership.length}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+        <Table
+          data={subnets}
+          columns={columns}
+          count={subnets.length}
+          initialSortBy={initialSort}
+          manualPagination={false}
+          manualSortBy={false}
+        />
       </section>
     </div>
   );

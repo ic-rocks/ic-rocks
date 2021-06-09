@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import { MetaTitle } from "../components/MetaTags";
 import governanceIdl from "../lib/canisters/governance.did";
 import nnsUiIdl from "../lib/canisters/nns-ui.did";
-import useInterval from "../lib/useInterval";
+import useInterval from "../lib/hooks/useInterval";
 declare const Buffer;
 
 const UpdateIcpXdrConversionRatePayload = (IDL) =>

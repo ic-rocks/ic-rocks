@@ -9,6 +9,9 @@ module.exports = {
         sans: ["Aestetico", ...defaultTheme.fontFamily.sans],
         mono: ["Space Mono", ...defaultTheme.fontFamily.mono],
       },
+      flex: {
+        2: "2 2 0%",
+      },
     },
   },
   variants: {

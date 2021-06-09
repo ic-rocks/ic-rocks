@@ -37,7 +37,7 @@ export default function SearchBar() {
         type="text"
         name="search"
         className="px-2 py-1 bg-gray-200 dark:bg-gray-800 focus:outline-none focus:border border-black dark:border-gray-200 rounded font-sm w-64"
-        placeholder="Search for principal or account"
+        placeholder="Search for principal, account, tx"
         value={input}
         onChange={handleChange}
       />

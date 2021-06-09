@@ -5,8 +5,8 @@ import SearchBar from "./Searchbar";
 export default function Nav() {
   return (
     <nav className="flex justify-center py-4">
-      <div className="flex sm:flex-row flex-col items-stretch justify-between sm:max-w-screen-lg w-full px-4">
-        <ul className="flex items-center">
+      <div className="flex flex-wrap items-stretch justify-between sm:max-w-screen-lg w-full gap-2 px-4">
+        <ul className="flex flex-wrap items-center">
           <li className="pr-8">
             <a href="/">
               <img

@@ -9,10 +9,16 @@ export const formatNumberUSD = (number: number, digits: number = 2) => {
   }).format(number);
 };
 
-export const formatNumber = (number: number) => {
+export const formatNumber = (number: any, digits?) => {
+  let n = number;
+  if (typeof number !== "number") {
+    n = Number(n);
+  }
+  const maximumFractionDigits =
+    typeof digits === "undefined" ? (number < 1 ? 8 : 4) : digits;
   return Intl.NumberFormat("en-US", {
-    maximumFractionDigits: 8,
-  }).format(number);
+    maximumFractionDigits,
+  }).format(n);
 };
 
 export const maybeTimestamp = (number: any): DateTime | null => {

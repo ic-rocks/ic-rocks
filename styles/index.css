@@ -35,3 +35,7 @@ select {
 .btn-default {
   @apply rounded bg-gray-100 dark:bg-gray-800 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors;
 }
+
+.link-overflow {
+  @apply hover:underline text-blue-600 overflow-hidden overflow-ellipsis;
+}
