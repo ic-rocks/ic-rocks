@@ -88,6 +88,7 @@ export const Table = ({
                       className: "px-2 whitespace-nowrap",
                     },
                     { className: column.className },
+                    { style: column.style },
                     column.getSortByToggleProps(),
                   ])}
                 >
@@ -117,6 +118,7 @@ export const Table = ({
                     <td
                       {...cell.getCellProps([
                         { className: cell.column.className },
+                        { style: cell.column.style },
                       ])}
                     >
                       {cell.render("Cell")}

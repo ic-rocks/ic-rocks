@@ -8,4 +8,14 @@ const withTM = require("next-transpile-modules")([
   "@dfinity/candid",
 ]);
 
-module.exports = withTM();
+module.exports = withTM({
+  async rewrites() {
+    return [
+      {
+        source: "/api/:path*",
+        // destination: "http://localhost:3001/:path*",
+        destination: "http://api.ic.rocks/:path*",
+      },
+    ];
+  },
+});

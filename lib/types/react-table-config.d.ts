@@ -1,4 +1,5 @@
 // https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/react-table
+import React from "react";
 import "react-table";
 
 declare module "react-table" {
@@ -67,6 +68,7 @@ declare module "react-table" {
       UseResizeColumnsColumnProps<D>,
       UseSortByColumnProps<D> {
     className: string;
+    style: React.CSSProperties;
   }
 
   export interface Cell<

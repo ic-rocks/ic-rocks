@@ -1,8 +1,9 @@
-import { Actor, HttpAgent } from "@dfinity/agent";
+import { Actor, Certificate, HttpAgent } from "@dfinity/agent";
 import { Principal } from "@dfinity/principal";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import CandidUI from "../../components/CandidUI";
+import { CanistersTable } from "../../components/CanistersTable";
 import NetworkGraph from "../../components/Charts/NetworkGraph";
 import CodeBlock from "../../components/CodeBlock";
 import { MetaTitle } from "../../components/MetaTags";
@@ -10,6 +11,8 @@ import { PrincipalNodesList } from "../../components/NodeList";
 import PrincipalDetails from "../../components/PrincipalDetails";
 import Search404 from "../../components/Search404";
 import CandidService from "../../lib/canisters/get-candid.did";
+import fetchJSON from "../../lib/fetch";
+import { APIPrincipal, Canister } from "../../lib/types/API";
 
 const didc = import("didc");
 
@@ -25,11 +28,12 @@ const PrincipalPage = () => {
   };
   const [isValid, setIsValid] = useState(true);
   const [type, setType] = useState<PrincipalType>("");
-  const [name, setName] = useState("");
   const [candid, setCandid] = useState("");
   const [bindings, setBindings] = useState(null);
   const [protobuf, setProtobuf] = useState("");
   const [nodes, setNodes] = useState(null);
+  const [principalData, setPrincipalData] = useState<APIPrincipal>(null);
+  const [canisterData, setCanisterData] = useState<Canister>(null);
 
   const setCandidAndBindings = (newCandid) => {
     setCandid(newCandid);
@@ -46,7 +50,6 @@ const PrincipalPage = () => {
   useEffect(() => {
     if (typeof principalId !== "string" || !principalId) return;
 
-    setName("");
     let newCandid = "";
     if (candidOverride) {
       try {
@@ -58,6 +61,8 @@ const PrincipalPage = () => {
     setCandidAndBindings(newCandid);
     setProtobuf("");
     setNodes(null);
+    setPrincipalData(null);
+    setCanisterData(null);
 
     let principal;
     try {
@@ -87,29 +92,72 @@ const PrincipalPage = () => {
     setType(type_ as PrincipalType);
 
     if (type_ == "Canister") {
-      // Try fetching candid if not available
-      (async () => {
-        if (candid) return;
+      // Fetch canister data
+      fetchJSON(`/api/canisters/${principalId}`).then((data) => {
+        if (!data) return;
 
-        const actor = Actor.createActor(CandidService, {
-          agent,
-          canisterId: principalId,
-        });
+        setCanisterData(data);
 
-        try {
-          const foundCandid =
-            (await actor.__get_candid_interface_tmp_hack()) as string;
-          setCandidAndBindings(foundCandid);
-        } catch (error) {}
-      })();
+        /** Read from state to verify data integrity */
+        const checkState = async () => {
+          const pathCommon = [Buffer.from("canister"), principal];
+          const pathModuleHash = pathCommon.concat(Buffer.from("module_hash"));
+          const pathController = pathCommon.concat(Buffer.from("controller"));
+          const agent = new HttpAgent({ host: "https://ic0.app" });
+          let res;
+          try {
+            res = await agent.readState(principalId, {
+              paths: [pathModuleHash, pathController],
+            });
+          } catch (error) {
+            if (res) {
+              console.log(res);
+            }
+            console.warn("read_state:", error);
+            return;
+          }
+          const cert = new Certificate(res, agent);
+          if (await cert.verify()) {
+            const subnet = cert["cert"].delegation
+              ? Principal.fromUint8Array(
+                  cert["cert"].delegation.subnet_id
+                ).toText()
+              : null;
+            if (subnet) {
+              if (subnet !== data?.subnetId) {
+                console.warn(`subnet: api=${data?.subnetId} state=${subnet}`);
+              }
+            } else {
+              console.warn("state: no subnet");
+            }
+            const certController = cert.lookup(pathController);
+            if (certController) {
+              const controller =
+                Principal.fromUint8Array(certController).toText();
+              if (data && data?.controllerId !== controller) {
+                console.warn(
+                  `controller: api=${data?.controllerId} state=${controller}`
+                );
+              }
+            } else {
+              console.warn("state: no controller");
+            }
+            const moduleHash = cert.lookup(pathModuleHash)?.toString("hex");
+            if (moduleHash && data?.moduleHash !== moduleHash) {
+              console.warn(
+                `moduleHash: api=${data?.moduleHash} state=${moduleHash}`
+              );
+            }
+          } else {
+            console.warn("state: unable to verify cert", cert);
+          }
+        };
+        checkState();
 
-      fetch("/data/json/canisters.json")
-        .then((res) => res.json())
-        .then((json) => {
-          const name = json[principalId];
-          setName(name);
-          if (name && !candidOverride) {
-            fetch(`/data/interfaces/${name}.did`)
+        /** Fetch local interface file(s) */
+        const fetchLocalFiles = async () => {
+          if (data.name && !candidOverride) {
+            fetch(`/data/interfaces/${data.name}.did`)
               .then((res) => {
                 if (!res.ok) {
                   throw res.statusText;
@@ -121,7 +169,7 @@ const PrincipalPage = () => {
               })
               .catch((e) => {});
 
-            fetch(`/data/interfaces/${name}.proto`)
+            fetch(`/data/interfaces/${data.name}.proto`)
               .then((res) => {
                 if (!res.ok) {
                   throw res.statusText;
@@ -133,8 +181,11 @@ const PrincipalPage = () => {
               })
               .catch((e) => {});
           }
-        });
+        };
+        fetchLocalFiles();
+      });
     } else {
+      // Could be node principal
       fetch("/data/generated/nodes.json")
         .then((res) => res.json())
         .then((json) => {
@@ -156,7 +207,32 @@ const PrincipalPage = () => {
           }
         });
     }
+
+    // Always fetch principal data
+    fetchJSON(`/api/principals/${principalId}`).then(
+      (data) => data && setPrincipalData(data)
+    );
   }, [principalId, candidOverride]);
+
+  useEffect(() => {
+    // Try fetching candid if not available
+    if (candid || type !== "Canister") return;
+
+    (async () => {
+      const actor = Actor.createActor(CandidService, {
+        agent,
+        canisterId: principalId,
+      });
+
+      try {
+        const foundCandid =
+          (await actor.__get_candid_interface_tmp_hack()) as string;
+        setCandidAndBindings(foundCandid);
+      } catch (error) {
+        console.warn("no candid found");
+      }
+    })();
+  }, [principalId, type, candid]);
 
   return isValid ? (
     <div className="py-16">
@@ -168,13 +244,21 @@ const PrincipalPage = () => {
         principalId={principalId}
         type={type}
         nodesType={nodes?.type}
-        canisterName={name}
+        principalData={principalData}
+        canisterData={canisterData}
         className="mb-8"
       />
+      {principalData?.canisterCount > 0 && (
+        <section className="mb-8">
+          <h2 className="text-2xl mb-4">Controlled Canisters</h2>
+          <CanistersTable controllerId={principalId} />
+        </section>
+      )}
       {candid && (
         <>
           {bindings && (
             <CandidUI
+              key={principalId}
               candid={candid}
               canisterId={principalId}
               jsBindings={bindings.js}

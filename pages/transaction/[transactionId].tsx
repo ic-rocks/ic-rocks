@@ -6,10 +6,12 @@ import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { MetaTitle } from "../../components/MetaTags";
 import Search404 from "../../components/Search404";
+import { TimestampLabel } from "../../components/TimestampLabel";
 import { TransactionTypeLabel } from "../../components/TransactionTypeLabel";
 import ledgerIdl from "../../lib/canisters/ledger.did";
+import fetchJSON from "../../lib/fetch";
 import { formatNumber } from "../../lib/numbers";
-import { TransactionResult } from "../../lib/types/TransactionResult";
+import { Transaction, TransactionsResponse } from "../../lib/types/API";
 
 const agent = new HttpAgent({ host: "https://ic0.app" });
 const ledger = Actor.createActor(ledgerIdl, {
@@ -17,10 +19,9 @@ const ledger = Actor.createActor(ledgerIdl, {
   canisterId: "ryjl3-tyaaa-aaaaa-aaaba-cai",
 });
 
-const Transaction = () => {
+const TransactionPage = () => {
   const router = useRouter();
-  const [tx, setTx] = useState(null);
-  const [accounts, setAccounts] = useState({});
+  const [data, setData] = useState<Transaction>(null);
   const [isValid, setIsValid] = useState(true);
   const [isLoadingTxs, setIsLoadingTxs] = useState(false);
   const { transactionId } = router.query as { transactionId: string };
@@ -28,70 +29,15 @@ const Transaction = () => {
   useEffect(() => {
     if (typeof transactionId !== "string" || !transactionId) return;
 
-    setTx(null);
+    setData(null);
     setIsLoadingTxs(true);
     setIsValid(true);
 
-    fetch("https://rosetta-api.internetcomputer.org/search/transactions", {
-      body: JSON.stringify({
-        network_identifier: {
-          blockchain: "Internet Computer",
-          network: "00000000000000020101",
-        },
-        transaction_identifier: {
-          hash: transactionId,
-        },
-      }),
-      method: "POST",
-      headers: {
-        "content-type": "application/json;charset=UTF-8",
-      },
-    })
-      .then((res) => res.json())
-      .then((json: TransactionResult) => {
-        const tx0 = json.transactions[0];
-        const type = tx0.transaction.operations[0].type;
-        let from, to, amount, fee;
-        if (type === "TRANSACTION") {
-          let fromOp = tx0.transaction.operations.find(
-            (op) => op.type === "TRANSACTION" && op.amount.value.startsWith("-")
-          );
-          let toOp = tx0.transaction.operations.find(
-            (op) =>
-              op.type === "TRANSACTION" && !op.amount.value.startsWith("-")
-          );
-          if (!fromOp) {
-            fromOp = tx0.transaction.operations[0];
-            toOp = tx0.transaction.operations[1];
-          }
-          from = fromOp.account.address;
-          const feeOp = tx0.transaction.operations.find(
-            (op) => op.type === "FEE"
-          );
-          to = toOp.account.address;
-          amount = toOp.amount;
-          fee = feeOp.amount;
-        } else if (type === "MINT") {
-          from = type;
-          to = tx0.transaction.operations[0].account.address;
-          amount = tx0.transaction.operations[0].amount;
-        } else if (type === "BURN") {
-          from = tx0.transaction.operations[0].account.address;
-          to = type;
-          amount = tx0.transaction.operations[0].amount;
-        }
-
-        const formatted = {
-          ...tx0.transaction.metadata,
-          type,
-          block_hash: tx0.block_identifier.hash,
-          tx_hash: tx0.transaction.transaction_identifier.hash,
-          from,
-          to,
-          amount,
-          fee,
-        };
-        setTx(formatted);
+    fetchJSON(`/api/transactions/${transactionId}`)
+      .then((data: TransactionsResponse) => {
+        const tx = data.rows[0];
+        if (!tx) throw "tx not found";
+        setData(tx);
         setIsLoadingTxs(false);
       })
       .catch((err) => {
@@ -99,16 +45,6 @@ const Transaction = () => {
         setIsValid(false);
       });
   }, [transactionId]);
-
-  useEffect(() => {
-    fetch("/data/json/accounts.json")
-      .then((res) => res.json())
-      .then((json) => {
-        setAccounts(json);
-      });
-  }, []);
-
-  const date = tx ? DateTime.fromMillis(tx.timestamp / 1e6).toUTC() : null;
 
   return isValid ? (
     <div className="py-16">
@@ -121,25 +57,27 @@ const Transaction = () => {
           <tr>
             <td className="px-2 py-2 w-1/6">Hash</td>
             <td className="px-2 py-2 w-5/6 overflow-hidden overflow-ellipsis">
-              {tx ? tx.tx_hash : null}
+              {data ? data.id : null}
             </td>
           </tr>
           <tr>
             <td className="px-2 py-2 w-1/6">Block</td>
-            <td className="px-2 py-2 w-5/6">{tx ? tx.block_height : null}</td>
+            <td className="px-2 py-2 w-5/6">
+              {data ? data.blockHeight : null}
+            </td>
           </tr>
           <tr>
             <td className="px-2 py-2 w-1/6">Type</td>
             <td className="px-2 py-2 w-5/6">
-              {tx ? <TransactionTypeLabel type={tx.type} /> : null}
+              {data ? <TransactionTypeLabel type={data.type} /> : null}
             </td>
           </tr>
           <tr>
             <td className="px-2 py-2 w-1/6">Amount</td>
             <td className="px-2 py-2 w-5/6">
-              {tx != null ? (
+              {data != null ? (
                 <>
-                  {formatNumber(Math.abs(Number(tx.amount.value)) / 1e8)}{" "}
+                  {formatNumber(Math.abs(Number(data.amount)) / 1e8)}{" "}
                   <span className="text-xs">ICP</span>
                 </>
               ) : null}
@@ -148,34 +86,23 @@ const Transaction = () => {
           <tr>
             <td className="px-2 py-2 w-1/6">Timestamp</td>
             <td className="px-2 py-2 w-5/6">
-              {date ? (
-                <>
-                  {date.toLocaleString({
-                    ...DateTime.DATETIME_FULL_WITH_SECONDS,
-                    hour12: false,
-                  })}{" "}
-                  ({date.toRelative()})
-                </>
+              {data ? (
+                <TimestampLabel dt={DateTime.fromISO(data.createdDate)} />
               ) : null}
             </td>
           </tr>
           <tr>
             <td className="px-2 py-2 w-1/6">From</td>
             <td
-              className={classnames(
-                "px-2 py-2 w-5/6 overflow-hidden overflow-ellipsis",
-                {
-                  "text-blue-600": tx && tx.type !== "MINT",
-                }
-              )}
+              className={classnames("px-2 py-2 w-5/6 overflow-hidden flex", {})}
             >
-              {tx ? (
-                tx.type === "MINT" ? (
+              {data ? (
+                data.type === "MINT" ? (
                   "Mint"
                 ) : (
-                  <Link href={`/account/${tx.from}`}>
-                    <a className="hover:underline">
-                      {accounts[tx.from] || tx.from}
+                  <Link href={`/account/${data.senderId}`}>
+                    <a className="link-overflow">
+                      {data.sender?.name || data.senderId}
                     </a>
                   </Link>
                 )
@@ -185,20 +112,15 @@ const Transaction = () => {
           <tr>
             <td className="px-2 py-2 w-1/6">To</td>
             <td
-              className={classnames(
-                "px-2 py-2 w-5/6 overflow-hidden overflow-ellipsis",
-                {
-                  "text-blue-600": tx && tx.type !== "BURN",
-                }
-              )}
+              className={classnames("px-2 py-2 w-5/6 overflow-hidden flex", {})}
             >
-              {tx ? (
-                tx.type === "BURN" ? (
+              {data ? (
+                data.type === "BURN" ? (
                   "Burn"
                 ) : (
-                  <Link href={`/account/${tx.to}`}>
-                    <a className="hover:underline">
-                      {accounts[tx.to] || tx.to}
+                  <Link href={`/account/${data.receiverId}`}>
+                    <a className="link-overflow">
+                      {data.receiver?.name || data.receiverId}
                     </a>
                   </Link>
                 )
@@ -208,13 +130,10 @@ const Transaction = () => {
           <tr>
             <td className="px-2 py-2 w-1/6">Fee</td>
             <td className="px-2 py-2 w-5/6">
-              {tx ? (
-                tx.fee ? (
+              {data ? (
+                data.fee ? (
                   <>
-                    {formatNumber(
-                      Math.abs(Number(tx.fee.value)) /
-                        10 ** tx.fee.currency.decimals
-                    )}{" "}
+                    {formatNumber(Math.abs(Number(data.fee)) / 1e8)}{" "}
                     <span className="text-xs">ICP</span>
                   </>
                 ) : (
@@ -225,7 +144,7 @@ const Transaction = () => {
           </tr>
           <tr>
             <td className="px-2 py-2 w-1/6">Memo</td>
-            <td className="px-2 py-2 w-5/6">{tx ? tx.memo : null}</td>
+            <td className="px-2 py-2 w-5/6">{data ? data.memo : null}</td>
           </tr>
         </tbody>
       </table>
@@ -235,4 +154,4 @@ const Transaction = () => {
   );
 };
 
-export default Transaction;
+export default TransactionPage;

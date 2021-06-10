@@ -11,6 +11,7 @@ import CandidAttach from "../../components/CandidAttach";
 import CodeBlock from "../../components/CodeBlock";
 import MatchingCanistersList from "../../components/MatchingCanistersList";
 import { MetaTitle } from "../../components/MetaTags";
+import { SecondaryNav } from "../../components/SecondaryNav";
 import { GITHUB_REPO } from "../../lib/constants";
 
 const didc = import("didc");
@@ -126,8 +127,14 @@ const Interfaces = ({ current, children }) => {
   }
 
   return (
-    <div className="py-16">
+    <div className="pb-16">
       <MetaTitle title={`interfaces${current ? "/" + current : ""}`} />
+      <SecondaryNav
+        items={[
+          <ActiveLink href="/canisters">Canisters</ActiveLink>,
+          <ActiveLink href="/interfaces">Interfaces</ActiveLink>,
+        ]}
+      />
       <h1 className="text-3xl mb-8">
         <ActiveLink
           href="/interfaces"

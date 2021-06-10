@@ -1,12 +1,12 @@
 import Link from "next/link";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import NetworkGraph from "../../components/Charts/NetworkGraph";
 import { MetaTitle } from "../../components/MetaTags";
 import subnetsJson from "../../generated/subnets.json";
 import { countBy } from "../../lib/arrays";
+import fetchJSON from "../../lib/fetch";
 import { getSubnetType } from "../../lib/network";
 import { formatNumber } from "../../lib/numbers";
-declare const Buffer;
 
 export async function getStaticPaths() {
   return {
@@ -45,15 +45,23 @@ const Subnet = ({
   subnetId,
   subnetType,
   nodes,
-  version,
   replicaVersionId,
 }: {
   subnetId: string;
   subnetType: string;
   nodes: any[];
-  version: string;
   replicaVersionId: string;
 }) => {
+  const [canisters, setCanisters] = useState(null);
+  useEffect(() => {
+    fetchJSON(
+      `/api/canisters?` +
+        new URLSearchParams({
+          subnetId,
+        })
+    ).then(setCanisters);
+  }, []);
+
   return (
     <div className="py-16">
       <MetaTitle title={`Subnet ${subnetId}`} />
@@ -98,8 +106,10 @@ const Subnet = ({
             <td className="px-2 py-2 w-3/4">{countBy(nodes, "provider")}</td>
           </tr>
           <tr>
-            <td className="px-2 py-2 w-1/4">Registry Version</td>
-            <td className="px-2 py-2 w-3/4">{version}</td>
+            <td className="px-2 py-2 w-1/4">Total Canisters</td>
+            <td className="px-2 py-2 w-3/4">
+              {canisters ? canisters.count : "-"}
+            </td>
           </tr>
         </tbody>
       </table>

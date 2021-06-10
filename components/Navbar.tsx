@@ -1,3 +1,5 @@
+import Link from "next/link";
+import React from "react";
 import ActiveLink from "./ActiveLink";
 import DarkModeToggle from "./DarkModeToggle";
 import SearchBar from "./Searchbar";
@@ -28,10 +30,13 @@ export default function Nav() {
             <ActiveLink href="/icp">ICP</ActiveLink>
           </li>
           <li className="pr-4">
-            <ActiveLink href="/interfaces">Interfaces</ActiveLink>
+            <ActiveLink href="/canisters">Canisters</ActiveLink>
           </li>
           <li className="pr-4">
-            <ActiveLink href="/canisters">Canisters</ActiveLink>
+            <ActiveLink href="/principals">Principals</ActiveLink>
+          </li>
+          <li className="pr-4">
+            <Link href="/accounts">Ledger</Link>
           </li>
         </ul>
 
