@@ -90,3 +90,11 @@ export type Canister = {
     moduleHash: string;
   }[];
 };
+
+export type ModulesResponse = PagedResponse<Module>;
+
+export type Module = {
+  moduleHash: string;
+  canisters: string;
+  subnets: string;
+};

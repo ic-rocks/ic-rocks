@@ -145,8 +145,13 @@ export default function PrincipalDetails({
                   {canisterData?.moduleHash ? (
                     <>
                       {canisterData.moduleHash || "-"}
-                      {!!canisterData.moduleMatches &&
-                        ` (${canisterData.moduleMatches} matches)`}
+                      {canisterData.moduleMatches > 1 && (
+                        <Link href={`/modules/${canisterData.moduleHash}`}>
+                          <a className="ml-1 link-overflow">
+                            ({canisterData.moduleMatches} matching modules)
+                          </a>
+                        </Link>
+                      )}
                     </>
                   ) : (
                     "-"

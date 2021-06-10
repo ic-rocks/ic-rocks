@@ -6,7 +6,13 @@ import fetchJSON from "../lib/fetch";
 import { CanistersResponse, SubnetResponse } from "../lib/types/API";
 import { Table } from "./Table";
 
-export const CanistersTable = ({ controllerId }: { controllerId?: string }) => {
+export const CanistersTable = ({
+  controllerId,
+  moduleHash,
+}: {
+  controllerId?: string;
+  moduleHash?: string;
+}) => {
   const [{ subnetId, ...filters }, setFilters] = useState({
     hasCandid: "",
     hasName: "",
@@ -111,6 +117,7 @@ export const CanistersTable = ({ controllerId }: { controllerId?: string }) => {
                 }
               : {}),
             ...(controllerId ? { controllerId } : {}),
+            ...(moduleHash ? { moduleHash } : {}),
             ...(filters.hasCandid ? { hasCandid: filters.hasCandid } : {}),
             ...(filters.hasName ? { hasName: filters.hasName } : {}),
             ...(filters.hasModule ? { hasModule: filters.hasModule } : {}),
@@ -127,6 +134,7 @@ export const CanistersTable = ({ controllerId }: { controllerId?: string }) => {
     },
     [
       controllerId,
+      moduleHash,
       subnetId,
       filters.hasCandid,
       filters.hasName,
@@ -139,7 +147,7 @@ export const CanistersTable = ({ controllerId }: { controllerId?: string }) => {
     { id: "hasName", label: "Canister Name" },
     { id: "hasCandid", label: "Interface" },
     !controllerId && { id: "hasController", label: "Controller" },
-    { id: "hasModule", label: "Module" },
+    !moduleHash && { id: "hasModule", label: "Module" },
   ].filter(Boolean);
 
   return (

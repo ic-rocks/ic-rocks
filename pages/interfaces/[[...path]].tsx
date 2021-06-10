@@ -8,10 +8,10 @@ import { BiPencil } from "react-icons/bi";
 import { FiFilePlus } from "react-icons/fi";
 import ActiveLink from "../../components/ActiveLink";
 import CandidAttach from "../../components/CandidAttach";
+import CanisterPage from "../../components/CanisterPage";
 import CodeBlock from "../../components/CodeBlock";
 import MatchingCanistersList from "../../components/MatchingCanistersList";
 import { MetaTitle } from "../../components/MetaTags";
-import { SecondaryNav } from "../../components/SecondaryNav";
 import { GITHUB_REPO } from "../../lib/constants";
 
 const didc = import("didc");
@@ -127,14 +127,8 @@ const Interfaces = ({ current, children }) => {
   }
 
   return (
-    <div className="pb-16">
+    <CanisterPage>
       <MetaTitle title={`interfaces${current ? "/" + current : ""}`} />
-      <SecondaryNav
-        items={[
-          <ActiveLink href="/canisters">Canisters</ActiveLink>,
-          <ActiveLink href="/interfaces">Interfaces</ActiveLink>,
-        ]}
-      />
       <h1 className="text-3xl mb-8">
         <ActiveLink
           href="/interfaces"
@@ -187,7 +181,7 @@ const Interfaces = ({ current, children }) => {
           </a>
         </>
       )}
-    </div>
+    </CanisterPage>
   );
 };
 

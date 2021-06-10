@@ -16,7 +16,12 @@ import { APIPrincipal, Canister } from "../../lib/types/API";
 
 const didc = import("didc");
 
-export type PrincipalType = "Canister" | "User" | "Anonymous" | "Derived" | "";
+export type PrincipalType =
+  | "Canister"
+  | "User"
+  | "Anonymous"
+  | "Derived"
+  | "Unknown";
 
 const agent = new HttpAgent({ host: "https://ic0.app" });
 
@@ -27,7 +32,7 @@ const PrincipalPage = () => {
     candid?: string;
   };
   const [isValid, setIsValid] = useState(true);
-  const [type, setType] = useState<PrincipalType>("");
+  const [type, setType] = useState<PrincipalType>("Unknown");
   const [candid, setCandid] = useState("");
   const [bindings, setBindings] = useState(null);
   const [protobuf, setProtobuf] = useState("");
@@ -74,7 +79,7 @@ const PrincipalPage = () => {
       return;
     }
 
-    let type_ = "";
+    let type_ = "Unknown";
     switch (principal.slice(-1)[0]) {
       case 1:
         type_ = "Canister";
