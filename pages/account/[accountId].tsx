@@ -3,6 +3,7 @@ import { getCrc32 } from "@dfinity/principal/lib/cjs/utils/getCrc";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
+import BalanceLabel from "../../components/Labels/BalanceLabel";
 import { MetaTitle } from "../../components/MetaTags";
 import Search404 from "../../components/Search404";
 import { TransactionsTable } from "../../components/TransactionsTable";
@@ -66,57 +67,44 @@ const Account = () => {
     <div className="py-16">
       <MetaTitle title={`Account${accountId ? ` ${accountId}` : ""}`} />
       <h1 className="text-3xl mb-8 overflow-hidden overflow-ellipsis">
-        Account <small className="text-2xl">{accountId}</small>
+        Account <small className="text-xl break-all">{accountId}</small>
       </h1>
       <table className="w-full table-fixed">
         <thead className="bg-gray-100 dark:bg-gray-800">
-          <tr className="invisible">
-            <td className="w-1/4" />
-            <td className="w-3/4" />
-          </tr>
-          <tr>
+          <tr className="flex">
             <th colSpan={2} className="px-2 py-2">
               Account Details
             </th>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-300 dark:divide-gray-700">
-          <tr>
-            <td className="px-2 py-2 w-1/4">Principal</td>
-            <td className="px-2 py-2 w-3/4 overflow-hidden overflow-ellipsis">
+          <tr className="flex">
+            <td className="px-2 py-2 w-32">Principal</td>
+            <td className="px-2 py-2 flex-1 flex overflow-hidden whitespace-nowrap">
               {data?.principal ? (
                 <Link href={`/principal/${data.principal}`}>
-                  <a className="hover:underline text-blue-600">
-                    {data.principal}
-                  </a>
+                  <a className="link-overflow">{data.principal}</a>
                 </Link>
               ) : (
                 "-"
               )}
             </td>
           </tr>
-          <tr>
-            <td className="px-2 py-2 w-1/4">Balance</td>
-            <td className="px-2 py-2 w-3/4">
-              {data ? (
-                <>
-                  {formatNumber(Number(data.balance) / 1e8)}{" "}
-                  <span className="text-xs">ICP</span>
-                </>
-              ) : (
-                "-"
-              )}
+          <tr className="flex">
+            <td className="px-2 py-2 w-32">Balance</td>
+            <td className="px-2 py-2 flex-1">
+              {data ? <BalanceLabel value={data.balance} /> : "-"}
             </td>
           </tr>
-          <tr>
-            <td className="px-2 py-2 w-1/4">Transactions</td>
-            <td className="px-2 py-2 w-3/4">
+          <tr className="flex">
+            <td className="px-2 py-2 w-32">Transactions</td>
+            <td className="px-2 py-2 flex-1">
               {data?.tx_count ? formatNumber(data.tx_count) : 0}
             </td>
           </tr>
-          <tr>
-            <td className="px-2 py-2 w-1/4">Name</td>
-            <td className="px-2 py-2 w-3/4">
+          <tr className="flex">
+            <td className="px-2 py-2 w-32">Name</td>
+            <td className="px-2 py-2 flex-1">
               {data?.name || (
                 <span className="inline-flex items-center">Unknown</span>
               )}

@@ -45,7 +45,7 @@ const NodePage = ({ nodeId, nodeRecord, subnets }) => {
     <div className="py-16">
       <MetaTitle title={`Node ${nodeId}`} />
       <h1 className="text-3xl mb-8 overflow-hidden overflow-ellipsis">
-        Node <small className="text-2xl">{nodeId}</small>
+        Node <small className="text-xl">{nodeId}</small>
       </h1>
       <table className="w-full table-fixed">
         <thead className="bg-gray-100 dark:bg-gray-800">

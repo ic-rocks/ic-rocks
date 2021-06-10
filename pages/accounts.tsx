@@ -1,5 +1,6 @@
 import Link from "next/link";
 import React, { useCallback, useMemo, useState } from "react";
+import BalanceLabel from "../components/Labels/BalanceLabel";
 import Ledger from "../components/LedgerPage";
 import { Table } from "../components/Table";
 import fetchJSON from "../lib/fetch";
@@ -64,12 +65,7 @@ const Accounts = () => {
         Header: "Balance",
         accessor: "balance",
         sortDescFirst: true,
-        Cell: ({ value }) => (
-          <>
-            {formatNumber(Number(value) / 1e8)}{" "}
-            <span className="text-xs">ICP</span>
-          </>
-        ),
+        Cell: ({ value }) => <BalanceLabel value={value} />,
         className: "px-2 w-40 whitespace-nowrap text-right",
       },
       {
@@ -77,7 +73,7 @@ const Accounts = () => {
         accessor: "tx_count",
         sortDescFirst: true,
         Cell: ({ value }) => formatNumber(value),
-        className: "px-2 w-24 text-right",
+        className: "px-2 w-20 xs:w-28 text-right",
       },
     ],
     []

@@ -32,14 +32,14 @@ export const PrincipalsTable = () => {
         accessor: "canisterCount",
         sortDescFirst: true,
         Cell: ({ value }) => formatNumber(value),
-        className: "px-2 w-48 text-right",
+        className: "px-2 w-24 sm:w-48 text-right",
       },
       {
         Header: "Accounts",
         accessor: "accountCount",
         disableSortBy: true,
         Cell: ({ value }) => formatNumber(value),
-        className: "px-2 w-36 text-right",
+        className: "px-2 w-24 text-right",
       },
     ],
     []

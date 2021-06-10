@@ -33,7 +33,7 @@ const ModulesTable = () => {
         disableSortBy: true,
         sortDescFirst: true,
         Cell: ({ value }) => formatNumber(value),
-        className: "px-2 w-36 text-right",
+        className: "px-2 w-28 text-right",
       },
       {
         Header: "Subnets",
@@ -41,7 +41,7 @@ const ModulesTable = () => {
         disableSortBy: true,
         sortDescFirst: true,
         Cell: ({ value }) => formatNumber(value),
-        className: "px-2 w-36 text-right",
+        className: "px-2 w-20 text-right",
       },
     ],
     []
@@ -63,14 +63,21 @@ const ModulesTable = () => {
   }, []);
 
   return (
-    <Table
-      columns={columns}
-      data={rows}
-      count={count}
-      fetchData={fetchData}
-      loading={isLoading}
-      initialSortBy={initialSort}
-    />
+    <>
+      <p className="mb-8">
+        {isLoading
+          ? "Searching for matching modules..."
+          : `There are ${count} modules that match multiple canisters.`}
+      </p>
+      <Table
+        columns={columns}
+        data={rows}
+        count={count}
+        fetchData={fetchData}
+        loading={isLoading}
+        initialSortBy={initialSort}
+      />
+    </>
   );
 };
 

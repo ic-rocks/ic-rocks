@@ -3,9 +3,9 @@ import Link from "next/link";
 import React, { useCallback, useMemo, useState } from "react";
 import fetchJSON from "../lib/fetch";
 import { TransactionsResponse } from "../lib/types/API";
-import BalanceLabel from "./BalanceLabel";
+import BalanceLabel from "./Labels/BalanceLabel";
+import { TransactionTypeLabel } from "./Labels/TransactionTypeLabel";
 import { Table } from "./Table";
-import { TransactionTypeLabel } from "./TransactionTypeLabel";
 
 export const TransactionsTable = ({
   accountId = "",
@@ -46,9 +46,7 @@ export const TransactionsTable = ({
         id: "id",
         Cell: ({ value }) => (
           <Link href={`/transaction/${value}`}>
-            <a className="hover:underline text-blue-600 overflow-hidden overflow-ellipsis">
-              {value}
-            </a>
+            <a className="link-overflow">{value}</a>
           </Link>
         ),
         className:
@@ -72,7 +70,7 @@ export const TransactionsTable = ({
             <TransactionTypeLabel type={row.original.type} />
           ) : value !== accountId ? (
             <Link href={`/account/${value}`}>
-              <a className="hover:underline text-blue-600 overflow-hidden overflow-ellipsis">
+              <a className="link-overflow">
                 {row.original.sender.name || value}
               </a>
             </Link>
@@ -81,8 +79,7 @@ export const TransactionsTable = ({
               {row.original.sender.name || value}
             </span>
           ),
-        className:
-          "px-2 flex-1 flex whitespace-nowrap overflow-hidden overflow-ellipsis",
+        className: "px-2 flex-1 flex whitespace-nowrap overflow-hidden",
         style: { minWidth: "4rem" },
         disableSortBy: true,
       },
@@ -94,7 +91,7 @@ export const TransactionsTable = ({
             <TransactionTypeLabel type={row.original.type} />
           ) : value !== accountId ? (
             <Link href={`/account/${value}`}>
-              <a className="hover:underline text-blue-600 overflow-hidden overflow-ellipsis">
+              <a className="link-overflow">
                 {row.original.receiver.name || value}
               </a>
             </Link>
@@ -103,8 +100,7 @@ export const TransactionsTable = ({
               {row.original.receiver.name || value}
             </span>
           ),
-        className:
-          "px-2 flex-1 flex whitespace-nowrap overflow-ellipsis overflow-hidden",
+        className: "px-2 flex-1 flex whitespace-nowrap overflow-hidden",
         style: { minWidth: "4rem" },
         disableSortBy: true,
       },
@@ -130,6 +126,8 @@ export const TransactionsTable = ({
 
   return (
     <Table
+      className="text-xs xs:text-sm sm:text-base"
+      style={{ minWidth: "400px" }}
       data={rows}
       columns={columns}
       count={count}

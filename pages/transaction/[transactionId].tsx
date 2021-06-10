@@ -4,13 +4,13 @@ import { DateTime } from "luxon";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
+import BalanceLabel from "../../components/Labels/BalanceLabel";
+import { TimestampLabel } from "../../components/Labels/TimestampLabel";
+import { TransactionTypeLabel } from "../../components/Labels/TransactionTypeLabel";
 import { MetaTitle } from "../../components/MetaTags";
 import Search404 from "../../components/Search404";
-import { TimestampLabel } from "../../components/TimestampLabel";
-import { TransactionTypeLabel } from "../../components/TransactionTypeLabel";
 import ledgerIdl from "../../lib/canisters/ledger.did";
 import fetchJSON from "../../lib/fetch";
-import { formatNumber } from "../../lib/numbers";
 import { Transaction, TransactionsResponse } from "../../lib/types/API";
 
 const agent = new HttpAgent({ host: "https://ic0.app" });
@@ -75,12 +75,7 @@ const TransactionPage = () => {
           <tr>
             <td className="px-2 py-2 w-1/6">Amount</td>
             <td className="px-2 py-2 w-5/6">
-              {data != null ? (
-                <>
-                  {formatNumber(Math.abs(Number(data.amount)) / 1e8)}{" "}
-                  <span className="text-xs">ICP</span>
-                </>
-              ) : null}
+              {data != null ? <BalanceLabel value={data.amount} /> : null}
             </td>
           </tr>
           <tr>
@@ -130,16 +125,7 @@ const TransactionPage = () => {
           <tr>
             <td className="px-2 py-2 w-1/6">Fee</td>
             <td className="px-2 py-2 w-5/6">
-              {data ? (
-                data.fee ? (
-                  <>
-                    {formatNumber(Math.abs(Number(data.fee)) / 1e8)}{" "}
-                    <span className="text-xs">ICP</span>
-                  </>
-                ) : (
-                  0
-                )
-              ) : null}
+              {data ? data.fee ? <BalanceLabel value={data.fee} /> : 0 : null}
             </td>
           </tr>
           <tr>

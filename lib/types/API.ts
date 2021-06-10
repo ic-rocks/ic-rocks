@@ -68,7 +68,7 @@ export type CanistersResponse = PagedResponse<Canister>;
 
 export type Canister = {
   id: string;
-  principal: {
+  principal?: {
     name: string;
   } | null;
   createdDate: string;

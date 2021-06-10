@@ -98,7 +98,7 @@ const PrincipalPage = () => {
 
     if (type_ == "Canister") {
       // Fetch canister data
-      fetchJSON(`/api/canisters/${principalId}`).then((data) => {
+      fetchJSON(`/api/canisters/${principalId}`).then((data: Canister) => {
         if (!data) return;
 
         setCanisterData(data);
@@ -161,8 +161,8 @@ const PrincipalPage = () => {
 
         /** Fetch local interface file(s) */
         const fetchLocalFiles = async () => {
-          if (data.name && !candidOverride) {
-            fetch(`/data/interfaces/${data.name}.did`)
+          if (data.principal?.name && !candidOverride) {
+            fetch(`/data/interfaces/${data.principal.name}.did`)
               .then((res) => {
                 if (!res.ok) {
                   throw res.statusText;
@@ -174,7 +174,7 @@ const PrincipalPage = () => {
               })
               .catch((e) => {});
 
-            fetch(`/data/interfaces/${data.name}.proto`)
+            fetch(`/data/interfaces/${data.principal.name}.proto`)
               .then((res) => {
                 if (!res.ok) {
                   throw res.statusText;
@@ -243,7 +243,7 @@ const PrincipalPage = () => {
     <div className="py-16">
       <MetaTitle title={`Principal${principalId ? ` ${principalId}` : ""}`} />
       <h1 className="text-3xl mb-8 overflow-hidden overflow-ellipsis">
-        Principal <small className="text-2xl">{principalId}</small>
+        Principal <small className="text-xl">{principalId}</small>
       </h1>
       <PrincipalDetails
         principalId={principalId}
@@ -260,7 +260,8 @@ const PrincipalPage = () => {
         </section>
       )}
       {candid && (
-        <>
+        <section>
+          <h2 className="text-2xl mb-4">Canister Interface</h2>
           {bindings && (
             <CandidUI
               key={principalId}
@@ -273,7 +274,7 @@ const PrincipalPage = () => {
             />
           )}
           <CodeBlock candid={candid} bindings={bindings} protobuf={protobuf} />
-        </>
+        </section>
       )}
       {nodes ? (
         <>

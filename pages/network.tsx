@@ -48,6 +48,8 @@ const Network = () => {
             <a className="link-overflow">{value}</a>
           </Link>
         ),
+        style: { minWidth: "8rem" },
+        disableSortBy: true,
         className: "px-2 flex flex-1 whitespace-nowrap overflow-hidden",
       },
       {
@@ -62,7 +64,7 @@ const Network = () => {
         accessor: "canisterCount",
         sortDescFirst: true,
         Cell: ({ value }) => formatNumber(value),
-        className: "px-2 w-28 text-right",
+        className: "px-2 hidden xs:block w-28 text-right",
       },
     ],
     []

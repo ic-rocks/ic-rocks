@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import React, { useEffect } from "react";
+import React, { CSSProperties, useEffect } from "react";
 import { CgSpinner } from "react-icons/cg";
 import { FaSortAmountDown, FaSortAmountUp } from "react-icons/fa";
 import {
@@ -14,6 +14,8 @@ import { Pagination } from "./Pagination";
 export const PAGE_SIZE = 25;
 
 export const Table = ({
+  className,
+  style,
   columns,
   data,
   count,
@@ -23,6 +25,8 @@ export const Table = ({
   manualPagination = true,
   manualSortBy = true,
 }: {
+  className?: string;
+  style?: CSSProperties;
   columns: Column<any>[];
   data: any[];
   count: number;
@@ -67,12 +71,15 @@ export const Table = ({
   return (
     <div className="max-w-full overflow-x-auto">
       <table
-        {...getTableProps({
-          className: "table-fixed w-full",
-          style: {
-            minWidth: 400,
+        {...getTableProps([
+          {
+            className: "table-fixed w-full",
+            style: {
+              minWidth: 320,
+            },
           },
-        })}
+          { className, style },
+        ])}
       >
         <thead className="block bg-gray-100 dark:bg-gray-800 py-2">
           {headerGroups.map((headerGroup) => (
@@ -85,7 +92,7 @@ export const Table = ({
                 <th
                   {...column.getHeaderProps([
                     {
-                      className: "px-2 whitespace-nowrap",
+                      className: "px-2",
                     },
                     { className: column.className },
                     { style: column.style },

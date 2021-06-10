@@ -9,9 +9,11 @@ import { Table } from "./Table";
 export const CanistersTable = ({
   controllerId,
   moduleHash,
+  onFetch,
 }: {
   controllerId?: string;
   moduleHash?: string;
+  onFetch?: (res?) => void;
 }) => {
   const [{ subnetId, ...filters }, setFilters] = useState({
     hasCandid: "",
@@ -129,6 +131,7 @@ export const CanistersTable = ({
             page: pageIndex,
           })
       );
+      if (onFetch) onFetch(res);
       if (res) setResponse(res);
       setIsLoading(false);
     },

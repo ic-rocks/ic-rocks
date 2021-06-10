@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import BalanceLabel from "../components/Labels/BalanceLabel";
 import Ledger from "../components/LedgerPage";
 import { TransactionsTable } from "../components/TransactionsTable";
 import fetchJSON from "../lib/fetch";
@@ -16,65 +17,51 @@ const Transactions = () => {
       <section>
         <table className="table-fixed w-full">
           <tbody className="divide-y divide-gray-300 dark:divide-gray-700">
-            <tr>
-              <td className="px-2 py-2 w-1/6">Total Transactions</td>
-              <td className="px-2 py-2 w-5/6 overflow-hidden overflow-ellipsis">
+            <tr className="flex">
+              <td className="px-2 py-2 w-28 sm:w-44">Total Transactions</td>
+              <td className="px-2 py-2 flex-1 overflow-hidden overflow-ellipsis">
                 {stats ? formatNumber(stats.stats.count) : null}
               </td>
             </tr>
-            <tr>
-              <td className="px-2 py-2 w-1/6">Total Minted</td>
-              <td className="px-2 py-2 w-5/6">
+            <tr className="flex">
+              <td className="px-2 py-2 w-28 sm:w-44">Total Minted</td>
+              <td className="px-2 py-2 flex-1">
                 {stats ? (
-                  <>
-                    {formatNumber(Number(stats.stats.total_minted) / 1e8)}{" "}
-                    <span className="text-xs">ICP</span>
-                  </>
+                  <BalanceLabel value={stats.stats.total_minted} />
                 ) : null}
               </td>
             </tr>
-            <tr>
-              <td className="px-2 py-2 w-1/6">Total Burned</td>
-              <td className="px-2 py-2 w-5/6">
+            <tr className="flex">
+              <td className="px-2 py-2 w-28 sm:w-44">Total Burned</td>
+              <td className="px-2 py-2 flex-1">
                 {stats ? (
-                  <>
-                    {formatNumber(Number(stats.stats.total_burned) / 1e8)}{" "}
-                    <span className="text-xs">ICP</span>
-                  </>
+                  <BalanceLabel value={stats.stats.total_burned} />
                 ) : null}
               </td>
             </tr>
-            <tr>
-              <td className="px-2 py-2 w-1/6">Total Fees</td>
-              <td className="px-2 py-2 w-5/6">
+            <tr className="flex">
+              <td className="px-2 py-2 w-28 sm:w-44">Total Fees</td>
+              <td className="px-2 py-2 flex-1">
+                {stats ? <BalanceLabel value={stats.stats.total_fees} /> : null}
+              </td>
+            </tr>
+            <tr className="flex">
+              <td className="px-2 py-2 w-28 sm:w-44">Average Transfer</td>
+              <td className="px-2 py-2 flex-1">
                 {stats ? (
-                  <>
-                    {formatNumber(Number(stats.stats.total_fees) / 1e8)}{" "}
-                    <span className="text-xs">ICP</span>
-                  </>
+                  <BalanceLabel value={stats.stats.avg_transferred} />
                 ) : null}
               </td>
             </tr>
-            <tr>
-              <td className="px-2 py-2 w-1/6">Average Transfer</td>
-              <td className="px-2 py-2 w-5/6">
-                {stats ? (
-                  <>
-                    {formatNumber(Number(stats.stats.avg_transferred) / 1e8)}{" "}
-                    <span className="text-xs">ICP</span>
-                  </>
-                ) : null}
-              </td>
-            </tr>
-            <tr>
-              <td className="px-2 py-2 w-1/6">Unique Senders</td>
-              <td className="px-2 py-2 w-5/6">
+            <tr className="flex">
+              <td className="px-2 py-2 w-28 sm:w-44">Unique Senders</td>
+              <td className="px-2 py-2 flex-1">
                 {stats ? formatNumber(stats.stats.senders) : null}
               </td>
             </tr>
-            <tr>
-              <td className="px-2 py-2 w-1/6">Unique Receivers</td>
-              <td className="px-2 py-2 w-5/6">
+            <tr className="flex">
+              <td className="px-2 py-2 w-28 sm:w-44">Unique Receivers</td>
+              <td className="px-2 py-2 flex-1">
                 {stats ? formatNumber(stats.stats.receivers) : null}
               </td>
             </tr>

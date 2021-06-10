@@ -7,8 +7,8 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { APIPrincipal, Canister } from "../lib/types/API";
 import { PrincipalType } from "../pages/principal/[principalId]";
-import BalanceLabel from "./BalanceLabel";
-import { TimestampLabel } from "./TimestampLabel";
+import BalanceLabel from "./Labels/BalanceLabel";
+import { TimestampLabel } from "./Labels/TimestampLabel";
 
 export default function PrincipalDetails({
   className,
@@ -141,13 +141,13 @@ export default function PrincipalDetails({
               </tr>
               <tr className="flex">
                 <td className="px-2 py-2 w-24 sm:w-44">Module Hash</td>
-                <td className="px-2 py-2 flex-1 overflow-hidden overflow-ellipsis">
+                <td className="px-2 py-2 flex-1 break-words overflow-hidden overflow-ellipsis">
                   {canisterData?.moduleHash ? (
                     <>
                       {canisterData.moduleHash || "-"}
                       {canisterData.moduleMatches > 1 && (
                         <Link href={`/modules/${canisterData.moduleHash}`}>
-                          <a className="ml-1 link-overflow">
+                          <a className="ml-1 link-overflow whitespace-nowrap">
                             ({canisterData.moduleMatches} matching modules)
                           </a>
                         </Link>

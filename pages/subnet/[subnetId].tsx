@@ -66,7 +66,7 @@ const Subnet = ({
     <div className="py-16">
       <MetaTitle title={`Subnet ${subnetId}`} />
       <h1 className="text-3xl mb-8 overflow-hidden overflow-ellipsis">
-        Subnet <small className="text-2xl">{subnetId}</small>
+        Subnet <small className="text-xl">{subnetId}</small>
       </h1>
       <table className="w-full table-fixed">
         <thead className="bg-gray-100 dark:bg-gray-800">
@@ -116,31 +116,32 @@ const Subnet = ({
 
       <NetworkGraph activeId={subnetId} activeType="Subnet" />
 
-      <table className="w-full mt-8">
+      <h2 className="text-2xl mt-8 mb-4">Nodes</h2>
+      <table className="w-full table-fixed">
         <thead className="bg-gray-100 dark:bg-gray-800">
-          <tr>
-            <th className="text-left px-2 py-2">Node</th>
-            <th className="text-left px-2 py-2">Operator</th>
-            <th className="text-left px-2 py-2">Provider</th>
+          <tr className="flex">
+            <th className="text-left px-2 py-2 flex-1">Node</th>
+            <th className="text-left px-2 py-2 flex-1">Operator</th>
+            <th className="text-left px-2 py-2 flex-1">Provider</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-300 dark:divide-gray-700">
+        <tbody className="block divide-y divide-gray-300 dark:divide-gray-700">
           {nodes.map(({ nodeId, operator, provider }) => {
             return (
-              <tr key={nodeId}>
-                <td className="px-2 py-0.5 overflow-hidden overflow-ellipsis text-blue-600">
+              <tr key={nodeId} className="flex">
+                <td className="px-2 py-0.5 flex-1 flex overflow-hidden whitespace-nowrap">
                   <Link href={`/node/${nodeId}`}>
-                    <a className="hover:underline">{nodeId}</a>
+                    <a className="link-overflow">{nodeId}</a>
                   </Link>
                 </td>
-                <td className="px-2 py-0.5 overflow-hidden overflow-ellipsis text-blue-600">
+                <td className="px-2 py-0.5 flex-1 flex overflow-hidden whitespace-nowrap">
                   <Link href={`/principal/${operator}`}>
-                    <a className="hover:underline">{operator}</a>
+                    <a className="link-overflow">{operator}</a>
                   </Link>
                 </td>
-                <td className="px-2 py-0.5 overflow-hidden overflow-ellipsis text-blue-600">
+                <td className="px-2 py-0.5 flex-1 flex overflow-hidden whitespace-nowrap">
                   <Link href={`/principal/${provider}`}>
-                    <a className="hover:underline">{provider}</a>
+                    <a className="link-overflow">{provider}</a>
                   </Link>
                 </td>
               </tr>
