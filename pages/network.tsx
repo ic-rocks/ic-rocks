@@ -2,7 +2,7 @@ import Link from "next/link";
 import React, { useEffect, useMemo, useState } from "react";
 import NetworkGraph from "../components/Charts/NetworkGraph";
 import { MetaTitle } from "../components/MetaTags";
-import { Table } from "../components/Table";
+import { Table } from "../components/Tables/Table";
 import subnetsJson from "../generated/subnets.json";
 import fetchJSON from "../lib/fetch";
 import { getSubnetType } from "../lib/network";

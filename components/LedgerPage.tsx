@@ -1,7 +1,7 @@
 import React from "react";
 import ActiveLink from "./ActiveLink";
 import { MetaTitle } from "./MetaTags";
-import { SecondaryNav } from "./SecondaryNav";
+import { SecondaryNav } from "./Nav/SecondaryNav";
 
 const Ledger = ({ title, children }) => {
   return (

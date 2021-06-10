@@ -2,7 +2,7 @@ import Link from "next/link";
 import React, { useCallback, useMemo, useState } from "react";
 import BalanceLabel from "../components/Labels/BalanceLabel";
 import Ledger from "../components/LedgerPage";
-import { Table } from "../components/Table";
+import { Table } from "../components/Tables/Table";
 import fetchJSON from "../lib/fetch";
 import { formatNumber } from "../lib/numbers";
 import { AccountsResponse } from "../lib/types/API";

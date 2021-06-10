@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { FiFileText } from "react-icons/fi";
 import fetchJSON from "../lib/fetch";
 import { CanistersResponse, SubnetResponse } from "../lib/types/API";
-import { Table } from "./Table";
+import { Table } from "./Tables/Table";
 
 export const CanistersTable = ({
   controllerId,

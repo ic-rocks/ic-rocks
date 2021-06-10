@@ -2,7 +2,7 @@ import Link from "next/link";
 import React, { useCallback, useMemo, useState } from "react";
 import CanisterPage from "../components/CanisterPage";
 import { MetaTitle } from "../components/MetaTags";
-import { Table } from "../components/Table";
+import { Table } from "../components/Tables/Table";
 import fetchJSON from "../lib/fetch";
 import { formatNumber } from "../lib/numbers";
 import { ModulesResponse } from "../lib/types/API";

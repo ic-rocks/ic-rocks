@@ -5,7 +5,7 @@ import fetchJSON from "../lib/fetch";
 import { TransactionsResponse } from "../lib/types/API";
 import BalanceLabel from "./Labels/BalanceLabel";
 import { TransactionTypeLabel } from "./Labels/TransactionTypeLabel";
-import { Table } from "./Table";
+import { Table } from "./Tables/Table";
 
 export const TransactionsTable = ({
   accountId = "",

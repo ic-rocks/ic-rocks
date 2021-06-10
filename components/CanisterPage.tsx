@@ -1,6 +1,6 @@
 import React from "react";
 import ActiveLink from "./ActiveLink";
-import { SecondaryNav } from "./SecondaryNav";
+import { SecondaryNav } from "./Nav/SecondaryNav";
 
 const CanisterPage = ({ children }) => {
   return (

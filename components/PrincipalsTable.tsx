@@ -3,7 +3,7 @@ import React, { useCallback, useMemo, useState } from "react";
 import fetchJSON from "../lib/fetch";
 import { formatNumber } from "../lib/numbers";
 import { PrincipalsResponse } from "../lib/types/API";
-import { Table } from "./Table";
+import { Table } from "./Tables/Table";
 
 export const PrincipalsTable = () => {
   const [isLoading, setIsLoading] = useState(false);
