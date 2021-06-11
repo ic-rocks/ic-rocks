@@ -106,4 +106,11 @@ export type StatsResponse = {
   accounts: number;
   txs: number;
   nodes: number;
+  supply: string;
 };
+
+export type SparklineResponse = {
+  currency: "ICP";
+  timestamps: string[];
+  prices: string[];
+}[];
