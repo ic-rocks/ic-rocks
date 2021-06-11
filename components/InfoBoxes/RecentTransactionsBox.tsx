@@ -3,7 +3,7 @@ import Link from "next/link";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { BsArrowRight } from "react-icons/bs";
 import fetchJSON from "../../lib/fetch";
-import { CanistersResponse } from "../../lib/types/API";
+import { Transaction } from "../../lib/types/API";
 import BalanceLabel from "../Labels/BalanceLabel";
 import { TransactionTypeLabel } from "../Labels/TransactionTypeLabel";
 import { Table } from "../Tables/Table";
@@ -11,21 +11,13 @@ import InfoBox from "./InfoBox";
 
 export default function RecentTransactionsBox() {
   const [isLoading, setIsLoading] = useState(true);
-  const [{ rows, count }, setResponse] = useState<CanistersResponse>({
-    count: 0,
-    rows: [],
-  });
+  const [rows, setResponse] = useState<Transaction[]>([]);
   useEffect(() => {
     const interval = setInterval(fetchData, 5000);
     return () => clearInterval(interval);
   }, []);
   const fetchData = useCallback(async () => {
-    const res = await fetchJSON(
-      "/api/transactions?" +
-        new URLSearchParams({
-          pageSize: "6",
-        })
-    );
+    const res = await fetchJSON("/api/transactions/recent");
     if (res) setResponse(res);
     setIsLoading(false);
   }, []);
@@ -104,7 +96,7 @@ export default function RecentTransactionsBox() {
         }}
         columns={columns}
         data={rows}
-        count={count}
+        count={rows.length}
         fetchData={fetchData}
         loading={isLoading}
         useSort={false}
