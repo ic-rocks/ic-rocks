@@ -7,7 +7,7 @@ import React, { useEffect, useState } from "react";
 import BalanceLabel from "../../components/Labels/BalanceLabel";
 import { TimestampLabel } from "../../components/Labels/TimestampLabel";
 import { TransactionTypeLabel } from "../../components/Labels/TransactionTypeLabel";
-import { MetaTitle } from "../../components/MetaTags";
+import { MetaTags } from "../../components/MetaTags";
 import Search404 from "../../components/Search404";
 import ledgerIdl from "../../lib/canisters/ledger.did";
 import fetchJSON from "../../lib/fetch";
@@ -48,8 +48,11 @@ const TransactionPage = () => {
 
   return isValid ? (
     <div className="py-16">
-      <MetaTitle
+      <MetaTags
         title={`Transaction${transactionId ? ` ${transactionId}` : ""}`}
+        description={`Details for transaction${
+          transactionId ? ` ${transactionId}` : ""
+        } on the Internet Computer ledger.`}
       />
       <h1 className="text-3xl mb-8">Transaction Details</h1>
       <table className="table-fixed w-full">

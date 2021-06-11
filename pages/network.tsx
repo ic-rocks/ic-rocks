@@ -1,7 +1,7 @@
 import Link from "next/link";
 import React, { useEffect, useMemo, useState } from "react";
 import NetworkGraph from "../components/Charts/NetworkGraph";
-import { MetaTitle } from "../components/MetaTags";
+import { MetaTags } from "../components/MetaTags";
 import { Table } from "../components/Tables/Table";
 import subnetsJson from "../generated/subnets.json";
 import fetchJSON from "../lib/fetch";
@@ -74,7 +74,10 @@ const Network = () => {
 
   return (
     <div className="py-16">
-      <MetaTitle title={title} />
+      <MetaTags
+        title={title}
+        description="An overview of the Internet Computer network. View subnets, nodes, operators, and providers."
+      />
       <h1 className="text-3xl mb-8">{title}</h1>
       <NetworkGraph />
       <section className="pt-8">

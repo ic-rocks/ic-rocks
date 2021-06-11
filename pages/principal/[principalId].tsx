@@ -6,7 +6,7 @@ import CandidUI from "../../components/CandidUI";
 import { CanistersTable } from "../../components/CanistersTable";
 import NetworkGraph from "../../components/Charts/NetworkGraph";
 import CodeBlock from "../../components/CodeBlock";
-import { MetaTitle } from "../../components/MetaTags";
+import { MetaTags } from "../../components/MetaTags";
 import { PrincipalNodesList } from "../../components/NodeList";
 import PrincipalDetails from "../../components/PrincipalDetails";
 import Search404 from "../../components/Search404";
@@ -241,7 +241,12 @@ const PrincipalPage = () => {
 
   return isValid ? (
     <div className="py-16">
-      <MetaTitle title={`Principal${principalId ? ` ${principalId}` : ""}`} />
+      <MetaTags
+        title={`Principal${principalId ? ` ${principalId}` : ""}`}
+        description={`Details for principal${
+          principalId ? ` ${principalId}` : ""
+        } on the Internet Computer.`}
+      />
       <h1 className="text-3xl mb-8 overflow-hidden overflow-ellipsis">
         Principal <small className="text-xl">{principalId}</small>
       </h1>

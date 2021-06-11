@@ -1,7 +1,7 @@
 import Link from "next/link";
 import React, { useCallback, useMemo, useState } from "react";
 import CanisterPage from "../components/CanisterPage";
-import { MetaTitle } from "../components/MetaTags";
+import { MetaTags } from "../components/MetaTags";
 import { Table } from "../components/Tables/Table";
 import fetchJSON from "../lib/fetch";
 import { formatNumber } from "../lib/numbers";
@@ -85,7 +85,10 @@ const ModulesPage = () => {
   const title = "Duplicate Modules";
   return (
     <CanisterPage>
-      <MetaTitle title={title} />
+      <MetaTags
+        title={title}
+        description="A list of duplicate modules on the Internet Computer."
+      />
       <h1 className="text-3xl mb-8">{title}</h1>
       <ModulesTable />
     </CanisterPage>

@@ -1,10 +1,10 @@
 import React from "react";
-import { MetaTitle } from "./MetaTags";
+import { homeDescription, MetaTags } from "./MetaTags";
 
 export default function Search404({ input }) {
   return (
     <div className="py-16">
-      <MetaTitle title="Not Found" />
+      <MetaTags title="Not Found" description={homeDescription} />
       <h1 className="text-3xl mb-8">Not found</h1>
       <p>You searched for: {input}</p>
     </div>

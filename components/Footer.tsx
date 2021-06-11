@@ -5,10 +5,10 @@ const DONATION_PRINCIPAL =
 
 export function Footer() {
   return (
-    <footer className="flex py-8">
+    <footer className="flex py-8 justify-center">
       <div className="w-full px-4 sm:max-w-screen-lg">
         <div className="flex items-center justify-between border-t border-gray-200 dark:border-gray-800 pt-8">
-          <div className="px-4 text-xs text-gray-500">
+          <div className="text-xs text-gray-500">
             © {new Date().getFullYear()} ic.rocks |{" "}
             <Link href={`/principal/${DONATION_PRINCIPAL}`}>
               <a className="link-overflow">Donate ICP or Cycles</a>

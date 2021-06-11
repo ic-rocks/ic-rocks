@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import BalanceLabel from "../components/Labels/BalanceLabel";
 import Ledger from "../components/LedgerPage";
+import { MetaTags } from "../components/MetaTags";
 import { TransactionsTable } from "../components/TransactionsTable";
 import fetchJSON from "../lib/fetch";
 import { formatNumber } from "../lib/numbers";
@@ -14,6 +15,10 @@ const Transactions = () => {
 
   return (
     <Ledger title="Transactions">
+      <MetaTags
+        title="Transactions"
+        description="A list of transactions on the Internet Computer ledger."
+      />
       <section>
         <table className="table-fixed w-full">
           <tbody className="divide-y divide-gray-300 dark:divide-gray-700">

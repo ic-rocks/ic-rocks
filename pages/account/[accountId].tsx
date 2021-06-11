@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import BalanceLabel from "../../components/Labels/BalanceLabel";
-import { MetaTitle } from "../../components/MetaTags";
+import { MetaTags } from "../../components/MetaTags";
 import Search404 from "../../components/Search404";
 import { TransactionsTable } from "../../components/TransactionsTable";
 import ledgerIdl from "../../lib/canisters/ledger.did";
@@ -65,7 +65,12 @@ const Account = () => {
 
   return isValid ? (
     <div className="py-16">
-      <MetaTitle title={`Account${accountId ? ` ${accountId}` : ""}`} />
+      <MetaTags
+        title={`Account${accountId ? ` ${accountId}` : ""}`}
+        description={`Details for account${
+          accountId ? ` ${accountId}` : ""
+        } on the Internet Computer ledger.`}
+      />
       <h1 className="text-3xl mb-8 overflow-hidden overflow-ellipsis">
         Account <small className="text-xl break-all">{accountId}</small>
       </h1>

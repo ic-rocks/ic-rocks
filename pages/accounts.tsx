@@ -2,6 +2,7 @@ import Link from "next/link";
 import React, { useCallback, useMemo, useState } from "react";
 import BalanceLabel from "../components/Labels/BalanceLabel";
 import Ledger from "../components/LedgerPage";
+import { MetaTags } from "../components/MetaTags";
 import { Table } from "../components/Tables/Table";
 import fetchJSON from "../lib/fetch";
 import { formatNumber } from "../lib/numbers";
@@ -83,6 +84,10 @@ const Accounts = () => {
 
   return (
     <Ledger title="Accounts">
+      <MetaTags
+        title="Accounts"
+        description="A list of accounts on the Internet Computer ledger."
+      />
       <Table
         data={rows}
         columns={columns}

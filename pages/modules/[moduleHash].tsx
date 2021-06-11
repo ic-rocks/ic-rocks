@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 import React, { useState } from "react";
 import CanisterPage from "../../components/CanisterPage";
 import { CanistersTable } from "../../components/CanistersTable";
-import { MetaTitle } from "../../components/MetaTags";
+import { MetaTags } from "../../components/MetaTags";
 import { pluralize } from "../../lib/strings";
 
 const ModuleCanistersPage = () => {
@@ -17,7 +17,12 @@ const ModuleCanistersPage = () => {
 
   return (
     <CanisterPage>
-      <MetaTitle title={`Module ${moduleHash}`} />
+      <MetaTags
+        title={`Module ${moduleHash}`}
+        description={`Details for module${
+          moduleHash ? ` ${moduleHash}` : ""
+        } on the Internet Computer.`}
+      />
       <h1 className="text-3xl mb-8 overflow-hidden overflow-ellipsis">
         Module <small className="text-xl break-all">{moduleHash}</small>
       </h1>

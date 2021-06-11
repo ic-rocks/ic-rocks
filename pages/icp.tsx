@@ -2,7 +2,7 @@ import { Actor, HttpAgent } from "@dfinity/agent";
 import { IDL } from "@dfinity/candid";
 import { DateTime } from "luxon";
 import React, { useEffect, useState } from "react";
-import { MetaTitle } from "../components/MetaTags";
+import { MetaTags } from "../components/MetaTags";
 import governanceIdl from "../lib/canisters/governance.did";
 import nnsUiIdl from "../lib/canisters/nns-ui.did";
 import useInterval from "../lib/hooks/useInterval";
@@ -117,7 +117,10 @@ function Prices() {
 
   return (
     <div>
-      <MetaTitle title="ICP Price" />
+      <MetaTags
+        title="ICP Price"
+        description="An overview of the ICP Price Oracle on the Internet Computer."
+      />
       <section className="py-16">
         <h1 className="text-3xl mb-4">ICP Price Oracle</h1>
         <table className="w-full">

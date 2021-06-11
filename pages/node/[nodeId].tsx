@@ -5,7 +5,7 @@ import Link from "next/link";
 import protobuf from "protobufjs";
 import React from "react";
 import NetworkGraph from "../../components/Charts/NetworkGraph";
-import { MetaTitle } from "../../components/MetaTags";
+import { MetaTags } from "../../components/MetaTags";
 import subnetsJson from "../../generated/subnets.json";
 import protobufJson from "../../lib/canisters/proto.json";
 
@@ -43,7 +43,10 @@ export async function getStaticProps({ params: { nodeId } }) {
 const NodePage = ({ nodeId, nodeRecord, subnets }) => {
   return (
     <div className="py-16">
-      <MetaTitle title={`Node ${nodeId}`} />
+      <MetaTags
+        title={`Node ${nodeId}`}
+        description={`Details for node ${nodeId} on the Internet Computer.`}
+      />
       <h1 className="text-3xl mb-8 overflow-hidden overflow-ellipsis">
         Node <small className="text-xl">{nodeId}</small>
       </h1>

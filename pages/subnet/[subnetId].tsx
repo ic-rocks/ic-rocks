@@ -1,7 +1,7 @@
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import NetworkGraph from "../../components/Charts/NetworkGraph";
-import { MetaTitle } from "../../components/MetaTags";
+import { MetaTags } from "../../components/MetaTags";
 import subnetsJson from "../../generated/subnets.json";
 import { countBy } from "../../lib/arrays";
 import fetchJSON from "../../lib/fetch";
@@ -64,7 +64,10 @@ const Subnet = ({
 
   return (
     <div className="py-16">
-      <MetaTitle title={`Subnet ${subnetId}`} />
+      <MetaTags
+        title={`Subnet ${subnetId}`}
+        description={`Details for subnet ${subnetId} on the Internet Computer.`}
+      />
       <h1 className="text-3xl mb-8 overflow-hidden overflow-ellipsis">
         Subnet <small className="text-xl">{subnetId}</small>
       </h1>
