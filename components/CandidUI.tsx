@@ -257,7 +257,7 @@ export default function CandidUI({
 
   return (
     <div className={className}>
-      <div className="px-2 py-2 bg-gray-100 dark:bg-gray-800 flex justify-between items-baseline">
+      <div className="px-2 py-2 bg-heading flex justify-between items-baseline">
         <div>
           <span className="font-bold">
             {sortedMethods.length}{" "}
@@ -361,7 +361,7 @@ export default function CandidUI({
               call(funcName, method, state.inputs[funcName]);
             }}
           >
-            <div className="px-2 py-2 bg-gray-100 dark:bg-gray-800 flex justify-between items-center">
+            <div className="px-2 py-2 bg-heading flex justify-between items-center">
               {funcName}
               <label
                 className={classNames(

@@ -42,16 +42,16 @@ export async function getStaticProps({ params: { nodeId } }) {
 
 const NodePage = ({ nodeId, nodeRecord, subnets }) => {
   return (
-    <div className="py-16">
+    <div className="pb-16">
       <MetaTags
         title={`Node ${nodeId}`}
         description={`Details for node ${nodeId} on the Internet Computer.`}
       />
-      <h1 className="text-3xl mb-8 overflow-hidden overflow-ellipsis">
+      <h1 className="text-3xl my-8 overflow-hidden">
         Node <small className="text-xl">{nodeId}</small>
       </h1>
       <table className="w-full table-fixed">
-        <thead className="bg-gray-100 dark:bg-gray-800">
+        <thead className="bg-heading">
           <tr className="invisible">
             <td className="w-1/4" />
             <td className="w-3/4" />
@@ -65,11 +65,11 @@ const NodePage = ({ nodeId, nodeRecord, subnets }) => {
         <tbody className="divide-y divide-gray-300 dark:divide-gray-700">
           <tr>
             <td className="px-2 py-2 w-1/4">Node Operator</td>
-            <td className="px-2 py-2 w-3/4 overflow-hidden overflow-ellipsis">
+            <td className="px-2 py-2 w-3/4 overflow-hidden">
               <Link
                 href={`/principal/${nodeRecord.nodeOperator.value.nodeOperatorPrincipalId}`}
               >
-                <a className="text-blue-600 hover:underline">
+                <a className="link-overflow">
                   {nodeRecord.nodeOperator.value.nodeOperatorPrincipalId}
                 </a>
               </Link>
@@ -77,11 +77,11 @@ const NodePage = ({ nodeId, nodeRecord, subnets }) => {
           </tr>
           <tr>
             <td className="px-2 py-2 w-1/4">Node Provider</td>
-            <td className="px-2 py-2 w-3/4 overflow-hidden overflow-ellipsis">
+            <td className="px-2 py-2 w-3/4 overflow-hidden">
               <Link
                 href={`/principal/${nodeRecord.nodeOperator.value.nodeProviderPrincipalId}`}
               >
-                <a className="text-blue-600 hover:underline">
+                <a className="link-overflow">
                   {nodeRecord.nodeOperator.value.nodeProviderPrincipalId}
                 </a>
               </Link>
@@ -89,11 +89,11 @@ const NodePage = ({ nodeId, nodeRecord, subnets }) => {
           </tr>
           <tr>
             <td className="px-2 py-2 w-1/4">Subnet</td>
-            <td className="px-2 py-2 w-3/4 overflow-hidden overflow-ellipsis">
+            <td className="px-2 py-2 w-3/4 overflow-hidden">
               {subnets.map((subnet) => {
                 return (
                   <Link key={subnet} href={`/subnet/${subnet}`}>
-                    <a className="text-blue-600 hover:underline">{subnet}</a>
+                    <a className="link-overflow">{subnet}</a>
                   </Link>
                 );
               })}
@@ -101,7 +101,7 @@ const NodePage = ({ nodeId, nodeRecord, subnets }) => {
           </tr>
           <tr>
             <td className="px-2 py-2 w-1/4">Node Allowance</td>
-            <td className="px-2 py-2 w-3/4 overflow-hidden overflow-ellipsis">
+            <td className="px-2 py-2 w-3/4 overflow-hidden">
               {nodeRecord.nodeOperator.value.nodeAllowance || "-"}
             </td>
           </tr>

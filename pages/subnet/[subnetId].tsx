@@ -63,16 +63,16 @@ const Subnet = ({
   }, []);
 
   return (
-    <div className="py-16">
+    <div className="pb-16">
       <MetaTags
         title={`Subnet ${subnetId}`}
         description={`Details for subnet ${subnetId} on the Internet Computer.`}
       />
-      <h1 className="text-3xl mb-8 overflow-hidden overflow-ellipsis">
+      <h1 className="text-3xl my-8 overflow-hidden overflow-ellipsis">
         Subnet <small className="text-xl">{subnetId}</small>
       </h1>
       <table className="w-full table-fixed">
-        <thead className="bg-gray-100 dark:bg-gray-800">
+        <thead className="bg-heading">
           <tr className="invisible">
             <td className="w-1/4" />
             <td className="w-3/4" />
@@ -121,7 +121,7 @@ const Subnet = ({
 
       <h2 className="text-2xl mt-8 mb-4">Nodes</h2>
       <table className="w-full table-fixed">
-        <thead className="bg-gray-100 dark:bg-gray-800">
+        <thead className="bg-heading">
           <tr className="flex">
             <th className="text-left px-2 py-2 flex-1">Node</th>
             <th className="text-left px-2 py-2 flex-1">Operator</th>
@@ -132,17 +132,17 @@ const Subnet = ({
           {nodes.map(({ nodeId, operator, provider }) => {
             return (
               <tr key={nodeId} className="flex">
-                <td className="px-2 py-0.5 flex-1 flex overflow-hidden whitespace-nowrap">
+                <td className="px-2 py-0.5 flex-1 flex oneline">
                   <Link href={`/node/${nodeId}`}>
                     <a className="link-overflow">{nodeId}</a>
                   </Link>
                 </td>
-                <td className="px-2 py-0.5 flex-1 flex overflow-hidden whitespace-nowrap">
+                <td className="px-2 py-0.5 flex-1 flex oneline">
                   <Link href={`/principal/${operator}`}>
                     <a className="link-overflow">{operator}</a>
                   </Link>
                 </td>
-                <td className="px-2 py-0.5 flex-1 flex overflow-hidden whitespace-nowrap">
+                <td className="px-2 py-0.5 flex-1 flex oneline">
                   <Link href={`/principal/${provider}`}>
                     <a className="link-overflow">{provider}</a>
                   </Link>

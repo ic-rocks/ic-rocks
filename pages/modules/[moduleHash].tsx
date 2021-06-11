@@ -23,7 +23,7 @@ const ModuleCanistersPage = () => {
           moduleHash ? ` ${moduleHash}` : ""
         } on the Internet Computer.`}
       />
-      <h1 className="text-3xl mb-8 overflow-hidden overflow-ellipsis">
+      <h1 className="text-3xl my-8 overflow-hidden overflow-ellipsis">
         Module <small className="text-xl break-all">{moduleHash}</small>
       </h1>
       <p className="mb-8">

@@ -39,3 +39,15 @@ select {
 .link-overflow {
   @apply hover:underline text-blue-600 overflow-hidden overflow-ellipsis;
 }
+
+.divide-default {
+  @apply divide-gray-300 dark:divide-gray-700;
+}
+
+.bg-heading {
+  @apply bg-gray-100 dark:bg-gray-800;
+}
+
+.oneline {
+  @apply whitespace-nowrap overflow-hidden;
+}

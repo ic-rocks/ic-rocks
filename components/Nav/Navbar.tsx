@@ -1,4 +1,3 @@
-import Link from "next/link";
 import React from "react";
 import ActiveLink from "../ActiveLink";
 import DarkModeToggle from "./DarkModeToggle";
@@ -6,45 +5,49 @@ import SearchBar from "./Searchbar";
 
 export default function Nav() {
   return (
-    <nav className="flex justify-center py-4">
-      <div className="flex flex-wrap items-stretch justify-between sm:max-w-screen-lg w-full gap-2 px-4">
-        <ul className="flex flex-wrap items-center">
-          <li className="pr-8">
-            <a href="/">
-              <img
-                src="/img/icrocks-light.svg"
-                alt="ic.rocks"
-                className="h-8 dark:hidden"
-              />
-              <img
-                src="/img/icrocks-dark.svg"
-                alt="ic.rocks"
-                className="h-8 hidden dark:block"
-              />
-            </a>
-          </li>
-          <li className="pr-4">
-            <ActiveLink href="/network">Network</ActiveLink>
-          </li>
-          <li className="pr-4">
-            <ActiveLink href="/icp">ICP</ActiveLink>
-          </li>
-          <li className="pr-4">
-            <ActiveLink href="/canisters">Canisters</ActiveLink>
-          </li>
-          <li className="pr-4">
-            <ActiveLink href="/principals">Principals</ActiveLink>
-          </li>
-          <li className="pr-4">
-            <Link href="/accounts">Ledger</Link>
-          </li>
-        </ul>
+    <nav className="pt-4 flex flex-col gap-4">
+      <div className="flex flex-wrap justify-between gap-2">
+        <div className="flex-none pr-8">
+          <a href="/">
+            <img
+              src="/img/icrocks-light.svg"
+              alt="ic.rocks"
+              className="h-8 dark:hidden"
+            />
+            <img
+              src="/img/icrocks-dark.svg"
+              alt="ic.rocks"
+              className="h-8 hidden dark:block"
+            />
+          </a>
+        </div>
 
-        <div className="flex">
+        <div className="flex-1 flex items-start max-w-sm gap-4">
           <SearchBar />
           <DarkModeToggle />
         </div>
       </div>
+
+      <ul className="flex flex-1 xs:py-2 divide-y divide-default xs:divide-none flex-col xs:flex-wrap xs:flex-row xs:items-center border-b xs:border-t border-gray-200 dark:border-gray-800 xs:gap-4">
+        <li>
+          <ActiveLink href="/network">Network</ActiveLink>
+        </li>
+        <li>
+          <ActiveLink href="/icp">ICP</ActiveLink>
+        </li>
+        <li>
+          <ActiveLink href="/canisters">Canisters</ActiveLink>
+        </li>
+        <li>
+          <ActiveLink href="/principals">Principals</ActiveLink>
+        </li>
+        <li>
+          <ActiveLink href="/accounts">Accounts</ActiveLink>
+        </li>
+        <li>
+          <ActiveLink href="/transactions">Transactions</ActiveLink>
+        </li>
+      </ul>
     </nav>
   );
 }

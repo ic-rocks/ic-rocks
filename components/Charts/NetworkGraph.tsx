@@ -38,7 +38,7 @@ const selectRelatedIds = (
   depth = 1
 ): Record<string, Set<string>> => {
   if (type === "Subnet") {
-    const arr = Object.entries(data.nodesMap)
+    const arr = Object.entries(data.nodesMap || {})
       .filter(([_, { subnet }]) => subnet === subnetIdx)
       .map(([nodeId]) => nodeId);
     const res = { [depth]: new Set(arr) };

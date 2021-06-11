@@ -240,14 +240,14 @@ const PrincipalPage = () => {
   }, [principalId, type, candid]);
 
   return isValid ? (
-    <div className="py-16">
+    <div className="pb-16">
       <MetaTags
         title={`Principal${principalId ? ` ${principalId}` : ""}`}
         description={`Details for principal${
           principalId ? ` ${principalId}` : ""
         } on the Internet Computer.`}
       />
-      <h1 className="text-3xl mb-8 overflow-hidden overflow-ellipsis">
+      <h1 className="text-3xl my-8 overflow-hidden overflow-ellipsis">
         Principal <small className="text-xl">{principalId}</small>
       </h1>
       <PrincipalDetails

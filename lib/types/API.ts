@@ -98,3 +98,12 @@ export type Module = {
   canisters: string;
   subnets: string;
 };
+
+export type StatsResponse = {
+  canisters: number;
+  controllers: number;
+  subnets: number;
+  accounts: number;
+  txs: number;
+  nodes: number;
+};

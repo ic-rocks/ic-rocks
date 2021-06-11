@@ -41,33 +41,28 @@ const Accounts = () => {
         Cell: ({ value, row }) => {
           return (
             <Link href={`/account/${value}`}>
-              <a className="hover:underline text-blue-600 overflow-hidden overflow-ellipsis">
-                {row.original.name || value}
-              </a>
+              <a className="link-overflow">{row.original.name || value}</a>
             </Link>
           );
         },
-        className: "px-2 flex-2 flex overflow-hidden",
+        className: "px-2 flex-2 flex oneline",
       },
       {
         Header: "Principal",
         accessor: "principal",
         Cell: ({ value }) => (
           <Link href={`/principal/${value}`}>
-            <a className="hover:underline text-blue-600 overflow-hidden overflow-ellipsis">
-              {value}
-            </a>
+            <a className="link-overflow">{value}</a>
           </Link>
         ),
-        className:
-          "px-2 sm:flex flex-1 hidden whitespace-nowrap overflow-hidden",
+        className: "px-2 sm:flex flex-1 hidden oneline",
       },
       {
         Header: "Balance",
         accessor: "balance",
         sortDescFirst: true,
         Cell: ({ value }) => <BalanceLabel value={value} />,
-        className: "px-2 w-40 whitespace-nowrap text-right",
+        className: "px-2 w-44 text-right",
       },
       {
         Header: "Tx Count",

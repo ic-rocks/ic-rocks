@@ -49,8 +49,7 @@ export const TransactionsTable = ({
             <a className="link-overflow">{value}</a>
           </Link>
         ),
-        className:
-          "px-2 flex-1 flex whitespace-nowrap overflow-hidden overflow-ellipsis",
+        className: "px-2 flex-1 flex oneline",
         style: { minWidth: "4rem" },
         disableSortBy: true,
       },
@@ -59,7 +58,7 @@ export const TransactionsTable = ({
         accessor: "blockHeight",
         Cell: ({ value, row }) =>
           DateTime.fromISO(row.original.createdDate).toRelative(),
-        className: "px-2 w-32 whitespace-nowrap",
+        className: "px-2 w-32 oneline",
         sortDescFirst: true,
       },
       {
@@ -79,7 +78,7 @@ export const TransactionsTable = ({
               {row.original.sender.name || value}
             </span>
           ),
-        className: "px-2 flex-1 flex whitespace-nowrap overflow-hidden",
+        className: "px-2 flex-1 flex oneline",
         style: { minWidth: "4rem" },
         disableSortBy: true,
       },
@@ -100,7 +99,7 @@ export const TransactionsTable = ({
               {row.original.receiver.name || value}
             </span>
           ),
-        className: "px-2 flex-1 flex whitespace-nowrap overflow-hidden",
+        className: "px-2 flex-1 flex oneline",
         style: { minWidth: "4rem" },
         disableSortBy: true,
       },
@@ -108,14 +107,14 @@ export const TransactionsTable = ({
         Header: "Amount",
         accessor: "amount",
         Cell: ({ value }) => <BalanceLabel value={value} />,
-        className: "px-2 w-36 whitespace-nowrap text-right",
+        className: "px-2 w-36 text-right oneline",
         sortDescFirst: true,
       },
       {
         Header: "Fee",
         accessor: "fee",
         Cell: ({ value }) => <BalanceLabel value={value} />,
-        className: "px-2 w-24 hidden sm:block whitespace-nowrap text-right",
+        className: "px-2 w-24 hidden sm:block text-right oneline",
         disableSortBy: true,
       },
     ],

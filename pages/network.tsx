@@ -38,7 +38,7 @@ const Network = () => {
         Header: "Type",
         accessor: "subnetType",
         Cell: ({ value }) => getSubnetType(value),
-        className: "px-2 w-40",
+        className: "px-2 w-24 sm:w-40",
       },
       {
         Header: "Subnet ID",
@@ -50,7 +50,7 @@ const Network = () => {
         ),
         style: { minWidth: "8rem" },
         disableSortBy: true,
-        className: "px-2 flex flex-1 whitespace-nowrap overflow-hidden",
+        className: "px-2 flex flex-1 oneline",
       },
       {
         Header: "Nodes",
@@ -73,12 +73,12 @@ const Network = () => {
   const initialSort = useMemo(() => [{ id: "subnetType", desc: false }], []);
 
   return (
-    <div className="py-16">
+    <div className="pb-16">
       <MetaTags
         title={title}
         description="An overview of the Internet Computer network. View subnets, nodes, operators, and providers."
       />
-      <h1 className="text-3xl mb-8">{title}</h1>
+      <h1 className="text-3xl my-8">{title}</h1>
       <NetworkGraph />
       <section className="pt-8">
         <h2 className="text-2xl mb-4">{subnetsData.length} Subnets</h2>

@@ -65,7 +65,7 @@ export const CanistersTable = ({
               </Link>
             );
           },
-          className: "pr-2 flex-1 flex whitespace-nowrap overflow-hidden",
+          className: "pr-2 flex-1 flex oneline",
         },
         !controllerId && {
           Header: "Controller",
@@ -78,8 +78,7 @@ export const CanistersTable = ({
               </a>
             </Link>
           ),
-          className:
-            "px-2 sm:flex flex-1 hidden whitespace-nowrap overflow-hidden",
+          className: "px-2 sm:flex flex-1 hidden oneline",
         },
         {
           Header: "Subnet",
@@ -90,8 +89,7 @@ export const CanistersTable = ({
               <a className="link-overflow">{row.original.subnet.displayName}</a>
             </Link>
           ),
-          className:
-            "px-2 sm:flex flex-1 hidden whitespace-nowrap overflow-hidden",
+          className: "px-2 sm:flex flex-1 hidden oneline",
         },
         {
           Header: "Last Updated",

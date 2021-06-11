@@ -25,7 +25,7 @@ export const PrincipalsTable = () => {
             </Link>
           );
         },
-        className: "pr-2 flex-1 flex whitespace-nowrap overflow-hidden",
+        className: "pr-2 flex-1 flex oneline",
       },
       {
         Header: "Controlled Canisters",

@@ -134,7 +134,7 @@ const Interfaces = ({ current, children }) => {
           current ? ` ${current}` : ""
         } on the Internet Computer.`}
       />
-      <h1 className="text-3xl mb-8">
+      <h1 className="text-3xl my-8">
         <ActiveLink
           href="/interfaces"
           linkClassName="text-blue-600 hover:underline"

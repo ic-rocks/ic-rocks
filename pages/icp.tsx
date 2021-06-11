@@ -121,8 +121,8 @@ function Prices() {
         title="ICP Price"
         description="An overview of the ICP Price Oracle on the Internet Computer."
       />
-      <section className="py-16">
-        <h1 className="text-3xl mb-4">ICP Price Oracle</h1>
+      <section className="pb-8">
+        <h1 className="text-3xl my-8">ICP Price Oracle</h1>
         <table className="w-full">
           <tbody className="divide-y divide-gray-300 dark:divide-gray-700">
             <tr>
@@ -150,8 +150,8 @@ function Prices() {
       </section>
       <h2 className="text-xl mb-4">Latest {count} price updates</h2>
       <table className="table-auto w-full">
-        <thead className="bg-gray-100 dark:bg-gray-800">
-          <tr className="bg-gray-100 dark:bg-gray-800">
+        <thead className="bg-heading">
+          <tr>
             <th className="px-2 py-2">ID</th>
             <th className="px-2 py-2">Proposed Timestamp</th>
             <th className="px-2 py-2">Executed Timestamp</th>

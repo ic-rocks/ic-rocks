@@ -6,14 +6,14 @@ import "../styles/svg.css";
 
 function MyApp({ Component, pageProps }) {
   return (
-    <div className="min-h-screen flex flex-col">
-      <Nav />
-      <main className="flex-1 flex flex-col items-center">
-        <div className="sm:max-w-screen-lg w-full px-4">
+    <div className="flex flex-col items-center">
+      <div className="flex flex-col justify-between min-h-screen w-full sm:max-w-screen-lg px-4">
+        <main>
+          <Nav />
           <Component {...pageProps} />
-        </div>
-      </main>
-      <Footer />
+        </main>
+        <Footer />
+      </div>
     </div>
   );
 }

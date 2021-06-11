@@ -16,22 +16,32 @@ export const PAGE_SIZE = 25;
 export const Table = ({
   className,
   style,
+  tableBodyProps = {},
+  tableHeaderGroupProps = {
+    className: "bg-heading py-2",
+  },
   columns,
   data,
   count,
   fetchData = () => {},
   loading,
+  useSort = true,
+  usePage = true,
   initialSortBy,
   manualPagination = true,
   manualSortBy = true,
 }: {
   className?: string;
   style?: CSSProperties;
+  tableBodyProps?: any;
+  tableHeaderGroupProps?: any;
   columns: Column<any>[];
   data: any[];
   count: number;
   fetchData?: ({ pageSize, pageIndex, sortBy }) => void;
   loading?: boolean;
+  useSort?: boolean;
+  usePage?: boolean;
   initialSortBy?: SortingRule<any>[];
   manualPagination?: boolean;
   manualSortBy?: boolean;
@@ -60,8 +70,7 @@ export const Table = ({
       pageCount: Math.ceil(count / PAGE_SIZE),
       manualSortBy,
     },
-    useSortBy,
-    usePagination
+    ...[useSort && useSortBy, usePagination].filter(Boolean)
   );
 
   useEffect(() => {
@@ -81,12 +90,15 @@ export const Table = ({
           { className, style },
         ])}
       >
-        <thead className="block bg-gray-100 dark:bg-gray-800 py-2">
+        <thead className="block">
           {headerGroups.map((headerGroup) => (
             <tr
-              {...headerGroup.getHeaderGroupProps({
-                className: "flex",
-              })}
+              {...headerGroup.getHeaderGroupProps([
+                {
+                  className: "flex",
+                },
+                tableHeaderGroupProps,
+              ])}
             >
               {headerGroup.headers.map((column) => (
                 <th
@@ -96,7 +108,7 @@ export const Table = ({
                     },
                     { className: column.className },
                     { style: column.style },
-                    column.getSortByToggleProps(),
+                    useSort && column.getSortByToggleProps(),
                   ])}
                 >
                   {column.render("Header")}
@@ -112,9 +124,12 @@ export const Table = ({
           ))}
         </thead>
         <tbody
-          {...getTableBodyProps({
-            className: "block divide-y divide-gray-300 dark:divide-gray-700",
-          })}
+          {...getTableBodyProps([
+            {
+              className: "block divide-y divide-default",
+            },
+            tableBodyProps,
+          ])}
         >
           {page.map((row, i) => {
             prepareRow(row);
@@ -155,7 +170,8 @@ export const Table = ({
               </td>
             </tr>
           )}
-          {count > 0 && (
+          {count > 0 && (usePage || loading) && (
+            // Show results count when usePage=true, but always show loading spinner
             <tr className="flex">
               <td
                 colSpan={columns.length}
@@ -166,14 +182,17 @@ export const Table = ({
                     invisible: !loading,
                   })}
                 />
-                Showing {pageIndex * pageSize} -{" "}
-                {Math.min(count, (pageIndex + 1) * pageSize)} of {count} results
+                {usePage &&
+                  `Showing ${pageIndex * pageSize} - ${Math.min(
+                    count,
+                    (pageIndex + 1) * pageSize
+                  )} of ${count} results`}
               </td>
             </tr>
           )}
         </tbody>
       </table>
-      {count > 0 && (
+      {usePage && count > 0 && (
         <div className="flex justify-center">
           <Pagination
             canPreviousPage={canPreviousPage}

@@ -12,39 +12,39 @@ export const PrincipalNodesList = ({
   const otherRole = type === "operator" ? "provider" : "operator";
 
   return (
-    <table className="w-full mt-8">
-      <thead className="bg-gray-100 dark:bg-gray-800">
-        <tr>
-          <th className="text-left px-2 py-2">
+    <table className="w-full table-fixed mt-8">
+      <thead className="bg-heading">
+        <tr className="flex py-2">
+          <th className="flex-1 px-2">
             {type === "operator" ? "Operator" : "Provider"} of Nodes (
             {nodes.length})
           </th>
-          <th className="text-left px-2 py-2">
+          <th className="flex-1 px-2">
             Subnet ({countBy(nodes, "subnet")} unique)
           </th>
-          <th className="text-left px-2 py-2">
+          <th className="flex-1 px-2">
             {type === "operator" ? "Provider" : "Operator"} (
             {countBy(nodes, otherRole)} unique)
           </th>
         </tr>
       </thead>
-      <tbody className="divide-y divide-gray-300 dark:divide-gray-700">
+      <tbody className="block divide-y divide-default">
         {nodes.map(({ nodeId, subnet, ...principals }) => {
           return (
-            <tr key={nodeId}>
-              <td className="px-2 py-0.5 overflow-hidden overflow-ellipsis text-blue-600">
+            <tr key={nodeId} className="flex">
+              <td className="px-2 py-0.5 flex-1 flex oneline">
                 <Link href={`/node/${nodeId}`}>
-                  <a className="hover:underline">{nodeId}</a>
+                  <a className="link-overflow">{nodeId}</a>
                 </Link>
               </td>
-              <td className="px-2 py-0.5 overflow-hidden overflow-ellipsis text-blue-600">
+              <td className="px-2 py-0.5 flex-1 flex oneline">
                 <Link href={`/subnet/${subnet}`}>
-                  <a className="hover:underline">{subnet}</a>
+                  <a className="link-overflow">{subnet}</a>
                 </Link>
               </td>
-              <td className="px-2 py-0.5 overflow-hidden overflow-ellipsis text-blue-600">
+              <td className="px-2 py-0.5 flex-1 flex oneline">
                 <Link href={`/principal/${principals[otherRole]}`}>
-                  <a className="hover:underline">{principals[otherRole]}</a>
+                  <a className="link-overflow">{principals[otherRole]}</a>
                 </Link>
               </td>
             </tr>

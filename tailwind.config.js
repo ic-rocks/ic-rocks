@@ -5,10 +5,16 @@ module.exports = {
   darkMode: "class",
   theme: {
     screens: {
+      xxs: "360px",
       xs: "475px",
       ...defaultTheme.screens,
     },
     extend: {
+      colors: {
+        gray: {
+          950: "hsl(222deg 42% 10%)",
+        },
+      },
       fontFamily: {
         sans: ["Aestetico", ...defaultTheme.fontFamily.sans],
         mono: ["Space Mono", ...defaultTheme.fontFamily.mono],

@@ -64,28 +64,28 @@ const Account = () => {
   }, [accountId]);
 
   return isValid ? (
-    <div className="py-16">
+    <div className="pb-16">
       <MetaTags
         title={`Account${accountId ? ` ${accountId}` : ""}`}
         description={`Details for account${
           accountId ? ` ${accountId}` : ""
         } on the Internet Computer ledger.`}
       />
-      <h1 className="text-3xl mb-8 overflow-hidden overflow-ellipsis">
+      <h1 className="text-3xl my-8 overflow-hidden overflow-ellipsis">
         Account <small className="text-xl break-all">{accountId}</small>
       </h1>
       <table className="w-full table-fixed">
-        <thead className="bg-gray-100 dark:bg-gray-800">
+        <thead className="bg-heading">
           <tr className="flex">
             <th colSpan={2} className="px-2 py-2">
               Account Details
             </th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-300 dark:divide-gray-700">
+        <tbody className="divide-y divide-default">
           <tr className="flex">
             <td className="px-2 py-2 w-32">Principal</td>
-            <td className="px-2 py-2 flex-1 flex overflow-hidden whitespace-nowrap">
+            <td className="px-2 py-2 flex-1 flex oneline">
               {data?.principal ? (
                 <Link href={`/principal/${data.principal}`}>
                   <a className="link-overflow">{data.principal}</a>
