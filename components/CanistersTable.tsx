@@ -93,7 +93,7 @@ export const CanistersTable = ({
         },
         {
           Header: "Last Updated",
-          accessor: "updatedDate",
+          accessor: "latestVersionDate",
           sortDescFirst: true,
           Cell: ({ value }) => DateTime.fromISO(value).toRelative(),
           className: "px-2 w-36 text-right",
@@ -102,7 +102,10 @@ export const CanistersTable = ({
     []
   );
 
-  const initialSort = useMemo(() => [{ id: "updatedDate", desc: true }], []);
+  const initialSort = useMemo(
+    () => [{ id: "latestVersionDate", desc: true }],
+    []
+  );
 
   const fetchData = useCallback(
     async ({ pageSize, pageIndex, sortBy }) => {

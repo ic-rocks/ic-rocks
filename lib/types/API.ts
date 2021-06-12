@@ -72,7 +72,8 @@ export type Canister = {
     name: string;
   } | null;
   createdDate: string;
-  updatedDate: string;
+  latestVersionDate: string;
+  status: "Running" | "Stopping" | "Stopped";
   controller: {
     name: string;
   } | null;

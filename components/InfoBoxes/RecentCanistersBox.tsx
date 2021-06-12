@@ -55,7 +55,7 @@ export default function RecentCanistersBox({}: {}) {
       },
       {
         Header: "Last Updated",
-        accessor: "updatedDate",
+        accessor: "latestVersionDate",
         Cell: ({ value }) => DateTime.fromISO(value).toRelative(),
         className: "px-2 w-36 text-right",
       },
