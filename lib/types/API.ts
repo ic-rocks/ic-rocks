@@ -73,6 +73,7 @@ export type APIPrincipal = {
   }[];
   operatorOf: CommonNodeResponse[];
   providerOf: CommonNodeResponse[];
+  nodeCount?: number;
 };
 
 export type TransactionsResponse = PagedResponse<Transaction>;

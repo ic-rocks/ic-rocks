@@ -104,7 +104,7 @@ export const Table = ({
                 <th
                   {...column.getHeaderProps([
                     {
-                      className: "px-2 items-center",
+                      className: "items-center",
                     },
                     { className: column.className },
                     { style: column.style },
