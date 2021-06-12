@@ -3,17 +3,9 @@ import React, { useEffect, useMemo, useState } from "react";
 import NetworkGraph from "../components/Charts/NetworkGraph";
 import { MetaTags } from "../components/MetaTags";
 import { Table } from "../components/Tables/Table";
-import subnetsJson from "../generated/subnets.json";
 import fetchJSON from "../lib/fetch";
 import { getSubnetType } from "../lib/network";
 import { formatNumber } from "../lib/numbers";
-
-const nodeCounts = Object.fromEntries(
-  Object.entries(subnetsJson.subnets).map(([id, { membership }]) => [
-    id,
-    membership.length,
-  ])
-);
 
 const Network = () => {
   const [loading, setLoading] = useState(false);
@@ -22,9 +14,7 @@ const Network = () => {
     setLoading(true);
     fetchJSON("/api/subnets").then((data) => {
       if (data) {
-        setSubnetsData(
-          data.map((d) => ({ ...d, nodeCount: nodeCounts[d.id] }))
-        );
+        setSubnetsData(data);
       }
       setLoading(false);
     });
@@ -81,7 +71,9 @@ const Network = () => {
       <h1 className="text-3xl my-8">{title}</h1>
       <NetworkGraph />
       <section className="pt-8">
-        <h2 className="text-2xl mb-4">{subnetsData.length} Subnets</h2>
+        <h2 className="text-2xl mb-4">
+          {loading ? "⁠—" : subnetsData.length} Subnets
+        </h2>
         <Table
           data={subnetsData}
           columns={columns}

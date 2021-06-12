@@ -14,7 +14,6 @@ export default function PrincipalDetails({
   className,
   principalId,
   type,
-  nodesType,
   principalData,
   canisterData,
 }: {
@@ -22,7 +21,6 @@ export default function PrincipalDetails({
   principalId: string;
   canisterName?: string;
   type: PrincipalType;
-  nodesType?: string;
   principalData?: APIPrincipal;
   canisterData?: Canister;
 }) {
@@ -89,10 +87,10 @@ export default function PrincipalDetails({
               {type == "Canister" &&
                 canisterData &&
                 ` (${canisterData.status})`}
-              {nodesType
-                ? nodesType === "operator"
-                  ? " (Node Operator)"
-                  : " (Node Provider)"
+              {principalData?.operatorOf.length > 0
+                ? " (Node Operator)"
+                : principalData?.providerOf.length > 0
+                ? " (Node Provider)"
                 : null}
             </td>
           </tr>

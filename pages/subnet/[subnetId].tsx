@@ -1,66 +1,23 @@
 import Link from "next/link";
+import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import NetworkGraph from "../../components/Charts/NetworkGraph";
 import { MetaTags } from "../../components/MetaTags";
-import subnetsJson from "../../generated/subnets.json";
 import { countBy } from "../../lib/arrays";
 import fetchJSON from "../../lib/fetch";
-import { getSubnetType } from "../../lib/network";
 import { formatNumber } from "../../lib/numbers";
+import { SubnetResponse } from "../../lib/types/API";
 
-export async function getStaticPaths() {
-  return {
-    paths: Object.keys(subnetsJson.subnets).map((subnetId) => ({
-      params: { subnetId },
-    })),
-    fallback: false,
+const Subnet = () => {
+  const router = useRouter();
+  const { subnetId } = router.query as {
+    subnetId?: string;
   };
-}
-
-export async function getStaticProps({ params: { subnetId } }) {
-  const { subnetType, replicaVersionId, version, membership } =
-    subnetsJson.subnets[subnetId];
-  const nodes = membership.map((nodeId) => {
-    const { nodeOperatorPrincipalId, nodeProviderPrincipalId } =
-      subnetsJson.nodes[nodeId].nodeOperator.value;
-    return {
-      nodeId,
-      operator: nodeOperatorPrincipalId,
-      provider: nodeProviderPrincipalId,
-    };
-  });
-
-  return {
-    props: {
-      subnetId,
-      subnetType: getSubnetType(subnetType),
-      nodes,
-      version,
-      replicaVersionId,
-    },
-  };
-}
-
-const Subnet = ({
-  subnetId,
-  subnetType,
-  nodes,
-  replicaVersionId,
-}: {
-  subnetId: string;
-  subnetType: string;
-  nodes: any[];
-  replicaVersionId: string;
-}) => {
-  const [canisters, setCanisters] = useState(null);
+  const [data, setData] = useState<SubnetResponse>(null);
   useEffect(() => {
-    fetchJSON(
-      `/api/canisters?` +
-        new URLSearchParams({
-          subnetId,
-        })
-    ).then(setCanisters);
-  }, []);
+    if (!subnetId) return;
+    fetchJSON(`/api/subnets/${subnetId}`).then(setData);
+  }, [subnetId]);
 
   return (
     <div className="pb-16">
@@ -87,31 +44,31 @@ const Subnet = ({
           <tr>
             <td className="px-2 py-2 w-1/4">Type</td>
             <td className="px-2 py-2 w-3/4 overflow-hidden overflow-ellipsis">
-              {subnetType}
-            </td>
-          </tr>
-          <tr>
-            <td className="px-2 py-2 w-1/4">Replica Version</td>
-            <td className="px-2 py-2 w-3/4 overflow-hidden overflow-ellipsis">
-              {replicaVersionId}
+              {data?.subnetType || "-"}
             </td>
           </tr>
           <tr>
             <td className="px-2 py-2 w-1/4">Nodes</td>
-            <td className="px-2 py-2 w-3/4">{formatNumber(nodes.length)}</td>
+            <td className="px-2 py-2 w-3/4">
+              {data ? formatNumber(data.nodeCount) : "-"}
+            </td>
           </tr>
           <tr>
             <td className="px-2 py-2 w-1/4">Unique Operators</td>
-            <td className="px-2 py-2 w-3/4">{countBy(nodes, "operator")}</td>
+            <td className="px-2 py-2 w-3/4">
+              {data ? countBy(data.nodes, (d) => d.operator.id) : "-"}
+            </td>
           </tr>
           <tr>
             <td className="px-2 py-2 w-1/4">Unique Providers</td>
-            <td className="px-2 py-2 w-3/4">{countBy(nodes, "provider")}</td>
+            <td className="px-2 py-2 w-3/4">
+              {data ? countBy(data.nodes, (d) => d.provider.id) : "-"}
+            </td>
           </tr>
           <tr>
             <td className="px-2 py-2 w-1/4">Total Canisters</td>
             <td className="px-2 py-2 w-3/4">
-              {canisters ? canisters.count : "-"}
+              {data ? data.canisterCount : "-"}
             </td>
           </tr>
         </tbody>
@@ -129,22 +86,26 @@ const Subnet = ({
           </tr>
         </thead>
         <tbody className="block divide-y divide-gray-300 dark:divide-gray-700">
-          {nodes.map(({ nodeId, operator, provider }) => {
+          {data?.nodes.map(({ id, operator, provider }) => {
             return (
-              <tr key={nodeId} className="flex">
+              <tr key={id} className="flex">
                 <td className="px-2 py-0.5 flex-1 flex oneline">
-                  <Link href={`/node/${nodeId}`}>
-                    <a className="link-overflow">{nodeId}</a>
+                  <Link href={`/node/${id}`}>
+                    <a className="link-overflow">{id}</a>
                   </Link>
                 </td>
                 <td className="px-2 py-0.5 flex-1 flex oneline">
-                  <Link href={`/principal/${operator}`}>
-                    <a className="link-overflow">{operator}</a>
+                  <Link href={`/principal/${operator.id}`}>
+                    <a className="link-overflow">
+                      {operator.name || operator.id}
+                    </a>
                   </Link>
                 </td>
                 <td className="px-2 py-0.5 flex-1 flex oneline">
-                  <Link href={`/principal/${provider}`}>
-                    <a className="link-overflow">{provider}</a>
+                  <Link href={`/principal/${provider.id}`}>
+                    <a className="link-overflow">
+                      {provider.name || provider.id}
+                    </a>
                   </Link>
                 </td>
               </tr>

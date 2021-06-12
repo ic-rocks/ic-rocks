@@ -7,8 +7,8 @@ import { CanistersTable } from "../../components/CanistersTable";
 import NetworkGraph from "../../components/Charts/NetworkGraph";
 import CodeBlock from "../../components/CodeBlock";
 import { MetaTags } from "../../components/MetaTags";
-import { PrincipalNodesList } from "../../components/NodeList";
 import PrincipalDetails from "../../components/PrincipalDetails";
+import { PrincipalNodesTable } from "../../components/PrincipalNodesTable";
 import Search404 from "../../components/Search404";
 import CandidService from "../../lib/canisters/get-candid.did";
 import fetchJSON from "../../lib/fetch";
@@ -36,7 +36,6 @@ const PrincipalPage = () => {
   const [candid, setCandid] = useState("");
   const [bindings, setBindings] = useState(null);
   const [protobuf, setProtobuf] = useState("");
-  const [nodes, setNodes] = useState(null);
   const [principalData, setPrincipalData] = useState<APIPrincipal>(null);
   const [canisterData, setCanisterData] = useState<Canister>(null);
 
@@ -65,7 +64,6 @@ const PrincipalPage = () => {
     }
     setCandidAndBindings(newCandid);
     setProtobuf("");
-    setNodes(null);
     setPrincipalData(null);
     setCanisterData(null);
 
@@ -189,28 +187,6 @@ const PrincipalPage = () => {
         };
         fetchLocalFiles();
       });
-    } else {
-      // Could be node principal
-      fetch("/data/generated/nodes.json")
-        .then((res) => res.json())
-        .then((json) => {
-          if (json.principalsMap && json.principalsMap[principalId]) {
-            const type = Object.keys(json.principalsMap[principalId])[0];
-            setNodes({
-              type,
-              nodes: json.principalsMap[principalId][type].map((nodeIdx) => {
-                const nodeId = json.nodesList[nodeIdx];
-                const nodeData = json.nodesMap[nodeId];
-                return {
-                  nodeId,
-                  subnet: json.subnetsList[nodeData.subnet],
-                  provider: json.principalsList[nodeData.provider],
-                  operator: json.principalsList[nodeData.operator],
-                };
-              }),
-            });
-          }
-        });
     }
 
     // Always fetch principal data
@@ -239,6 +215,10 @@ const PrincipalPage = () => {
     })();
   }, [principalId, type, candid]);
 
+  const showNodes =
+    principalData?.operatorOf.length > 0 ||
+    principalData?.providerOf.length > 0;
+
   return isValid ? (
     <div className="pb-16">
       <MetaTags
@@ -253,7 +233,6 @@ const PrincipalPage = () => {
       <PrincipalDetails
         principalId={principalId}
         type={type}
-        nodesType={nodes?.type}
         principalData={principalData}
         canisterData={canisterData}
         className="mb-8"
@@ -281,10 +260,10 @@ const PrincipalPage = () => {
           <CodeBlock candid={candid} bindings={bindings} protobuf={protobuf} />
         </section>
       )}
-      {nodes ? (
+      {showNodes ? (
         <>
           <NetworkGraph activeId={principalId} activeType="Principal" />
-          <PrincipalNodesList type={nodes.type} nodes={nodes.nodes} />
+          <PrincipalNodesTable data={principalData} />
         </>
       ) : null}
     </div>

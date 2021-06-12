@@ -3,12 +3,53 @@ export type SubnetResponse = {
   createdDate: string;
   updatedDate: string;
   registryVersion: number;
+  recordVersion: number;
   startIndex: string;
   endIndex: string;
-  canisterIndex: number;
   subnetType: string;
   name: string;
   displayName: string;
+  nodeCount: number;
+  canisterIndex: number;
+  canisterCount: number;
+  nodes: CommonNodeResponse[];
+};
+
+export type CommonNodeResponse = {
+  id: string;
+  principal: {
+    name: string;
+  };
+  operator: {
+    id: string;
+    name: string;
+    operatorAllowance: number | null;
+  };
+  provider: {
+    id: string;
+    name: string;
+  };
+  subnet: {
+    id: string;
+    subnetType: string;
+    displayName: string;
+  };
+};
+
+export type NodeResponse = CommonNodeResponse & {
+  createdDate: string;
+};
+
+export type NetworkResponse = {
+  subnets: [id: string, name: string][];
+  nodes: [
+    id: string,
+    subnetIdx: number,
+    operatorIdx: number,
+    providerIdx: number,
+    name: string
+  ][];
+  principals: [id: string, name: string][];
 };
 
 export type TransactionType = "TRANSACTION" | "FEE" | "MINT" | "BURN";
@@ -30,6 +71,8 @@ export type APIPrincipal = {
     id: string;
     balance: string;
   }[];
+  operatorOf: CommonNodeResponse[];
+  providerOf: CommonNodeResponse[];
 };
 
 export type TransactionsResponse = PagedResponse<Transaction>;

@@ -1,3 +1,5 @@
+import { Principal } from "@dfinity/principal";
+
 export const pluralize = (str: string, n: number) =>
   n === 1 ? str : str + "s";
 
@@ -28,8 +30,10 @@ export const guessEncoding = (string: string): [Buffer, BufferEncoding] => {
   return [Buffer.from(string, "utf-8"), "utf-8"];
 };
 
-export const shortPrincipal = (principal: string) => {
-  const parts = principal.split("-");
+export const shortPrincipal = (principal: string | Principal) => {
+  const parts = (
+    typeof principal === "string" ? principal : principal.toText()
+  ).split("-");
   return `${parts[0]}...${parts.slice(-1)[0]}`;
 };
 

@@ -10,7 +10,6 @@ import useInterval from "../../lib/hooks/useInterval";
 import { formatNumber } from "../../lib/numbers";
 import { SparklineResponse, StatsResponse } from "../../lib/types/API";
 import { UInt64Value } from "../../lib/types/canisters";
-import nodesData from "../../public/data/generated/nodes.json";
 import SparklineChart from "../Charts/SparklineChart";
 const root = protobuf.Root.fromJSON(protobufJson as protobuf.INamespace);
 const agent = new HttpAgent({ host: "https://ic0.app" });
@@ -22,9 +21,7 @@ extendProtobuf(cyclesMinting, root.lookupService("CyclesMinting"));
 
 export default function StatsBoxes() {
   const [isLoading, setIsLoading] = useState(true);
-  const [stats, setStats] = useState<Partial<StatsResponse>>({
-    nodes: nodesData.nodesList.length,
-  });
+  const [stats, setStats] = useState<StatsResponse>(null);
   const [isLoadingChart, setIsLoadingChart] = useState(true);
   const [chart, setChart] = useState<SparklineResponse[number]>(null);
 

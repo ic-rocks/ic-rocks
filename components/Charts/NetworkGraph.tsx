@@ -1,10 +1,12 @@
+import { Principal } from "@dfinity/principal";
 import * as d3 from "d3";
 import { SimulationNodeDatum } from "d3";
 import { useRouter } from "next/router";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import useMeasure from "react-use-measure";
+import fetchJSON from "../../lib/fetch";
 import { capitalize, shortPrincipal } from "../../lib/strings";
-import data from "../../public/data/generated/nodes.json";
+import { NetworkResponse } from "../../lib/types/API";
 
 type NodeType = "Subnet" | "Node" | "Principal" | "Provider" | "Operator";
 type Node = {
@@ -33,63 +35,6 @@ function mergeRecordSets<T>(recs: Record<string, Set<T>>[]) {
     }, {});
 }
 
-const selectRelatedIds = (
-  { type, id, subnetIdx }: { type: NodeType; id?: string; subnetIdx?: number },
-  depth = 1
-): Record<string, Set<string>> => {
-  if (type === "Subnet") {
-    const arr = Object.entries(data.nodesMap || {})
-      .filter(([_, { subnet }]) => subnet === subnetIdx)
-      .map(([nodeId]) => nodeId);
-    const res = { [depth]: new Set(arr) };
-    if (depth < 2) {
-      return mergeRecordSets(
-        arr
-          .map((nodeId) =>
-            selectRelatedIds({ type: "Node", id: nodeId }, depth + 1)
-          )
-          .concat(res)
-      );
-    }
-    return res;
-  } else if (type === "Node") {
-    const { subnet, provider, operator } = data.nodesMap[id];
-    const arr = [
-      data.subnetsList[subnet],
-      data.principalsList[provider],
-      data.principalsList[operator],
-    ];
-    const res = { [depth]: new Set(arr) };
-    if (depth < 2) {
-      return mergeRecordSets([
-        res,
-        selectRelatedIds({ type: "Subnet", subnetIdx: subnet }, depth + 1),
-        ...arr
-          .slice(1)
-          .map((principalId) =>
-            selectRelatedIds({ type: "Provider", id: principalId }, depth + 1)
-          ),
-      ]);
-    }
-    return res;
-  } else {
-    const arr = (Object.values(data.principalsMap[id])[0] as number[]).map(
-      (idx_) => data.nodesList[idx_]
-    );
-    const res = { [depth]: new Set(arr) };
-    if (depth < 2) {
-      return mergeRecordSets(
-        arr
-          .map((nodeId) =>
-            selectRelatedIds({ type: "Node", id: nodeId }, depth + 1)
-          )
-          .concat(res)
-      );
-    }
-    return res;
-  }
-};
-
 const color = d3.scaleOrdinal(d3.schemeCategory10);
 const LABELS = ["Subnet", "Node", "Provider", "Operator"];
 
@@ -103,97 +48,229 @@ const NetworkGraph = ({
   const router = useRouter();
   const svgRef = useRef(null);
   const [ref, { width: containerWidth }] = useMeasure();
+  const [data, setData] = useState<NetworkResponse>(null);
 
   const width = containerWidth ? Math.max(500, containerWidth) : null;
   let height = 600;
 
-  // Generate all nodes and links
-  const nodes: Node[] = data.nodesList
-    .map((id, idx) => ({
-      id,
-      idx,
-      type: "Node" as NodeType,
-      title: shortPrincipal(id),
-      radius: 6,
-      color: color("Node"),
-    }))
-    .concat(
-      data.principalsList.map((id, idx) => {
-        const type = capitalize(
-          Object.keys(data.principalsMap[id])[0]
-        ) as NodeType;
-        return {
-          id,
-          idx,
-          type,
-          title: shortPrincipal(id),
-          radius: 4,
-          color: color(type),
-        };
-      })
-    )
-    .concat(
-      data.subnetsList.map((id, idx) => ({
+  useEffect(() => {
+    fetchJSON("/api/network").then(
+      (data) =>
+        data &&
+        setData({
+          subnets: data.subnets.map((s) => [
+            Principal.fromUint8Array(
+              Uint8Array.from(Buffer.from(s[0], "base64"))
+            ).toText(),
+            s[1],
+          ]),
+          nodes: data.nodes.map(([id, ...rest]) => [
+            Principal.fromUint8Array(
+              Uint8Array.from(Buffer.from(id, "base64"))
+            ).toText(),
+            ...rest,
+          ]),
+          principals: data.principals.map((s) => [
+            Principal.fromUint8Array(
+              Uint8Array.from(Buffer.from(s[0], "base64"))
+            ).toText(),
+            s[1],
+          ]),
+        })
+    );
+  }, []);
+
+  const principalsMap = useMemo(
+    () =>
+      data
+        ? data.nodes.reduce(
+            (acc, [nodeId, _, operatorIdx, providerIdx], idx) => {
+              const keyOp = data.principals[operatorIdx][0];
+              if (!acc[keyOp]) {
+                acc[keyOp] = {};
+              }
+              if (!acc[keyOp].operator) {
+                acc[keyOp].operator = [];
+              }
+              acc[keyOp].operator.push(idx);
+
+              const keyPr = data.principals[providerIdx][0];
+              if (!acc[keyPr]) {
+                acc[keyPr] = {};
+              }
+              if (!acc[keyPr].provider) {
+                acc[keyPr].provider = [];
+              }
+              acc[keyPr].provider.push(idx);
+              return acc;
+            },
+            {}
+          )
+        : null,
+    [data]
+  );
+
+  const selectRelatedIds = useCallback(
+    (
+      {
+        type,
         id,
-        idx,
-        type: "Subnet",
-        title: shortPrincipal(id),
-        radius: 8,
-        color: color("Subnet"),
-      }))
-    );
+        subnetIdx,
+      }: { type: NodeType; id?: string; subnetIdx?: number },
+      depth = 1
+    ): Record<string, Set<string>> => {
+      if (!data) return;
 
-  const links: Link[] = data.nodesList.flatMap((id) => {
-    return [
-      {
-        source: id,
-        target: data.principalsList[data.nodesMap[id].operator],
-      },
-      {
-        source: id,
-        target: data.principalsList[data.nodesMap[id].provider],
-      },
-      {
-        source: id,
-        target: data.subnetsList[data.nodesMap[id].subnet],
-      },
-    ];
-  });
-
-  // Filter nodes and links
-  let activeNode,
-    visibleLinks = links,
-    visibleNodes = nodes;
-  if (activeId && activeType) {
-    // Smaller chart if viewing subset
-    height = 300;
-
-    let peers;
-    if (activeType === "Subnet") {
-      peers = selectRelatedIds({
-        type: activeType,
-        id: activeId,
-        subnetIdx: data.subnetsList.findIndex((id) => id === activeId),
-      });
-    } else {
-      peers = selectRelatedIds({
-        type: activeType,
-        id: activeId,
-      });
-    }
-    visibleLinks = links.filter(
-      (link) =>
-        (peers[1].has(link.source) || peers[2].has(link.source)) &&
-        (peers[1].has(link.target) || peers[2].has(link.target))
-    );
-    visibleNodes = nodes.filter(
-      ({ id }) => peers[1].has(id) || peers[2].has(id)
-    );
-    activeNode = nodes.find(({ id }) => id === activeId);
-  }
+      if (type === "Subnet") {
+        const arr = data.nodes
+          .filter(([_, subnet]) => subnet === subnetIdx)
+          .map(([nodeId]) => nodeId);
+        const res = { [depth]: new Set(arr) };
+        if (depth < 2) {
+          return mergeRecordSets(
+            arr
+              .map((nodeId) =>
+                selectRelatedIds({ type: "Node", id: nodeId }, depth + 1)
+              )
+              .concat(res)
+          );
+        }
+        return res;
+      } else if (type === "Node") {
+        const [_, subnet, operator, provider] = data.nodes.find(
+          ([nodeId]) => nodeId === id
+        );
+        const arr = [
+          data.subnets[subnet][0],
+          data.principals[provider][0],
+          data.principals[operator][0],
+        ];
+        const res = { [depth]: new Set(arr) };
+        if (depth < 2) {
+          return mergeRecordSets([
+            res,
+            selectRelatedIds({ type: "Subnet", subnetIdx: subnet }, depth + 1),
+            ...arr
+              .slice(1)
+              .map((principalId) =>
+                selectRelatedIds(
+                  { type: "Provider", id: principalId },
+                  depth + 1
+                )
+              ),
+          ]);
+        }
+        return res;
+      } else {
+        const arr = (Object.values(principalsMap[id])[0] as number[]).map(
+          (idx_) => data.nodes[idx_][0]
+        );
+        const res = { [depth]: new Set(arr) };
+        if (depth < 2) {
+          return mergeRecordSets(
+            arr
+              .map((nodeId) =>
+                selectRelatedIds({ type: "Node", id: nodeId }, depth + 1)
+              )
+              .concat(res)
+          );
+        }
+        return res;
+      }
+    },
+    [data]
+  );
 
   useEffect(() => {
-    if (!width) return;
+    if (!width || !data) return;
+
+    // Generate all nodes and links
+    const nodes: Node[] = data.nodes
+      .map(([id, _s, _o, _p, name], idx) => ({
+        id,
+        idx,
+        type: "Node" as NodeType,
+        title: name || shortPrincipal(id),
+        radius: 6,
+        color: color("Node"),
+      }))
+      .concat(
+        data.principals.map(([id, name], idx) => {
+          const type = capitalize(
+            Object.keys(principalsMap[id])[0]
+          ) as NodeType;
+          return {
+            id,
+            idx,
+            type,
+            title: name || shortPrincipal(id),
+            radius: 4,
+            color: color(type),
+          };
+        })
+      )
+      .concat(
+        data.subnets.map(([id, title], idx) => ({
+          id,
+          idx,
+          type: "Subnet",
+          title,
+          radius: 8,
+          color: color("Subnet"),
+        }))
+      );
+
+    const links: Link[] = data.nodes.flatMap(
+      ([id, subnet, operator, provider], i) => {
+        return [
+          {
+            source: id,
+            target: data.principals[operator][0],
+          },
+          {
+            source: id,
+            target: data.principals[provider][0],
+          },
+          {
+            source: id,
+            target: data.subnets[subnet][0],
+          },
+        ];
+      }
+    );
+
+    // Filter nodes and links
+    let activeNode,
+      visibleLinks = links,
+      visibleNodes = nodes;
+    if (activeId && activeType) {
+      // Smaller chart if viewing subset
+      height = 300;
+
+      let peers;
+      if (activeType === "Subnet") {
+        peers = selectRelatedIds({
+          type: activeType,
+          id: activeId,
+          subnetIdx: data.subnets.findIndex(([id]) => id === activeId),
+        });
+      } else {
+        peers = selectRelatedIds({
+          type: activeType,
+          id: activeId,
+        });
+      }
+
+      visibleLinks = links.filter(
+        (link) =>
+          (peers[1].has(link.source) || peers[2].has(link.source)) &&
+          (peers[1].has(link.target) || peers[2].has(link.target))
+      );
+      visibleNodes = nodes.filter(
+        ({ id }) => peers[1].has(id) || peers[2].has(id)
+      );
+      activeNode = nodes.find(({ id }) => id === activeId);
+    }
 
     const svg = d3
       .select(svgRef.current)
@@ -372,7 +449,7 @@ const NetworkGraph = ({
     if (activeNode) {
       activateNode(activeNode);
     }
-  }, [activeId, width]);
+  }, [data, activeId, width]);
 
   return (
     <div className="flex" ref={ref}>
