@@ -158,7 +158,7 @@ export type SparklineResponse = {
   currency: "ICP";
   timestamps: string[];
   prices: string[];
-}[];
+};
 
 export type NomicsTickerResponse = {
   id: string;

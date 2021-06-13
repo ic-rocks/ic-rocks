@@ -1,15 +1,17 @@
 import * as d3 from "d3";
 import { useEffect, useRef } from "react";
-import { SparklineResponse } from "../../lib/types/API";
+import useMeasure from "react-use-measure";
+import { useGlobalState } from "../StateContext";
 
-const SparklineChart = ({ data }: { data: SparklineResponse[number] }) => {
+const SparklineChart = () => {
   const svgRef = useRef(null);
+  const [ref, { width }] = useMeasure();
+  const { markets } = useGlobalState();
 
-  const width = 250;
   let height = 150;
 
   useEffect(() => {
-    if (!width) return;
+    if (!width || !markets?.sparkline) return;
 
     const parent = d3
       .select(svgRef.current)
@@ -25,9 +27,9 @@ const SparklineChart = ({ data }: { data: SparklineResponse[number] }) => {
       .append("g")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    const zipped = data.timestamps.map((x, i) => ({
+    const zipped = markets.sparkline.timestamps.map((x, i) => ({
       x: new Date(x),
-      y: Number(data.prices[i]),
+      y: Number(markets.sparkline.prices[i]),
     }));
 
     const xScale = d3
@@ -63,9 +65,13 @@ const SparklineChart = ({ data }: { data: SparklineResponse[number] }) => {
       .attr("class", "line stroke-current stroke-2 dark:text-gray-400")
       .attr("fill", "none")
       .attr("d", line as any);
-  }, [width]);
+  }, [markets, width]);
 
-  return <svg width={width} height={height} ref={svgRef} />;
+  return (
+    <div className="flex" ref={ref}>
+      <svg width={width} height={height} ref={svgRef} />
+    </div>
+  );
 };
 
 export default SparklineChart;

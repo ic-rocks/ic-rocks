@@ -7,10 +7,11 @@ import { CgSpinner } from "react-icons/cg";
 import protobufJson from "../../lib/canisters/proto.json";
 import fetchJSON from "../../lib/fetch";
 import useInterval from "../../lib/hooks/useInterval";
-import { formatNumber } from "../../lib/numbers";
-import { SparklineResponse, StatsResponse } from "../../lib/types/API";
+import { formatNumber, formatNumberUSD } from "../../lib/numbers";
+import { StatsResponse } from "../../lib/types/API";
 import { UInt64Value } from "../../lib/types/canisters";
 import SparklineChart from "../Charts/SparklineChart";
+import { useGlobalState } from "../StateContext";
 const root = protobuf.Root.fromJSON(protobufJson as protobuf.INamespace);
 const agent = new HttpAgent({ host: "https://ic0.app" });
 const cyclesMinting = Actor.createActor(() => IDL.Service({}), {
@@ -22,8 +23,7 @@ extendProtobuf(cyclesMinting, root.lookupService("CyclesMinting"));
 export default function StatsBoxes() {
   const [isLoading, setIsLoading] = useState(true);
   const [stats, setStats] = useState<StatsResponse>(null);
-  const [isLoadingChart, setIsLoadingChart] = useState(true);
-  const [chart, setChart] = useState<SparklineResponse[number]>(null);
+  const { markets } = useGlobalState();
 
   const fetchStats = async () => {
     fetchJSON("/api/stats").then(
@@ -44,13 +44,6 @@ export default function StatsBoxes() {
       await fetchStats();
       setIsLoading(false);
     })();
-
-    fetchJSON("/api/markets/sparkline?ids=ICP&period=1M").then((res) => {
-      if (res && res[0]?.timestamps) {
-        setChart(res[0]);
-      }
-      setIsLoadingChart(false);
-    });
   }, []);
 
   const dataLabels = [
@@ -74,14 +67,13 @@ export default function StatsBoxes() {
 
   return (
     <section className="rounded p-4 border border-gray-500 flex flex-row-reverse flex-wrap sm:flex-nowrap justify-evenly gap-8 mb-8">
-      <div className="flex-none flex flex-col">
-        <label>ICP Price</label>
+      <div className="flex-none flex flex-col w-full xs:w-64">
+        <div className="flex justify-between">
+          <label>ICP Price</label>
+          {markets && <strong>{formatNumberUSD(markets.ticker.price)}</strong>}
+        </div>
 
-        {isLoadingChart ? (
-          <CgSpinner className="animate-spin" />
-        ) : (
-          <SparklineChart data={chart} />
-        )}
+        {!markets ? <CgSpinner className="animate-spin" /> : <SparklineChart />}
       </div>
 
       <div className="flex flex-wrap gap-4">

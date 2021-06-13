@@ -8,10 +8,14 @@ import {
 } from "react";
 import fetchJSON from "../lib/fetch";
 import useInterval from "../lib/hooks/useInterval";
-import { NetworkResponse, NomicsTickerResponse } from "../lib/types/API";
+import {
+  NetworkResponse,
+  NomicsTickerResponse,
+  SparklineResponse,
+} from "../lib/types/API";
 
 type State = {
-  markets: NomicsTickerResponse;
+  markets: { ticker: NomicsTickerResponse; sparkline: SparklineResponse };
   network: NetworkResponse;
 };
 
@@ -38,13 +42,11 @@ export const StateProvider = ({ children }) => {
 
   const fetchTicker = useCallback(
     () =>
-      fetchJSON("/api/markets/ticker?ids=ICP").then(
-        (res: NomicsTickerResponse[]) => {
-          if (res) {
-            dispatch({ type: "markets", payload: res[0] });
-          }
+      fetchJSON("/api/markets").then((res) => {
+        if (res) {
+          dispatch({ type: "markets", payload: res });
         }
-      ),
+      }),
     []
   );
   useInterval(fetchTicker, 60 * 1000);

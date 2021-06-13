@@ -115,13 +115,13 @@ const AccountPage = () => {
           <tr className="flex">
             <td className="px-2 py-2 w-32">Value</td>
             <td className="px-2 py-2 flex-1">
-              {data && markets ? (
+              {data && markets?.ticker ? (
                 <>
                   {formatNumberUSD(
-                    (Number(markets.price) * Number(data.balance)) / 1e8
+                    (Number(markets.ticker.price) * Number(data.balance)) / 1e8
                   )}
                   <small className="ml-1 text-xs">
-                    (@{formatNumberUSD(markets.price)}/ICP)
+                    (@{formatNumberUSD(markets.ticker.price)}/ICP)
                   </small>
                 </>
               ) : (

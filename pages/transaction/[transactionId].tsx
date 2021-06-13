@@ -126,11 +126,12 @@ const TransactionPage = () => {
               {data != null ? (
                 <>
                   <BalanceLabel value={data.amount} />
-                  {markets && (
+                  {markets?.ticker && (
                     <small className="ml-1 text-xs">
                       (
                       {formatNumberUSD(
-                        (Number(markets.price) * Number(data.amount)) / 1e8
+                        (Number(markets.ticker.price) * Number(data.amount)) /
+                          1e8
                       )}
                       )
                     </small>
@@ -150,7 +151,8 @@ const TransactionPage = () => {
                       <small className="ml-1 text-xs">
                         (
                         {formatNumberUSD(
-                          (Number(markets.price) * Number(data.fee)) / 1e8
+                          (Number(markets.ticker.price) * Number(data.fee)) /
+                            1e8
                         )}
                         )
                       </small>

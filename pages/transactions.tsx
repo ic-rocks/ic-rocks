@@ -36,11 +36,11 @@ const Transactions = () => {
                 {stats ? (
                   <>
                     <BalanceLabel value={stats.stats.total_minted} />
-                    {markets && (
+                    {markets?.ticker && (
                       <small className="ml-1 text-xs">
                         (
                         {formatNumberUSD(
-                          (Number(markets.price) *
+                          (Number(markets.ticker.price) *
                             Number(stats.stats.total_minted)) /
                             1e8
                         )}
@@ -57,11 +57,11 @@ const Transactions = () => {
                 {stats ? (
                   <>
                     <BalanceLabel value={stats.stats.total_burned} />
-                    {markets && (
+                    {markets?.ticker && (
                       <small className="ml-1 text-xs">
                         (
                         {formatNumberUSD(
-                          (Number(markets.price) *
+                          (Number(markets.ticker.price) *
                             Number(stats.stats.total_burned)) /
                             1e8
                         )}
@@ -78,11 +78,11 @@ const Transactions = () => {
                 {stats ? (
                   <>
                     <BalanceLabel value={stats.stats.total_fees} />
-                    {markets && (
+                    {markets?.ticker && (
                       <small className="ml-1 text-xs">
                         (
                         {formatNumberUSD(
-                          (Number(markets.price) *
+                          (Number(markets.ticker.price) *
                             Number(stats.stats.total_fees)) /
                             1e8
                         )}
@@ -99,11 +99,11 @@ const Transactions = () => {
                 {stats ? (
                   <>
                     <BalanceLabel value={stats.stats.avg_transferred} />
-                    {markets && (
+                    {markets?.ticker && (
                       <small className="ml-1 text-xs">
                         (
                         {formatNumberUSD(
-                          (Number(markets.price) *
+                          (Number(markets.ticker.price) *
                             Number(stats.stats.avg_transferred)) /
                             1e8
                         )}
