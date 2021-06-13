@@ -46,7 +46,7 @@ export default function StatsBoxes() {
     })();
 
     fetchJSON("/api/markets/sparkline?ids=ICP&period=1M").then((res) => {
-      if (res) {
+      if (res && res[0]?.timestamps) {
         setChart(res[0]);
       }
       setIsLoadingChart(false);

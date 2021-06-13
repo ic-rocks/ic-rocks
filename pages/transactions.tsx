@@ -2,12 +2,14 @@ import React, { useEffect, useState } from "react";
 import BalanceLabel from "../components/Labels/BalanceLabel";
 import Ledger from "../components/LedgerPage";
 import { MetaTags } from "../components/MetaTags";
+import { useGlobalState } from "../components/StateContext";
 import { TransactionsTable } from "../components/TransactionsTable";
 import fetchJSON from "../lib/fetch";
-import { formatNumber } from "../lib/numbers";
+import { formatNumber, formatNumberUSD } from "../lib/numbers";
 
 const Transactions = () => {
   const [stats, setStats] = useState(null);
+  const { markets } = useGlobalState();
 
   useEffect(() => {
     fetchJSON("/api/transactions/stats").then(setStats);
@@ -32,7 +34,20 @@ const Transactions = () => {
               <td className="px-2 py-2 w-28 sm:w-44">Total Minted</td>
               <td className="px-2 py-2 flex-1">
                 {stats ? (
-                  <BalanceLabel value={stats.stats.total_minted} />
+                  <>
+                    <BalanceLabel value={stats.stats.total_minted} />
+                    {markets && (
+                      <small className="ml-1 text-xs">
+                        (
+                        {formatNumberUSD(
+                          (Number(markets.price) *
+                            Number(stats.stats.total_minted)) /
+                            1e8
+                        )}
+                        )
+                      </small>
+                    )}
+                  </>
                 ) : null}
               </td>
             </tr>
@@ -40,21 +55,62 @@ const Transactions = () => {
               <td className="px-2 py-2 w-28 sm:w-44">Total Burned</td>
               <td className="px-2 py-2 flex-1">
                 {stats ? (
-                  <BalanceLabel value={stats.stats.total_burned} />
+                  <>
+                    <BalanceLabel value={stats.stats.total_burned} />
+                    {markets && (
+                      <small className="ml-1 text-xs">
+                        (
+                        {formatNumberUSD(
+                          (Number(markets.price) *
+                            Number(stats.stats.total_burned)) /
+                            1e8
+                        )}
+                        )
+                      </small>
+                    )}
+                  </>
                 ) : null}
               </td>
             </tr>
             <tr className="flex">
               <td className="px-2 py-2 w-28 sm:w-44">Total Fees</td>
               <td className="px-2 py-2 flex-1">
-                {stats ? <BalanceLabel value={stats.stats.total_fees} /> : null}
+                {stats ? (
+                  <>
+                    <BalanceLabel value={stats.stats.total_fees} />
+                    {markets && (
+                      <small className="ml-1 text-xs">
+                        (
+                        {formatNumberUSD(
+                          (Number(markets.price) *
+                            Number(stats.stats.total_fees)) /
+                            1e8
+                        )}
+                        )
+                      </small>
+                    )}
+                  </>
+                ) : null}
               </td>
             </tr>
             <tr className="flex">
               <td className="px-2 py-2 w-28 sm:w-44">Average Transfer</td>
               <td className="px-2 py-2 flex-1">
                 {stats ? (
-                  <BalanceLabel value={stats.stats.avg_transferred} />
+                  <>
+                    <BalanceLabel value={stats.stats.avg_transferred} />
+                    {markets && (
+                      <small className="ml-1 text-xs">
+                        (
+                        {formatNumberUSD(
+                          (Number(markets.price) *
+                            Number(stats.stats.avg_transferred)) /
+                            1e8
+                        )}
+                        )
+                      </small>
+                    )}
+                  </>
                 ) : null}
               </td>
             </tr>

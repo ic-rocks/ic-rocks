@@ -159,3 +159,31 @@ export type SparklineResponse = {
   timestamps: string[];
   prices: string[];
 }[];
+
+export type NomicsTickerResponse = {
+  id: string;
+  currency: string;
+  symbol: string;
+  name: string;
+  logo_url: string;
+  price: string;
+  price_date: string;
+  price_timestamp: string;
+  circulating_supply?: string;
+  max_supply?: string;
+  market_cap?: string;
+  rank: string;
+  high: string;
+  high_timestamp: string;
+  "1d":
+    | {
+        volume: string;
+        price_change: string;
+        price_change_pct: string;
+        volume_change: string;
+        volume_change_pct: string;
+        market_cap_change: string;
+        market_cap_change_pct: string;
+      }
+    | undefined;
+};

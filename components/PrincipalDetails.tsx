@@ -86,7 +86,9 @@ export default function PrincipalDetails({
               {type}
               {type == "Canister" &&
                 canisterData &&
-                ` (${canisterData.status})`}
+                ` (${canisterData.status === "Stopped" ? "🛑 " : ""}${
+                  canisterData.status
+                })`}
               {principalData?.operatorOf.length > 0
                 ? " (Node Operator)"
                 : principalData?.providerOf.length > 0

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import React from "react";
 import ActiveLink from "../ActiveLink";
 import DarkModeToggle from "./DarkModeToggle";
@@ -8,18 +9,20 @@ export default function Nav() {
     <nav className="pt-4 flex flex-col gap-4">
       <div className="flex flex-wrap justify-between gap-2">
         <div className="flex-none pr-8">
-          <a href="/">
+          <Link href="/">
             <img
               src="/img/icrocks-light.svg"
               alt="ic.rocks"
-              className="h-8 dark:hidden"
+              className="h-8 dark:hidden cursor-pointer"
             />
+          </Link>
+          <Link href="/">
             <img
               src="/img/icrocks-dark.svg"
               alt="ic.rocks"
-              className="h-8 hidden dark:block"
+              className="h-8 hidden dark:block cursor-pointer"
             />
-          </a>
+          </Link>
         </div>
 
         <div className="flex-1 flex items-start max-w-sm gap-4">

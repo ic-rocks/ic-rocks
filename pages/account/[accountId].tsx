@@ -6,10 +6,12 @@ import React, { useEffect, useState } from "react";
 import BalanceLabel from "../../components/Labels/BalanceLabel";
 import { MetaTags } from "../../components/MetaTags";
 import Search404 from "../../components/Search404";
+import { useGlobalState } from "../../components/StateContext";
 import { TransactionsTable } from "../../components/TransactionsTable";
 import ledgerIdl from "../../lib/canisters/ledger.did";
 import fetchJSON from "../../lib/fetch";
-import { formatNumber } from "../../lib/numbers";
+import { formatNumber, formatNumberUSD } from "../../lib/numbers";
+import { Account } from "../../lib/types/API";
 
 const agent = new HttpAgent({ host: "https://ic0.app" });
 const ledger = Actor.createActor(ledgerIdl, {
@@ -17,11 +19,12 @@ const ledger = Actor.createActor(ledgerIdl, {
   canisterId: "ryjl3-tyaaa-aaaaa-aaaba-cai",
 });
 
-const Account = () => {
+const AccountPage = () => {
   const router = useRouter();
   const [data, setData] = useState(null);
   const [isValid, setIsValid] = useState(true);
   const { accountId } = router.query as { accountId: string };
+  const { markets } = useGlobalState();
 
   useEffect(() => {
     if (typeof accountId !== "string" || !accountId) return;
@@ -41,7 +44,7 @@ const Account = () => {
 
     if (valid) {
       (async () => {
-        const data = await fetchJSON(`/api/accounts/${accountId}`);
+        const data: Account = await fetchJSON(`/api/accounts/${accountId}`);
         if (data) {
           setData(data);
         }
@@ -84,6 +87,14 @@ const Account = () => {
         </thead>
         <tbody className="divide-y divide-default">
           <tr className="flex">
+            <td className="px-2 py-2 w-32">Name</td>
+            <td className="px-2 py-2 flex-1">
+              {data?.name || (
+                <span className="inline-flex items-center">Unknown</span>
+              )}
+            </td>
+          </tr>
+          <tr className="flex">
             <td className="px-2 py-2 w-32">Principal</td>
             <td className="px-2 py-2 flex-1 flex oneline">
               {data?.principal ? (
@@ -102,17 +113,26 @@ const Account = () => {
             </td>
           </tr>
           <tr className="flex">
-            <td className="px-2 py-2 w-32">Transactions</td>
+            <td className="px-2 py-2 w-32">Value</td>
             <td className="px-2 py-2 flex-1">
-              {data?.tx_count ? formatNumber(data.tx_count) : 0}
+              {data && markets ? (
+                <>
+                  {formatNumberUSD(
+                    (Number(markets.price) * Number(data.balance)) / 1e8
+                  )}
+                  <small className="ml-1 text-xs">
+                    (@{formatNumberUSD(markets.price)}/ICP)
+                  </small>
+                </>
+              ) : (
+                "-"
+              )}
             </td>
           </tr>
           <tr className="flex">
-            <td className="px-2 py-2 w-32">Name</td>
+            <td className="px-2 py-2 w-32">Transactions</td>
             <td className="px-2 py-2 flex-1">
-              {data?.name || (
-                <span className="inline-flex items-center">Unknown</span>
-              )}
+              {data?.tx_count ? formatNumber(data.tx_count) : 0}
             </td>
           </tr>
         </tbody>
@@ -127,4 +147,4 @@ const Account = () => {
   );
 };
 
-export default Account;
+export default AccountPage;

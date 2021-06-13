@@ -1,12 +1,10 @@
-import { Principal } from "@dfinity/principal";
 import * as d3 from "d3";
 import { SimulationNodeDatum } from "d3";
 import { useRouter } from "next/router";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import useMeasure from "react-use-measure";
-import fetchJSON from "../../lib/fetch";
 import { capitalize, shortPrincipal } from "../../lib/strings";
-import { NetworkResponse } from "../../lib/types/API";
+import { useGlobalDispatch, useGlobalState } from "../StateContext";
 
 type NodeType = "Subnet" | "Node" | "Principal" | "Provider" | "Operator";
 type Node = {
@@ -48,44 +46,20 @@ const NetworkGraph = ({
   const router = useRouter();
   const svgRef = useRef(null);
   const [ref, { width: containerWidth }] = useMeasure();
-  const [data, setData] = useState<NetworkResponse>(null);
+  const { network } = useGlobalState();
+  const dispatch = useGlobalDispatch();
 
   const width = containerWidth ? Math.max(500, containerWidth) : null;
   let height = 600;
 
-  useEffect(() => {
-    fetchJSON("/api/network").then(
-      (data) =>
-        data &&
-        setData({
-          subnets: data.subnets.map((s) => [
-            Principal.fromUint8Array(
-              Uint8Array.from(Buffer.from(s[0], "base64"))
-            ).toText(),
-            s[1],
-          ]),
-          nodes: data.nodes.map(([id, ...rest]) => [
-            Principal.fromUint8Array(
-              Uint8Array.from(Buffer.from(id, "base64"))
-            ).toText(),
-            ...rest,
-          ]),
-          principals: data.principals.map((s) => [
-            Principal.fromUint8Array(
-              Uint8Array.from(Buffer.from(s[0], "base64"))
-            ).toText(),
-            s[1],
-          ]),
-        })
-    );
-  }, []);
+  useEffect(() => dispatch({ type: "fetchNetwork" }), []);
 
   const principalsMap = useMemo(
     () =>
-      data
-        ? data.nodes.reduce(
+      network
+        ? network.nodes.reduce(
             (acc, [nodeId, _, operatorIdx, providerIdx], idx) => {
-              const keyOp = data.principals[operatorIdx][0];
+              const keyOp = network.principals[operatorIdx][0];
               if (!acc[keyOp]) {
                 acc[keyOp] = {};
               }
@@ -94,7 +68,7 @@ const NetworkGraph = ({
               }
               acc[keyOp].operator.push(idx);
 
-              const keyPr = data.principals[providerIdx][0];
+              const keyPr = network.principals[providerIdx][0];
               if (!acc[keyPr]) {
                 acc[keyPr] = {};
               }
@@ -107,7 +81,7 @@ const NetworkGraph = ({
             {}
           )
         : null,
-    [data]
+    [network]
   );
 
   const selectRelatedIds = useCallback(
@@ -119,10 +93,10 @@ const NetworkGraph = ({
       }: { type: NodeType; id?: string; subnetIdx?: number },
       depth = 1
     ): Record<string, Set<string>> => {
-      if (!data) return;
+      if (!network) return;
 
       if (type === "Subnet") {
-        const arr = data.nodes
+        const arr = network.nodes
           .filter(([_, subnet]) => subnet === subnetIdx)
           .map(([nodeId]) => nodeId);
         const res = { [depth]: new Set(arr) };
@@ -137,13 +111,13 @@ const NetworkGraph = ({
         }
         return res;
       } else if (type === "Node") {
-        const [_, subnet, operator, provider] = data.nodes.find(
+        const [_, subnet, operator, provider] = network.nodes.find(
           ([nodeId]) => nodeId === id
         );
         const arr = [
-          data.subnets[subnet][0],
-          data.principals[provider][0],
-          data.principals[operator][0],
+          network.subnets[subnet][0],
+          network.principals[provider][0],
+          network.principals[operator][0],
         ];
         const res = { [depth]: new Set(arr) };
         if (depth < 2) {
@@ -163,7 +137,7 @@ const NetworkGraph = ({
         return res;
       } else {
         const arr = (Object.values(principalsMap[id])[0] as number[]).map(
-          (idx_) => data.nodes[idx_][0]
+          (idx_) => network.nodes[idx_][0]
         );
         const res = { [depth]: new Set(arr) };
         if (depth < 2) {
@@ -178,14 +152,14 @@ const NetworkGraph = ({
         return res;
       }
     },
-    [data]
+    [network]
   );
 
   useEffect(() => {
-    if (!width || !data) return;
+    if (!width || !network) return;
 
     // Generate all nodes and links
-    const nodes: Node[] = data.nodes
+    const nodes: Node[] = network.nodes
       .map(([id, _s, _o, _p, name], idx) => ({
         id,
         idx,
@@ -195,7 +169,7 @@ const NetworkGraph = ({
         color: color("Node"),
       }))
       .concat(
-        data.principals.map(([id, name], idx) => {
+        network.principals.map(([id, name], idx) => {
           const type = capitalize(
             Object.keys(principalsMap[id])[0]
           ) as NodeType;
@@ -210,7 +184,7 @@ const NetworkGraph = ({
         })
       )
       .concat(
-        data.subnets.map(([id, title], idx) => ({
+        network.subnets.map(([id, title], idx) => ({
           id,
           idx,
           type: "Subnet",
@@ -220,20 +194,20 @@ const NetworkGraph = ({
         }))
       );
 
-    const links: Link[] = data.nodes.flatMap(
+    const links: Link[] = network.nodes.flatMap(
       ([id, subnet, operator, provider], i) => {
         return [
           {
             source: id,
-            target: data.principals[operator][0],
+            target: network.principals[operator][0],
           },
           {
             source: id,
-            target: data.principals[provider][0],
+            target: network.principals[provider][0],
           },
           {
             source: id,
-            target: data.subnets[subnet][0],
+            target: network.subnets[subnet][0],
           },
         ];
       }
@@ -252,7 +226,7 @@ const NetworkGraph = ({
         peers = selectRelatedIds({
           type: activeType,
           id: activeId,
-          subnetIdx: data.subnets.findIndex(([id]) => id === activeId),
+          subnetIdx: network.subnets.findIndex(([id]) => id === activeId),
         });
       } else {
         peers = selectRelatedIds({
@@ -449,7 +423,7 @@ const NetworkGraph = ({
     if (activeNode) {
       activateNode(activeNode);
     }
-  }, [data, activeId, width]);
+  }, [network, activeId, width]);
 
   return (
     <div className="flex" ref={ref}>

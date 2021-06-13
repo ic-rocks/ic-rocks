@@ -1,4 +1,3 @@
-import { Actor, HttpAgent } from "@dfinity/agent";
 import classnames from "classnames";
 import { DateTime } from "luxon";
 import Link from "next/link";
@@ -9,15 +8,10 @@ import { TimestampLabel } from "../../components/Labels/TimestampLabel";
 import { TransactionTypeLabel } from "../../components/Labels/TransactionTypeLabel";
 import { MetaTags } from "../../components/MetaTags";
 import Search404 from "../../components/Search404";
-import ledgerIdl from "../../lib/canisters/ledger.did";
+import { useGlobalState } from "../../components/StateContext";
 import fetchJSON from "../../lib/fetch";
+import { formatNumberUSD } from "../../lib/numbers";
 import { Transaction, TransactionsResponse } from "../../lib/types/API";
-
-const agent = new HttpAgent({ host: "https://ic0.app" });
-const ledger = Actor.createActor(ledgerIdl, {
-  agent,
-  canisterId: "ryjl3-tyaaa-aaaaa-aaaba-cai",
-});
 
 const TransactionPage = () => {
   const router = useRouter();
@@ -25,6 +19,7 @@ const TransactionPage = () => {
   const [isValid, setIsValid] = useState(true);
   const [isLoadingTxs, setIsLoadingTxs] = useState(false);
   const { transactionId } = router.query as { transactionId: string };
+  const { markets } = useGlobalState();
 
   useEffect(() => {
     if (typeof transactionId !== "string" || !transactionId) return;
@@ -73,12 +68,6 @@ const TransactionPage = () => {
             <td className="px-2 py-2 w-24">Type</td>
             <td className="px-2 py-2 flex-1">
               {data ? <TransactionTypeLabel type={data.type} /> : null}
-            </td>
-          </tr>
-          <tr className="flex">
-            <td className="px-2 py-2 w-24">Amount</td>
-            <td className="px-2 py-2 flex-1">
-              {data != null ? <BalanceLabel value={data.amount} /> : null}
             </td>
           </tr>
           <tr className="flex">
@@ -132,9 +121,45 @@ const TransactionPage = () => {
             </td>
           </tr>
           <tr className="flex">
+            <td className="px-2 py-2 w-24">Amount</td>
+            <td className="px-2 py-2 flex-1">
+              {data != null ? (
+                <>
+                  <BalanceLabel value={data.amount} />
+                  {markets && (
+                    <small className="ml-1 text-xs">
+                      (
+                      {formatNumberUSD(
+                        (Number(markets.price) * Number(data.amount)) / 1e8
+                      )}
+                      )
+                    </small>
+                  )}
+                </>
+              ) : null}
+            </td>
+          </tr>
+          <tr className="flex">
             <td className="px-2 py-2 w-24">Fee</td>
             <td className="px-2 py-2 flex-1">
-              {data ? data.fee ? <BalanceLabel value={data.fee} /> : 0 : null}
+              {data ? (
+                data.fee ? (
+                  <>
+                    <BalanceLabel value={data.fee} />
+                    {markets && (
+                      <small className="ml-1 text-xs">
+                        (
+                        {formatNumberUSD(
+                          (Number(markets.price) * Number(data.fee)) / 1e8
+                        )}
+                        )
+                      </small>
+                    )}
+                  </>
+                ) : (
+                  0
+                )
+              ) : null}
             </td>
           </tr>
           <tr className="flex">
