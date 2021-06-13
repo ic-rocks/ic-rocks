@@ -245,15 +245,6 @@ export default function CandidUI({
   );
 
   const sortedMethods = Object.entries(methods).sort(methodCmp);
-  const appLink = methods.http_request ? (
-    <a
-      className="hover:underline text-blue-600 flex items-center text-xs"
-      href={`https://${canisterId}.raw.ic0.app`}
-      target="_blank"
-    >
-      Go to App <FiExternalLink className="ml-1" />
-    </a>
-  ) : null;
 
   return (
     <div className={className}>
@@ -280,7 +271,6 @@ export default function CandidUI({
           )}
         </div>
         <div className="flex gap-2">
-          {appLink}
           <a
             className="hover:underline text-blue-600 flex items-center text-xs"
             href={`${CANDID_UI_URL}?id=${canisterId}&did=${encodeURIComponent(
@@ -288,7 +278,7 @@ export default function CandidUI({
             )}`}
             target="_blank"
           >
-            Go to Candid UI <FiExternalLink className="ml-1" />
+            View in Candid UI <FiExternalLink className="ml-1" />
           </a>
         </div>
       </div>
@@ -364,13 +354,10 @@ export default function CandidUI({
             <div className="px-2 py-2 bg-heading flex justify-between items-center">
               {funcName}
               <label
-                className={classNames(
-                  "rounded text-xs py-1 px-2 dark:text-black ml-2",
-                  {
-                    "bg-red-400": isPb,
-                    "bg-blue-400": !isPb,
-                  }
-                )}
+                className={classNames("label-tag ml-2", {
+                  "bg-red-400": isPb,
+                  "bg-blue-400": !isPb,
+                })}
               >
                 {isPb ? "protobuf" : "candid"}
               </label>

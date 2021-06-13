@@ -34,7 +34,7 @@ export default function CodeBlock({
   className?: string;
   candid: string;
   bindings: Bindings | null;
-  protobuf: string;
+  protobuf?: string;
 }) {
   const [language, setLanguage] = useState<typeof LANGUAGES[number]>(
     candid ? "candid" : "protobuf"

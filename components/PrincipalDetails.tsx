@@ -5,6 +5,7 @@ import { Buffer } from "buffer/";
 import { DateTime } from "luxon";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
+import { FiExternalLink } from "react-icons/fi";
 import { APIPrincipal, Canister } from "../lib/types/API";
 import { PrincipalType } from "../pages/principal/[principalId]";
 import BalanceLabel from "./Labels/BalanceLabel";
@@ -68,8 +69,17 @@ export default function PrincipalDetails({
       <table className="w-full table-fixed">
         <thead className="block bg-heading">
           <tr className="flex">
-            <th colSpan={2} className="px-2 py-2">
+            <th colSpan={2} className="px-2 py-2 flex-1 flex justify-between">
               Overview
+              {canisterData?.module?.hasHttp && (
+                <a
+                  className="hover:underline font-normal label-tag bg-green-label"
+                  href={`https://${principalId}.raw.ic0.app`}
+                  target="_blank"
+                >
+                  View URL <FiExternalLink className="inline ml-1" />
+                </a>
+              )}
             </th>
           </tr>
         </thead>
@@ -145,13 +155,16 @@ export default function PrincipalDetails({
               <tr className="flex">
                 <td className="px-2 py-2 w-24 sm:w-44">Module Hash</td>
                 <td className="px-2 py-2 flex-1 break-words overflow-hidden">
-                  {canisterData?.moduleHash ? (
+                  {canisterData?.module ? (
                     <>
-                      {canisterData.moduleHash || "-"}
-                      {canisterData.moduleMatches > 1 && (
-                        <Link href={`/modules/${canisterData.moduleHash}`}>
-                          <a className="ml-1 link-overflow whitespace-nowrap">
-                            ({canisterData.moduleMatches} matching modules)
+                      {canisterData.module.name && (
+                        <div>{canisterData.module.name}</div>
+                      )}
+                      <div>{canisterData.module?.id || "-"}</div>
+                      {canisterData.module.canisterCount > 1 && (
+                        <Link href={`/modules/${canisterData.module.id}`}>
+                          <a className="text-sm link-overflow">
+                            {canisterData.module.canisterCount} matching modules
                           </a>
                         </Link>
                       )}

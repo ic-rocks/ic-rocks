@@ -37,7 +37,7 @@ export const Table = ({
   tableHeaderGroupProps?: any;
   columns: Column<any>[];
   data: any[];
-  count: number;
+  count?: number;
   fetchData?: ({ pageSize, pageIndex, sortBy }) => void;
   loading?: boolean;
   useSort?: boolean;
@@ -67,7 +67,7 @@ export const Table = ({
       data,
       initialState: { pageSize: PAGE_SIZE, sortBy: initialSortBy },
       manualPagination,
-      pageCount: Math.ceil(count / PAGE_SIZE),
+      pageCount: count == undefined ? 1 : Math.ceil(count / PAGE_SIZE),
       manualSortBy,
     },
     ...[useSort && useSortBy, usePagination].filter(Boolean)

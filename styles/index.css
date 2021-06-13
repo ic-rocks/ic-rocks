@@ -51,3 +51,11 @@ select {
 .oneline {
   @apply whitespace-nowrap overflow-hidden;
 }
+
+.label-tag {
+  @apply rounded text-xs py-1 px-2 dark:text-black;
+}
+
+.bg-green-label {
+  @apply bg-green-200 dark:bg-green-400;
+}

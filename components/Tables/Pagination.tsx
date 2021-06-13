@@ -23,7 +23,7 @@ export const Pagination = ({
       <button
         disabled={!canPreviousPage}
         className={classnames(
-          "px-1 py-0.5 rounded btn-default transition-colors",
+          "px-1 py-0.5 rounded bg-gray-100 dark:bg-gray-800 transition-colors",
           {
             "text-gray-300 dark:text-gray-700 cursor-default": !canPreviousPage,
             "cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700":
@@ -37,7 +37,7 @@ export const Pagination = ({
       <button
         disabled={!canPreviousPage}
         className={classnames(
-          "px-1 py-0.5 rounded btn-default transition-colors",
+          "px-1 py-0.5 rounded bg-gray-100 dark:bg-gray-800 transition-colors",
           {
             "text-gray-300 dark:text-gray-700 cursor-default": !canPreviousPage,
             "cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700":
@@ -49,9 +49,12 @@ export const Pagination = ({
         <FiChevronLeft />
       </button>
       <span
-        className={classnames("px-1 py-0.5 rounded btn-default text-xs", {
-          "text-gray-500": pageOptions.length === 0,
-        })}
+        className={classnames(
+          "px-1 py-0.5 text-xs rounded bg-gray-100 dark:bg-gray-800 cursor-default",
+          {
+            "text-gray-500": pageOptions.length === 0,
+          }
+        )}
       >
         {pageOptions.length > 0
           ? `Page ${pageIndex + 1} of ${pageOptions.length}`
@@ -60,7 +63,7 @@ export const Pagination = ({
       <button
         disabled={!canNextPage}
         className={classnames(
-          "px-1 py-0.5 rounded btn-default transition-colors",
+          "px-1 py-0.5 rounded bg-gray-100 dark:bg-gray-800 transition-colors",
           {
             "text-gray-300 dark:text-gray-600 cursor-default": !canNextPage,
             "cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700":
@@ -74,7 +77,7 @@ export const Pagination = ({
       <button
         disabled={!canNextPage}
         className={classnames(
-          "px-1 py-0.5 rounded btn-default transition-colors",
+          "px-1 py-0.5 rounded bg-gray-100 dark:bg-gray-800 transition-colors",
           {
             "text-gray-300 dark:text-gray-600 cursor-default": !canNextPage,
             "cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700":

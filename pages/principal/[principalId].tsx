@@ -127,8 +127,8 @@ const PrincipalPage = () => {
                 ).toText()
               : null;
             if (subnet) {
-              if (subnet !== data?.subnetId) {
-                console.warn(`subnet: api=${data?.subnetId} state=${subnet}`);
+              if (subnet !== data.subnetId) {
+                console.warn(`subnet: api=${data.subnetId} state=${subnet}`);
               }
             } else {
               console.warn("state: no subnet");
@@ -137,18 +137,18 @@ const PrincipalPage = () => {
             if (certController) {
               const controller =
                 Principal.fromUint8Array(certController).toText();
-              if (data && data?.controllerId !== controller) {
+              if (data && data.controllerId !== controller) {
                 console.warn(
-                  `controller: api=${data?.controllerId} state=${controller}`
+                  `controller: api=${data.controllerId} state=${controller}`
                 );
               }
             } else {
               console.warn("state: no controller");
             }
             const moduleHash = cert.lookup(pathModuleHash)?.toString("hex");
-            if (moduleHash && data?.moduleHash !== moduleHash) {
+            if (moduleHash && data.module?.id !== moduleHash) {
               console.warn(
-                `moduleHash: api=${data?.moduleHash} state=${moduleHash}`
+                `moduleHash: api=${data.module?.id} state=${moduleHash}`
               );
             }
           } else {
@@ -185,7 +185,12 @@ const PrincipalPage = () => {
               .catch((e) => {});
           }
         };
-        fetchLocalFiles();
+
+        if (data.module?.candid) {
+          setCandidAndBindings(data.module.candid);
+        } else {
+          fetchLocalFiles();
+        }
       });
     }
 

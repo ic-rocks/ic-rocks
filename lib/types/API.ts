@@ -127,9 +127,8 @@ export type Canister = {
     displayName: string;
   };
   subnetId: string;
-  hasCandid: boolean;
-  moduleHash: string;
-  moduleMatches: number;
+  hasInterface: boolean;
+  module: Partial<Module>;
   versions?: {
     createdDate: string;
     moduleHash: string;
@@ -139,9 +138,15 @@ export type Canister = {
 export type ModulesResponse = PagedResponse<Module>;
 
 export type Module = {
-  moduleHash: string;
-  canisters: string;
-  subnets: string;
+  id: string;
+  name: string;
+  hasHttp: boolean;
+  canisterCount: number;
+  hasInterface: boolean;
+  subnetCount: number;
+  sourceUrl: string;
+  source: string;
+  candid: string;
 };
 
 export type StatsResponse = {

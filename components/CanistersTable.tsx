@@ -1,22 +1,22 @@
 import { DateTime } from "luxon";
 import Link from "next/link";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { FiFileText } from "react-icons/fi";
+import { FiExternalLink, FiFileText } from "react-icons/fi";
 import fetchJSON from "../lib/fetch";
 import { CanistersResponse, SubnetResponse } from "../lib/types/API";
 import { Table } from "./Tables/Table";
 
 export const CanistersTable = ({
   controllerId,
-  moduleHash,
+  moduleId,
   onFetch,
 }: {
   controllerId?: string;
-  moduleHash?: string;
+  moduleId?: string;
   onFetch?: (res?) => void;
 }) => {
   const [{ subnetId, ...filters }, setFilters] = useState({
-    hasCandid: "",
+    hasInterface: "",
     hasName: "",
     hasModule: "",
     hasController: "",
@@ -43,10 +43,10 @@ export const CanistersTable = ({
     () =>
       [
         {
-          accessor: "hasCandid",
+          accessor: "hasInterface",
           disableSortBy: true,
           Cell: ({ value }) => {
-            return value && <FiFileText size={16} title="Candid Interface" />;
+            return value && <FiFileText size={16} title="Has Interface" />;
           },
           defaultClass: false,
           className: "flex w-6 items-center justify-center dark:text-gray-500",
@@ -80,6 +80,19 @@ export const CanistersTable = ({
           ),
           className: "px-2 sm:flex flex-1 hidden oneline",
         },
+        !moduleId && {
+          Header: "Module",
+          accessor: (d) => d.module?.id,
+          disableSortBy: true,
+          Cell: ({ value, row }) => (
+            <Link href={`/modules/${value}`}>
+              <a className="link-overflow">
+                {row.original.module?.name || value}
+              </a>
+            </Link>
+          ),
+          className: "px-2 xs:flex flex-1 hidden oneline",
+        },
         {
           Header: "Subnet",
           accessor: "subnetId",
@@ -97,6 +110,22 @@ export const CanistersTable = ({
           sortDescFirst: true,
           Cell: ({ value }) => DateTime.fromISO(value).toRelative(),
           className: "px-2 w-36 text-right",
+        },
+        {
+          Header: "URL",
+          accessor: (d) => d.module?.hasHttp,
+          id: "http",
+          disableSortBy: true,
+          Cell: ({ value, row }) =>
+            value ? (
+              <a
+                href={`https://${row.original.id}.raw.ic0.app`}
+                target="_blank"
+              >
+                <FiExternalLink className="inline link-overflow" />
+              </a>
+            ) : null,
+          className: "w-16 text-center hidden sm:block",
         },
       ].filter(Boolean),
     []
@@ -120,8 +149,10 @@ export const CanistersTable = ({
                 }
               : {}),
             ...(controllerId ? { controllerId } : {}),
-            ...(moduleHash ? { moduleHash } : {}),
-            ...(filters.hasCandid ? { hasCandid: filters.hasCandid } : {}),
+            ...(moduleId ? { moduleId } : {}),
+            ...(filters.hasInterface
+              ? { hasInterface: filters.hasInterface }
+              : {}),
             ...(filters.hasName ? { hasName: filters.hasName } : {}),
             ...(filters.hasModule ? { hasModule: filters.hasModule } : {}),
             ...(filters.hasController
@@ -138,9 +169,9 @@ export const CanistersTable = ({
     },
     [
       controllerId,
-      moduleHash,
+      moduleId,
       subnetId,
-      filters.hasCandid,
+      filters.hasInterface,
       filters.hasName,
       filters.hasModule,
       filters.hasController,
@@ -149,9 +180,9 @@ export const CanistersTable = ({
 
   const toggleFilters = [
     { id: "hasName", label: "Canister Name" },
-    { id: "hasCandid", label: "Interface" },
+    { id: "hasInterface", label: "Interface" },
     !controllerId && { id: "hasController", label: "Controller" },
-    !moduleHash && { id: "hasModule", label: "Module" },
+    !moduleId && { id: "hasModule", label: "Module" },
   ].filter(Boolean);
 
   return (
