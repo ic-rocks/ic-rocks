@@ -122,6 +122,10 @@ export type Canister = {
     name: string;
   } | null;
   controllerId: string | null;
+  ancestors?: {
+    id: string;
+    name: string;
+  }[];
   subnet: {
     subnetType: string;
     displayName: string;

@@ -59,6 +59,8 @@ export const StateProvider = ({ children }) => {
     if (state.fetchNetwork) return;
 
     fetchJSON("/api/network").then((data) => {
+      if (!data) return;
+
       const payload = {
         subnets: data.subnets.map((s) => [
           Principal.fromUint8Array(

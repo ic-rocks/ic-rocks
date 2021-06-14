@@ -8,13 +8,15 @@ const withTM = require("next-transpile-modules")([
   "@dfinity/candid",
 ]);
 
+const API_ENDPOINT = process.env.API_ENDPOINT || "http://api.ic.rocks";
+console.log("API_ENDPOINT:", API_ENDPOINT);
+
 module.exports = withTM({
   async rewrites() {
     return [
       {
         source: "/api/:path*",
-        // destination: "http://localhost:3001/:path*",
-        destination: "http://api.ic.rocks/:path*",
+        destination: `${API_ENDPOINT}/:path*`,
       },
     ];
   },

@@ -5,7 +5,8 @@ import { Buffer } from "buffer/";
 import classNames from "classnames";
 import { DateTime } from "luxon";
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { BsArrowReturnRight } from "react-icons/bs";
 import { FiExternalLink } from "react-icons/fi";
 import { APIPrincipal, Canister } from "../lib/types/API";
 import { PrincipalType } from "../pages/principal/[principalId]";
@@ -74,6 +75,38 @@ export default function PrincipalDetails({
     principalData?.accounts && principalData.accounts.length > 0
       ? principalData.accounts
       : generatedAccounts;
+
+  const ancestors = useMemo(() => {
+    if (!canisterData?.ancestors) return [];
+    const arr = [...canisterData.ancestors];
+    arr.reverse();
+    return arr;
+  }, [canisterData]);
+
+  const renderAncestors = (
+    [head, ...rest]: Canister["ancestors"],
+    isFirst = false
+  ) =>
+    head && (
+      <>
+        {head.id && head.id !== principalId ? (
+          <Link href={`/principal/${head.id}`}>
+            <a className="link-overflow">{head.name || head.id}</a>
+          </Link>
+        ) : (
+          <span>{head.name || head.id}</span>
+        )}
+        {rest.length > 0 && (
+          <div className={classNames({ "pl-3": !isFirst })}>
+            {/* <span className="text-gray-500 mr-1 pointer-events-none">└</span> */}
+            <span className="text-gray-500 pointer-events-none">
+              <BsArrowReturnRight className="inline mr-0.5" />
+            </span>
+            {renderAncestors(rest)}
+          </div>
+        )}
+      </>
+    );
 
   return (
     <div className={className}>
@@ -206,28 +239,33 @@ export default function PrincipalDetails({
                 </td>
               </tr>
               <tr className="flex">
-                <td className="px-2 py-2 w-24 sm:w-44">Controller</td>
-                <td className="px-2 py-2 flex-1">
-                  {canisterData?.controllerId ? (
-                    <Link href={`/principal/${canisterData.controllerId}`}>
-                      <a className="link-overflow">
-                        {canisterData?.controller?.name ||
-                          canisterData?.controllerId}
-                      </a>
-                    </Link>
-                  ) : (
-                    "-"
-                  )}
+                <td className="px-2 py-2 w-24 sm:w-44">Controller Tree</td>
+                <td className="px-2 py-2 flex-1 leading-snug text-xs">
+                  {canisterData &&
+                    renderAncestors(
+                      ancestors
+                        .concat({
+                          id: principalId,
+                          name: `This canister${
+                            principalData?.name
+                              ? ` (${principalData.name})`
+                              : ""
+                          }`,
+                        })
+                        .concat(
+                          principalData?.canisterCount > 0
+                            ? {
+                                id: null,
+                                name: `${principalData.canisterCount} controlled`,
+                              }
+                            : []
+                        ),
+                      true
+                    )}
                 </td>
               </tr>
             </>
           )}
-          <tr className="flex">
-            <td className="px-2 py-2 w-24 sm:w-44">Controlled Canisters</td>
-            <td className="px-2 py-2 flex-1">
-              {principalData?.canisterCount ? principalData.canisterCount : "-"}
-            </td>
-          </tr>
           <tr className="flex">
             <td className="px-2 py-2 w-24 sm:w-44 align-top">
               Ledger Accounts
