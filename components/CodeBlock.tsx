@@ -34,7 +34,7 @@ export default function CodeBlock({
   className?: string;
   candid: string;
   bindings: Bindings | null;
-  protobuf: string;
+  protobuf?: string;
 }) {
   const [language, setLanguage] = useState<typeof LANGUAGES[number]>(
     candid ? "candid" : "protobuf"
@@ -61,7 +61,7 @@ export default function CodeBlock({
 
   return (
     <div className={className}>
-      <div className="flex divide-x divide-gray-100 dark:divide-gray-900">
+      <div className="flex flex-wrap divide-x divide-gray-100 dark:divide-gray-900">
         {LANGUAGES.map((lang) => {
           const disabled =
             (lang === "protobuf" && !protobuf) ||
@@ -70,7 +70,7 @@ export default function CodeBlock({
             <button
               key={lang}
               className={classnames(
-                "px-3 py-1 focus:outline-none transition-200 transition-colors",
+                "text-xs px-3 py-1 focus:outline-none transition-200 transition-colors",
                 {
                   "text-gray-300 dark:text-gray-700 cursor-not-allowed":
                     disabled,

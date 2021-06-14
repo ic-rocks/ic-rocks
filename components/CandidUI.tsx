@@ -189,10 +189,15 @@ export default function CandidUI({
           ([_, func]) =>
             func.annotations[0] === "query" && !func.argTypes.length
         )
-        .forEach(async ([name, _]) => {
+        .forEach(async ([name, func]) => {
           dispatch({ type: "loading", func: name, payload: true });
           try {
             const res = await actor_[name]();
+            // If response is > 1kb, default to raw display
+            const buf = func.retTypes[0].encodeValue(res);
+            if (buf.length > 1000) {
+              dispatch({ type: "outputDisplay", func: name, payload: "Raw" });
+            }
             dispatch({ type: "output", func: name, payload: { res } });
           } catch (error) {
             dispatch({
@@ -245,19 +250,10 @@ export default function CandidUI({
   );
 
   const sortedMethods = Object.entries(methods).sort(methodCmp);
-  const appLink = methods.http_request ? (
-    <a
-      className="hover:underline text-blue-600 flex items-center text-xs"
-      href={`https://${canisterId}.raw.ic0.app`}
-      target="_blank"
-    >
-      Go to App <FiExternalLink className="ml-1" />
-    </a>
-  ) : null;
 
   return (
     <div className={className}>
-      <div className="px-2 py-2 bg-gray-100 dark:bg-gray-800 flex justify-between items-baseline">
+      <div className="px-2 py-2 bg-heading flex justify-between items-baseline">
         <div>
           <span className="font-bold">
             {sortedMethods.length}{" "}
@@ -280,7 +276,6 @@ export default function CandidUI({
           )}
         </div>
         <div className="flex gap-2">
-          {appLink}
           <a
             className="hover:underline text-blue-600 flex items-center text-xs"
             href={`${CANDID_UI_URL}?id=${canisterId}&did=${encodeURIComponent(
@@ -288,7 +283,7 @@ export default function CandidUI({
             )}`}
             target="_blank"
           >
-            Go to Candid UI <FiExternalLink className="ml-1" />
+            View in Candid UI <FiExternalLink className="ml-1" />
           </a>
         </div>
       </div>
@@ -361,16 +356,13 @@ export default function CandidUI({
               call(funcName, method, state.inputs[funcName]);
             }}
           >
-            <div className="px-2 py-2 bg-gray-100 dark:bg-gray-800 flex justify-between items-center">
+            <div className="px-2 py-2 bg-heading flex justify-between items-center">
               {funcName}
               <label
-                className={classNames(
-                  "rounded text-xs py-1 px-2 dark:text-black ml-2",
-                  {
-                    "bg-red-400": isPb,
-                    "bg-blue-400": !isPb,
-                  }
-                )}
+                className={classNames("label-tag ml-2", {
+                  "bg-red-400": isPb,
+                  "bg-blue-400": !isPb,
+                })}
               >
                 {isPb ? "protobuf" : "candid"}
               </label>

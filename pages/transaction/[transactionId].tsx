@@ -1,97 +1,38 @@
-import { Actor, HttpAgent } from "@dfinity/agent";
 import classnames from "classnames";
 import { DateTime } from "luxon";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
-import { MetaTitle } from "../../components/MetaTags";
+import BalanceLabel from "../../components/Labels/BalanceLabel";
+import { TimestampLabel } from "../../components/Labels/TimestampLabel";
+import { TransactionTypeLabel } from "../../components/Labels/TransactionTypeLabel";
+import { MetaTags } from "../../components/MetaTags";
 import Search404 from "../../components/Search404";
-import { TransactionTypeLabel } from "../../components/TransactionTypeLabel";
-import ledgerIdl from "../../lib/canisters/ledger.did";
-import { formatNumber } from "../../lib/numbers";
-import { TransactionResult } from "../../lib/types/TransactionResult";
+import { useGlobalState } from "../../components/StateContext";
+import fetchJSON from "../../lib/fetch";
+import { formatNumberUSD } from "../../lib/numbers";
+import { Transaction, TransactionsResponse } from "../../lib/types/API";
 
-const agent = new HttpAgent({ host: "https://ic0.app" });
-const ledger = Actor.createActor(ledgerIdl, {
-  agent,
-  canisterId: "ryjl3-tyaaa-aaaaa-aaaba-cai",
-});
-
-const Transaction = () => {
+const TransactionPage = () => {
   const router = useRouter();
-  const [tx, setTx] = useState(null);
-  const [accounts, setAccounts] = useState({});
+  const [data, setData] = useState<Transaction>(null);
   const [isValid, setIsValid] = useState(true);
   const [isLoadingTxs, setIsLoadingTxs] = useState(false);
   const { transactionId } = router.query as { transactionId: string };
+  const { markets } = useGlobalState();
 
   useEffect(() => {
     if (typeof transactionId !== "string" || !transactionId) return;
 
-    setTx(null);
+    setData(null);
     setIsLoadingTxs(true);
     setIsValid(true);
 
-    fetch("https://rosetta-api.internetcomputer.org/search/transactions", {
-      body: JSON.stringify({
-        network_identifier: {
-          blockchain: "Internet Computer",
-          network: "00000000000000020101",
-        },
-        transaction_identifier: {
-          hash: transactionId,
-        },
-      }),
-      method: "POST",
-      headers: {
-        "content-type": "application/json;charset=UTF-8",
-      },
-    })
-      .then((res) => res.json())
-      .then((json: TransactionResult) => {
-        const tx0 = json.transactions[0];
-        const type = tx0.transaction.operations[0].type;
-        let from, to, amount, fee;
-        if (type === "TRANSACTION") {
-          let fromOp = tx0.transaction.operations.find(
-            (op) => op.type === "TRANSACTION" && op.amount.value.startsWith("-")
-          );
-          let toOp = tx0.transaction.operations.find(
-            (op) =>
-              op.type === "TRANSACTION" && !op.amount.value.startsWith("-")
-          );
-          if (!fromOp) {
-            fromOp = tx0.transaction.operations[0];
-            toOp = tx0.transaction.operations[1];
-          }
-          from = fromOp.account.address;
-          const feeOp = tx0.transaction.operations.find(
-            (op) => op.type === "FEE"
-          );
-          to = toOp.account.address;
-          amount = toOp.amount;
-          fee = feeOp.amount;
-        } else if (type === "MINT") {
-          from = type;
-          to = tx0.transaction.operations[0].account.address;
-          amount = tx0.transaction.operations[0].amount;
-        } else if (type === "BURN") {
-          from = tx0.transaction.operations[0].account.address;
-          to = type;
-          amount = tx0.transaction.operations[0].amount;
-        }
-
-        const formatted = {
-          ...tx0.transaction.metadata,
-          type,
-          block_hash: tx0.block_identifier.hash,
-          tx_hash: tx0.transaction.transaction_identifier.hash,
-          from,
-          to,
-          amount,
-          fee,
-        };
-        setTx(formatted);
+    fetchJSON(`/api/transactions/${transactionId}`)
+      .then((data: TransactionsResponse) => {
+        const tx = data.rows[0];
+        if (!tx) throw "tx not found";
+        setData(tx);
         setIsLoadingTxs(false);
       })
       .catch((err) => {
@@ -100,122 +41,122 @@ const Transaction = () => {
       });
   }, [transactionId]);
 
-  useEffect(() => {
-    fetch("/data/json/accounts.json")
-      .then((res) => res.json())
-      .then((json) => {
-        setAccounts(json);
-      });
-  }, []);
-
-  const date = tx ? DateTime.fromMillis(tx.timestamp / 1e6).toUTC() : null;
-
   return isValid ? (
-    <div className="py-16">
-      <MetaTitle
+    <div className="pb-16">
+      <MetaTags
         title={`Transaction${transactionId ? ` ${transactionId}` : ""}`}
+        description={`Details for transaction${
+          transactionId ? ` ${transactionId}` : ""
+        } on the Internet Computer ledger.`}
       />
-      <h1 className="text-3xl mb-8">Transaction Details</h1>
+      <h1 className="text-3xl my-8">Transaction Details</h1>
       <table className="table-fixed w-full">
-        <tbody className="divide-y divide-gray-300 dark:divide-gray-700">
-          <tr>
-            <td className="px-2 py-2 w-1/6">Hash</td>
-            <td className="px-2 py-2 w-5/6 overflow-hidden overflow-ellipsis">
-              {tx ? tx.tx_hash : null}
+        <tbody className="divide-y divide-default">
+          <tr className="flex">
+            <td className="px-2 py-2 w-24">Hash</td>
+            <td className="px-2 py-2 flex-1 overflow-hidden overflow-ellipsis">
+              {data ? data.id : null}
             </td>
           </tr>
-          <tr>
-            <td className="px-2 py-2 w-1/6">Block</td>
-            <td className="px-2 py-2 w-5/6">{tx ? tx.block_height : null}</td>
-          </tr>
-          <tr>
-            <td className="px-2 py-2 w-1/6">Type</td>
-            <td className="px-2 py-2 w-5/6">
-              {tx ? <TransactionTypeLabel type={tx.type} /> : null}
+          <tr className="flex">
+            <td className="px-2 py-2 w-24">Block</td>
+            <td className="px-2 py-2 flex-1">
+              {data ? data.blockHeight : null}
             </td>
           </tr>
-          <tr>
-            <td className="px-2 py-2 w-1/6">Amount</td>
-            <td className="px-2 py-2 w-5/6">
-              {tx != null ? (
-                <>
-                  {formatNumber(Math.abs(Number(tx.amount.value)) / 1e8)}{" "}
-                  <span className="text-xs">ICP</span>
-                </>
+          <tr className="flex">
+            <td className="px-2 py-2 w-24">Type</td>
+            <td className="px-2 py-2 flex-1">
+              {data ? <TransactionTypeLabel type={data.type} /> : null}
+            </td>
+          </tr>
+          <tr className="flex">
+            <td className="px-2 py-2 w-24">Timestamp</td>
+            <td className="px-2 py-2 flex-1">
+              {data ? (
+                <TimestampLabel dt={DateTime.fromISO(data.createdDate)} />
               ) : null}
             </td>
           </tr>
-          <tr>
-            <td className="px-2 py-2 w-1/6">Timestamp</td>
-            <td className="px-2 py-2 w-5/6">
-              {date ? (
-                <>
-                  {date.toLocaleString({
-                    ...DateTime.DATETIME_FULL_WITH_SECONDS,
-                    hour12: false,
-                  })}{" "}
-                  ({date.toRelative()})
-                </>
-              ) : null}
-            </td>
-          </tr>
-          <tr>
-            <td className="px-2 py-2 w-1/6">From</td>
+          <tr className="flex">
+            <td className="px-2 py-2 w-24">From</td>
             <td
               className={classnames(
-                "px-2 py-2 w-5/6 overflow-hidden overflow-ellipsis",
-                {
-                  "text-blue-600": tx && tx.type !== "MINT",
-                }
+                "px-2 py-2 flex-1 overflow-hidden flex",
+                {}
               )}
             >
-              {tx ? (
-                tx.type === "MINT" ? (
+              {data ? (
+                data.type === "MINT" ? (
                   "Mint"
                 ) : (
-                  <Link href={`/account/${tx.from}`}>
-                    <a className="hover:underline">
-                      {accounts[tx.from] || tx.from}
+                  <Link href={`/account/${data.senderId}`}>
+                    <a className="link-overflow">
+                      {data.sender?.name || data.senderId}
                     </a>
                   </Link>
                 )
               ) : null}
             </td>
           </tr>
-          <tr>
-            <td className="px-2 py-2 w-1/6">To</td>
+          <tr className="flex">
+            <td className="px-2 py-2 w-24">To</td>
             <td
               className={classnames(
-                "px-2 py-2 w-5/6 overflow-hidden overflow-ellipsis",
-                {
-                  "text-blue-600": tx && tx.type !== "BURN",
-                }
+                "px-2 py-2 flex-1 overflow-hidden flex",
+                {}
               )}
             >
-              {tx ? (
-                tx.type === "BURN" ? (
+              {data ? (
+                data.type === "BURN" ? (
                   "Burn"
                 ) : (
-                  <Link href={`/account/${tx.to}`}>
-                    <a className="hover:underline">
-                      {accounts[tx.to] || tx.to}
+                  <Link href={`/account/${data.receiverId}`}>
+                    <a className="link-overflow">
+                      {data.receiver?.name || data.receiverId}
                     </a>
                   </Link>
                 )
               ) : null}
             </td>
           </tr>
-          <tr>
-            <td className="px-2 py-2 w-1/6">Fee</td>
-            <td className="px-2 py-2 w-5/6">
-              {tx ? (
-                tx.fee ? (
+          <tr className="flex">
+            <td className="px-2 py-2 w-24">Amount</td>
+            <td className="px-2 py-2 flex-1">
+              {data != null ? (
+                <>
+                  <BalanceLabel value={data.amount} />
+                  {markets?.ticker && (
+                    <small className="ml-1 text-xs">
+                      (
+                      {formatNumberUSD(
+                        (Number(markets.ticker.price) * Number(data.amount)) /
+                          1e8
+                      )}
+                      )
+                    </small>
+                  )}
+                </>
+              ) : null}
+            </td>
+          </tr>
+          <tr className="flex">
+            <td className="px-2 py-2 w-24">Fee</td>
+            <td className="px-2 py-2 flex-1">
+              {data ? (
+                data.fee ? (
                   <>
-                    {formatNumber(
-                      Math.abs(Number(tx.fee.value)) /
-                        10 ** tx.fee.currency.decimals
-                    )}{" "}
-                    <span className="text-xs">ICP</span>
+                    <BalanceLabel value={data.fee} />
+                    {markets && (
+                      <small className="ml-1 text-xs">
+                        (
+                        {formatNumberUSD(
+                          (Number(markets.ticker.price) * Number(data.fee)) /
+                            1e8
+                        )}
+                        )
+                      </small>
+                    )}
                   </>
                 ) : (
                   0
@@ -223,9 +164,11 @@ const Transaction = () => {
               ) : null}
             </td>
           </tr>
-          <tr>
-            <td className="px-2 py-2 w-1/6">Memo</td>
-            <td className="px-2 py-2 w-5/6">{tx ? tx.memo : null}</td>
+          <tr className="flex">
+            <td className="px-2 py-2 w-24">Memo</td>
+            <td className="px-2 py-2 flex-1 break-all">
+              {data ? data.memo : null}
+            </td>
           </tr>
         </tbody>
       </table>
@@ -235,4 +178,4 @@ const Transaction = () => {
   );
 };
 
-export default Transaction;
+export default TransactionPage;

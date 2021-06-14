@@ -50,7 +50,7 @@ export const Pagination = ({
       </button>
       <span
         className={classnames(
-          "px-1 py-0.5 rounded bg-gray-100 dark:bg-gray-800 text-xs",
+          "px-1 py-0.5 text-xs rounded bg-gray-100 dark:bg-gray-800 cursor-default",
           {
             "text-gray-500": pageOptions.length === 0,
           }

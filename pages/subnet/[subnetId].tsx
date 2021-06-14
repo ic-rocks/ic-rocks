@@ -1,67 +1,35 @@
 import Link from "next/link";
-import React from "react";
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
 import NetworkGraph from "../../components/Charts/NetworkGraph";
-import { MetaTitle } from "../../components/MetaTags";
-import subnetsJson from "../../generated/subnets.json";
+import { MetaTags } from "../../components/MetaTags";
 import { countBy } from "../../lib/arrays";
-import { getSubnetType } from "../../lib/network";
+import fetchJSON from "../../lib/fetch";
 import { formatNumber } from "../../lib/numbers";
-declare const Buffer;
+import { SubnetResponse } from "../../lib/types/API";
 
-export async function getStaticPaths() {
-  return {
-    paths: Object.keys(subnetsJson.subnets).map((subnetId) => ({
-      params: { subnetId },
-    })),
-    fallback: false,
+const Subnet = () => {
+  const router = useRouter();
+  const { subnetId } = router.query as {
+    subnetId?: string;
   };
-}
+  const [data, setData] = useState<SubnetResponse>(null);
+  useEffect(() => {
+    if (!subnetId) return;
+    fetchJSON(`/api/subnets/${subnetId}`).then(setData);
+  }, [subnetId]);
 
-export async function getStaticProps({ params: { subnetId } }) {
-  const { subnetType, replicaVersionId, version, membership } =
-    subnetsJson.subnets[subnetId];
-  const nodes = membership.map((nodeId) => {
-    const { nodeOperatorPrincipalId, nodeProviderPrincipalId } =
-      subnetsJson.nodes[nodeId].nodeOperator.value;
-    return {
-      nodeId,
-      operator: nodeOperatorPrincipalId,
-      provider: nodeProviderPrincipalId,
-    };
-  });
-
-  return {
-    props: {
-      subnetId,
-      subnetType: getSubnetType(subnetType),
-      nodes,
-      version,
-      replicaVersionId,
-    },
-  };
-}
-
-const Subnet = ({
-  subnetId,
-  subnetType,
-  nodes,
-  version,
-  replicaVersionId,
-}: {
-  subnetId: string;
-  subnetType: string;
-  nodes: any[];
-  version: string;
-  replicaVersionId: string;
-}) => {
   return (
-    <div className="py-16">
-      <MetaTitle title={`Subnet ${subnetId}`} />
-      <h1 className="text-3xl mb-8 overflow-hidden overflow-ellipsis">
-        Subnet <small className="text-2xl">{subnetId}</small>
+    <div className="pb-16">
+      <MetaTags
+        title={`Subnet ${subnetId}`}
+        description={`Details for subnet ${subnetId} on the Internet Computer.`}
+      />
+      <h1 className="text-3xl my-8 overflow-hidden overflow-ellipsis">
+        Subnet <small className="text-xl">{subnetId}</small>
       </h1>
       <table className="w-full table-fixed">
-        <thead className="bg-gray-100 dark:bg-gray-800">
+        <thead className="bg-heading">
           <tr className="invisible">
             <td className="w-1/4" />
             <td className="w-3/4" />
@@ -76,61 +44,68 @@ const Subnet = ({
           <tr>
             <td className="px-2 py-2 w-1/4">Type</td>
             <td className="px-2 py-2 w-3/4 overflow-hidden overflow-ellipsis">
-              {subnetType}
-            </td>
-          </tr>
-          <tr>
-            <td className="px-2 py-2 w-1/4">Replica Version</td>
-            <td className="px-2 py-2 w-3/4 overflow-hidden overflow-ellipsis">
-              {replicaVersionId}
+              {data?.subnetType || "-"}
             </td>
           </tr>
           <tr>
             <td className="px-2 py-2 w-1/4">Nodes</td>
-            <td className="px-2 py-2 w-3/4">{formatNumber(nodes.length)}</td>
+            <td className="px-2 py-2 w-3/4">
+              {data ? formatNumber(data.nodeCount) : "-"}
+            </td>
           </tr>
           <tr>
             <td className="px-2 py-2 w-1/4">Unique Operators</td>
-            <td className="px-2 py-2 w-3/4">{countBy(nodes, "operator")}</td>
+            <td className="px-2 py-2 w-3/4">
+              {data ? countBy(data.nodes, (d) => d.operator.id) : "-"}
+            </td>
           </tr>
           <tr>
             <td className="px-2 py-2 w-1/4">Unique Providers</td>
-            <td className="px-2 py-2 w-3/4">{countBy(nodes, "provider")}</td>
+            <td className="px-2 py-2 w-3/4">
+              {data ? countBy(data.nodes, (d) => d.provider.id) : "-"}
+            </td>
           </tr>
           <tr>
-            <td className="px-2 py-2 w-1/4">Registry Version</td>
-            <td className="px-2 py-2 w-3/4">{version}</td>
+            <td className="px-2 py-2 w-1/4">Total Canisters</td>
+            <td className="px-2 py-2 w-3/4">
+              {data ? data.canisterCount : "-"}
+            </td>
           </tr>
         </tbody>
       </table>
 
       <NetworkGraph activeId={subnetId} activeType="Subnet" />
 
-      <table className="w-full mt-8">
-        <thead className="bg-gray-100 dark:bg-gray-800">
-          <tr>
-            <th className="text-left px-2 py-2">Node</th>
-            <th className="text-left px-2 py-2">Operator</th>
-            <th className="text-left px-2 py-2">Provider</th>
+      <h2 className="text-2xl mt-8 mb-4">Nodes</h2>
+      <table className="w-full table-fixed">
+        <thead className="bg-heading">
+          <tr className="flex">
+            <th className="text-left px-2 py-2 flex-1">Node</th>
+            <th className="text-left px-2 py-2 flex-1">Operator</th>
+            <th className="text-left px-2 py-2 flex-1">Provider</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-300 dark:divide-gray-700">
-          {nodes.map(({ nodeId, operator, provider }) => {
+        <tbody className="block divide-y divide-gray-300 dark:divide-gray-700">
+          {data?.nodes.map(({ id, operator, provider }) => {
             return (
-              <tr key={nodeId}>
-                <td className="px-2 py-0.5 overflow-hidden overflow-ellipsis text-blue-600">
-                  <Link href={`/node/${nodeId}`}>
-                    <a className="hover:underline">{nodeId}</a>
+              <tr key={id} className="flex">
+                <td className="px-2 py-0.5 flex-1 flex oneline">
+                  <Link href={`/node/${id}`}>
+                    <a className="link-overflow">{id}</a>
                   </Link>
                 </td>
-                <td className="px-2 py-0.5 overflow-hidden overflow-ellipsis text-blue-600">
-                  <Link href={`/principal/${operator}`}>
-                    <a className="hover:underline">{operator}</a>
+                <td className="px-2 py-0.5 flex-1 flex oneline">
+                  <Link href={`/principal/${operator.id}`}>
+                    <a className="link-overflow">
+                      {operator.name || operator.id}
+                    </a>
                   </Link>
                 </td>
-                <td className="px-2 py-0.5 overflow-hidden overflow-ellipsis text-blue-600">
-                  <Link href={`/principal/${provider}`}>
-                    <a className="hover:underline">{provider}</a>
+                <td className="px-2 py-0.5 flex-1 flex oneline">
+                  <Link href={`/principal/${provider.id}`}>
+                    <a className="link-overflow">
+                      {provider.name || provider.id}
+                    </a>
                   </Link>
                 </td>
               </tr>

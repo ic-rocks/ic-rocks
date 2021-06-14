@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import { TransactionType } from "../lib/types/TransactionResult";
+import { TransactionType } from "../../lib/types/API";
 
 export function TransactionTypeLabel({ type }: { type: TransactionType }) {
   const label = type[0] + type.slice(1).toLowerCase();

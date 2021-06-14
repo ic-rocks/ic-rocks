@@ -1,5 +1,4 @@
 import Document, { Head, Html, Main, NextScript } from "next/document";
-import { DESCRIPTION } from "../lib/constants";
 
 export default class MyDocument extends Document {
   render() {
@@ -11,20 +10,7 @@ export default class MyDocument extends Document {
             type="image/png"
             href="https://ic.rocks/img/icrocks-logo.png"
           />
-          <meta name="description" content={DESCRIPTION} />
           <meta property="og:type" content="website" />
-          <meta property="og:description" content={DESCRIPTION} />
-          <meta
-            property="og:image"
-            content="https://ic.rocks/img/icrocks-hero.png"
-          />
-
-          <meta property="twitter:card" content="summary_large_image" />
-          <meta property="twitter:description" content={DESCRIPTION} />
-          <meta
-            property="twitter:image"
-            content="https://ic.rocks/img/icrocks-hero.png"
-          />
         </Head>
         <body className="dark:bg-gray-900 dark:text-white">
           <script src="/noflash.js" />

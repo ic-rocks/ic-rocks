@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import React, { useEffect } from "react";
+import React, { CSSProperties, useEffect } from "react";
 import { CgSpinner } from "react-icons/cg";
 import { FaSortAmountDown, FaSortAmountUp } from "react-icons/fa";
 import {
@@ -14,20 +14,34 @@ import { Pagination } from "./Pagination";
 export const PAGE_SIZE = 25;
 
 export const Table = ({
+  className,
+  style,
+  tableBodyProps = {},
+  tableHeaderGroupProps = {
+    className: "bg-heading py-2",
+  },
   columns,
   data,
   count,
   fetchData = () => {},
   loading,
+  useSort = true,
+  usePage = true,
   initialSortBy,
   manualPagination = true,
   manualSortBy = true,
 }: {
+  className?: string;
+  style?: CSSProperties;
+  tableBodyProps?: any;
+  tableHeaderGroupProps?: any;
   columns: Column<any>[];
   data: any[];
-  count: number;
+  count?: number;
   fetchData?: ({ pageSize, pageIndex, sortBy }) => void;
   loading?: boolean;
+  useSort?: boolean;
+  usePage?: boolean;
   initialSortBy?: SortingRule<any>[];
   manualPagination?: boolean;
   manualSortBy?: boolean;
@@ -53,11 +67,10 @@ export const Table = ({
       data,
       initialState: { pageSize: PAGE_SIZE, sortBy: initialSortBy },
       manualPagination,
-      pageCount: Math.ceil(count / PAGE_SIZE),
+      pageCount: count == undefined ? 1 : Math.ceil(count / PAGE_SIZE),
       manualSortBy,
     },
-    useSortBy,
-    usePagination
+    ...[useSort && useSortBy, usePagination].filter(Boolean)
   );
 
   useEffect(() => {
@@ -67,28 +80,35 @@ export const Table = ({
   return (
     <div className="max-w-full overflow-x-auto">
       <table
-        {...getTableProps({
-          className: "table-fixed w-full",
-          style: {
-            minWidth: 400,
+        {...getTableProps([
+          {
+            className: "table-fixed w-full",
+            style: {
+              minWidth: 320,
+            },
           },
-        })}
+          { className, style },
+        ])}
       >
-        <thead className="block bg-gray-100 dark:bg-gray-800 py-2">
+        <thead className="block">
           {headerGroups.map((headerGroup) => (
             <tr
-              {...headerGroup.getHeaderGroupProps({
-                className: "flex",
-              })}
+              {...headerGroup.getHeaderGroupProps([
+                {
+                  className: "flex",
+                },
+                tableHeaderGroupProps,
+              ])}
             >
               {headerGroup.headers.map((column) => (
                 <th
                   {...column.getHeaderProps([
                     {
-                      className: "px-2 whitespace-nowrap",
+                      className: "items-center",
                     },
                     { className: column.className },
-                    column.getSortByToggleProps(),
+                    { style: column.style },
+                    useSort && column.getSortByToggleProps(),
                   ])}
                 >
                   {column.render("Header")}
@@ -104,9 +124,12 @@ export const Table = ({
           ))}
         </thead>
         <tbody
-          {...getTableBodyProps({
-            className: "block divide-y divide-gray-300 dark:divide-gray-700",
-          })}
+          {...getTableBodyProps([
+            {
+              className: "block divide-y divide-default",
+            },
+            tableBodyProps,
+          ])}
         >
           {page.map((row, i) => {
             prepareRow(row);
@@ -117,6 +140,7 @@ export const Table = ({
                     <td
                       {...cell.getCellProps([
                         { className: cell.column.className },
+                        { style: cell.column.style },
                       ])}
                     >
                       {cell.render("Cell")}
@@ -146,7 +170,8 @@ export const Table = ({
               </td>
             </tr>
           )}
-          {count > 0 && (
+          {count > 0 && (usePage || loading) && (
+            // Show results count when usePage=true, but always show loading spinner
             <tr className="flex">
               <td
                 colSpan={columns.length}
@@ -157,14 +182,17 @@ export const Table = ({
                     invisible: !loading,
                   })}
                 />
-                Showing {pageIndex * pageSize} -{" "}
-                {Math.min(count, (pageIndex + 1) * pageSize)} of {count} results
+                {usePage &&
+                  `Showing ${pageIndex * pageSize} - ${Math.min(
+                    count,
+                    (pageIndex + 1) * pageSize
+                  )} of ${count} results`}
               </td>
             </tr>
           )}
         </tbody>
       </table>
-      {count > 0 && (
+      {usePage && count > 0 && (
         <div className="flex justify-center">
           <Pagination
             canPreviousPage={canPreviousPage}

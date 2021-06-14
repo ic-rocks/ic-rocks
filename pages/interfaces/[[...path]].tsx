@@ -8,9 +8,10 @@ import { BiPencil } from "react-icons/bi";
 import { FiFilePlus } from "react-icons/fi";
 import ActiveLink from "../../components/ActiveLink";
 import CandidAttach from "../../components/CandidAttach";
+import CanisterPage from "../../components/CanisterPage";
 import CodeBlock from "../../components/CodeBlock";
 import MatchingCanistersList from "../../components/MatchingCanistersList";
-import { MetaTitle } from "../../components/MetaTags";
+import { MetaTags } from "../../components/MetaTags";
 import { GITHUB_REPO } from "../../lib/constants";
 
 const didc = import("didc");
@@ -126,9 +127,14 @@ const Interfaces = ({ current, children }) => {
   }
 
   return (
-    <div className="py-16">
-      <MetaTitle title={`interfaces${current ? "/" + current : ""}`} />
-      <h1 className="text-3xl mb-8">
+    <CanisterPage>
+      <MetaTags
+        title={`interfaces${current ? "/" + current : ""}`}
+        description={`View canister interface${
+          current ? ` ${current}` : ""
+        } on the Internet Computer.`}
+      />
+      <h1 className="text-3xl my-8">
         <ActiveLink
           href="/interfaces"
           linkClassName="text-blue-600 hover:underline"
@@ -153,7 +159,7 @@ const Interfaces = ({ current, children }) => {
           </ul>
           <a
             className="inline-flex items-center text-blue-600 hover:underline"
-            href={`${GITHUB_REPO}/new/main/public/data/interfaces/${current}?filename=newfile.did&value=%2F%2F%20Candid%20file%20here`}
+            href={`${GITHUB_REPO}/new/main/public/data/interfaces/${current}?value=%2F%2F%20Candid%20file%20here`}
             target="_blank"
           >
             <FiFilePlus className="mr-0.5" />
@@ -180,7 +186,7 @@ const Interfaces = ({ current, children }) => {
           </a>
         </>
       )}
-    </div>
+    </CanisterPage>
   );
 };
 

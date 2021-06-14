@@ -1,6 +1,6 @@
 import { DateTime } from "luxon";
 
-export const formatNumberUSD = (number: number, digits: number = 2) => {
+export const formatNumberUSD = (number: any, digits: number = 2) => {
   return Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
