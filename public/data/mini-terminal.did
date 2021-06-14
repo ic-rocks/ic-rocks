@@ -1,0 +1,108 @@
+type UserInfo =
+ record {
+   textColor:
+    record { // foreground, background
+     record { nat; nat; nat; };
+     record { nat; nat; nat; };
+   };
+   userName: text;
+ };
+type Result = 
+ variant {
+   err: opt text;
+   ok: Out;
+ };
+type Rect = 
+ record {
+   dim: Dim;
+   pos: Pos;
+ };
+type Pos = 
+ record {
+   x: nat;
+   y: nat;
+ };
+type Out = 
+ variant {
+   draw: Elm;
+   redraw: vec record {
+                 text;
+                 Elm;
+               };
+ };
+type Node = 
+ record {
+   elms: Elms;
+   fill: Fill;
+   rect: Rect;
+ };
+type KeyInfo = 
+ record {
+   alt: bool;
+   ctrl: bool;
+   key: text;
+   meta: bool;
+   shift: bool;
+ };
+type GraphicsRequest = 
+ variant {
+   all: Dim;
+   last: Dim;
+   none;
+ };
+type Graphics = Result;
+type Fill = 
+ variant {
+   closed: Color;
+   none;
+   open: record {
+           Color;
+           nat;
+         };
+ };
+type EventInfo_2 = 
+ record {
+   dateTimeLocal: text;
+   dateTimeUtc: text;
+   event: Event;
+   nonce: opt nat;
+   userInfo: UserInfo;
+ };
+type EventInfo = EventInfo_2;
+type Event = 
+ variant {
+   clipBoard: text;
+   fileRead: record {
+               content: text;
+               path: text;
+             };
+   keyDown: vec KeyInfo;
+   mouseDown: Pos;
+   quit;
+   skip;
+   windowSize: Dim;
+ };
+type Elms = vec Elm;
+type Elm = 
+ variant {
+   node: Node;
+   rect: record {
+           Rect;
+           Fill;
+         };
+ };
+type Dim = 
+ record {
+   height: nat;
+   width: nat;
+ };
+type Color = 
+ record {
+   nat;
+   nat;
+   nat;
+ };
+service : {
+  update: (vec EventInfo, GraphicsRequest) -> (vec Graphics);
+  view: (Dim, vec EventInfo) -> (Graphics) query;
+}
