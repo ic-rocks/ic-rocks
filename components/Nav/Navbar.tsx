@@ -36,9 +36,6 @@ export default function Nav() {
           <ActiveLink href="/network">Network</ActiveLink>
         </li>
         <li>
-          <ActiveLink href="/icp">ICP</ActiveLink>
-        </li>
-        <li>
           <ActiveLink href="/canisters">Canisters</ActiveLink>
         </li>
         <li>
@@ -49,6 +46,9 @@ export default function Nav() {
         </li>
         <li>
           <ActiveLink href="/transactions">Transactions</ActiveLink>
+        </li>
+        <li>
+          <ActiveLink href="/icp">ICP</ActiveLink>
         </li>
       </ul>
     </nav>

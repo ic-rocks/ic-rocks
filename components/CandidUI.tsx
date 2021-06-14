@@ -189,10 +189,15 @@ export default function CandidUI({
           ([_, func]) =>
             func.annotations[0] === "query" && !func.argTypes.length
         )
-        .forEach(async ([name, _]) => {
+        .forEach(async ([name, func]) => {
           dispatch({ type: "loading", func: name, payload: true });
           try {
             const res = await actor_[name]();
+            // If response is > 1kb, default to raw display
+            const buf = func.retTypes[0].encodeValue(res);
+            if (buf.length > 1000) {
+              dispatch({ type: "outputDisplay", func: name, payload: "Raw" });
+            }
             dispatch({ type: "output", func: name, payload: { res } });
           } catch (error) {
             dispatch({

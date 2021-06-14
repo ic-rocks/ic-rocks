@@ -8,8 +8,8 @@ const CanisterPage = ({ children }) => {
       <SecondaryNav
         items={[
           <ActiveLink href="/canisters">Canisters</ActiveLink>,
-          <ActiveLink href="/interfaces">Interfaces</ActiveLink>,
           <ActiveLink href="/modules">Modules</ActiveLink>,
+          <ActiveLink href="/interfaces">Interfaces</ActiveLink>,
         ]}
       />
       {children}

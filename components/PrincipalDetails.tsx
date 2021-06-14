@@ -2,6 +2,7 @@ import { Principal } from "@dfinity/principal";
 import { getCrc32 } from "@dfinity/principal/lib/cjs/utils/getCrc.js";
 import { sha224 } from "@dfinity/principal/lib/cjs/utils/sha224.js";
 import { Buffer } from "buffer/";
+import classNames from "classnames";
 import { DateTime } from "luxon";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
@@ -59,6 +60,16 @@ export default function PrincipalDetails({
     );
   }, [principalId]);
 
+  const [httpResponse, setHttpResponse] = useState<Response>(null);
+  useEffect(() => {
+    if (canisterData?.module?.hasHttp) {
+      (async () => {
+        const res = await fetch(`https://${principalId}.raw.ic0.app`);
+        setHttpResponse(res);
+      })();
+    }
+  }, [canisterData]);
+
   const accounts =
     principalData?.accounts && principalData.accounts.length > 0
       ? principalData.accounts
@@ -69,16 +80,36 @@ export default function PrincipalDetails({
       <table className="w-full table-fixed">
         <thead className="block bg-heading">
           <tr className="flex">
-            <th colSpan={2} className="px-2 py-2 flex-1 flex justify-between">
+            <th
+              colSpan={2}
+              className="px-2 py-2 flex-1 flex flex-wrap justify-between"
+            >
               Overview
               {canisterData?.module?.hasHttp && (
-                <a
-                  className="hover:underline font-normal label-tag bg-green-label"
-                  href={`https://${principalId}.raw.ic0.app`}
-                  target="_blank"
-                >
-                  View URL <FiExternalLink className="inline ml-1" />
-                </a>
+                <div>
+                  {httpResponse && !httpResponse.ok && (
+                    <span
+                      className={classNames("font-normal text-xs mr-1", {
+                        "text-yellow-400":
+                          httpResponse.status >= 300 &&
+                          httpResponse.status < 400,
+                        "text-red-400": httpResponse.status >= 400,
+                      })}
+                    >
+                      {httpResponse.status}{" "}
+                      {httpResponse.status === 404
+                        ? "Not Found"
+                        : httpResponse.statusText}
+                    </span>
+                  )}
+                  <a
+                    className="hover:underline font-normal label-tag bg-green-label"
+                    href={`https://${principalId}.raw.ic0.app`}
+                    target="_blank"
+                  >
+                    View URL <FiExternalLink className="inline ml-1" />
+                  </a>
+                </div>
               )}
             </th>
           </tr>
