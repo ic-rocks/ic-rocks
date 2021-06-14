@@ -74,7 +74,7 @@ const Subnet = () => {
         </tbody>
       </table>
 
-      <NetworkGraph activeId={subnetId} activeType="Subnet" />
+      {data && <NetworkGraph activeId={subnetId} activeType="Subnet" />}
 
       <h2 className="text-2xl mt-8 mb-4">Nodes</h2>
       <table className="w-full table-fixed">
