@@ -65,6 +65,7 @@ export default function CodeBlock({
         {LANGUAGES.map((lang) => {
           const disabled =
             (lang === "protobuf" && !protobuf) ||
+            (lang !== "candid" && lang !== "protobuf" && !bindings) ||
             (lang !== "protobuf" && !candid);
           return (
             <button

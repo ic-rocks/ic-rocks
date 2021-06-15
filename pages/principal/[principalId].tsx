@@ -44,6 +44,9 @@ const PrincipalPage = () => {
     if (newCandid) {
       didc.then((mod) => {
         const gen = mod.generate(newCandid);
+        if (!gen) {
+          console.warn("failed to generate bindings");
+        }
         setBindings(gen);
       });
     } else {
