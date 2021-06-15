@@ -263,7 +263,13 @@ export const CandidOutput = ({
   } else if (display === "JSON") {
     return <OutputWrapper force={true} value={stringify(value)} />;
   } else if (display === "Raw") {
-    const raw = type.encodeValue(value);
+    let raw;
+    try {
+      raw = type.encodeValue(value);
+    } catch (error) {
+      console.warn("failed to decode", type, argName, value, error);
+      raw = String(value);
+    }
     return (
       <Node
         label={
