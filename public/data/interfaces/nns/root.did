@@ -32,5 +32,4 @@ service : {
   submit_change_nns_canister_proposal : (nat64, ChangeNnsCanisterProposalPayload) -> (Result_ProposalId_String);
   canister_status : (CanisterIdRecord) -> (CanisterStatusResult);
   change_nns_canister : (ChangeNnsCanisterProposalPayload) -> ();
-  add_nns_canister : (AddNnsCanisterProposalPayload) -> ();
 }
