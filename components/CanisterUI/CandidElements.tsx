@@ -38,7 +38,7 @@ export const CandidInput = ({
   errors,
   handleInput,
 }: {
-  argName?: string;
+  argName?: string | number;
   path: (string | number)[];
   type: IDL.Type;
   showLabel?: boolean;
@@ -46,6 +46,19 @@ export const CandidInput = ({
   errors: any;
   handleInput: (value: any, path: any[]) => void;
 }) => {
+  if (type instanceof IDL.RecClass) {
+    return (
+      <CandidInput
+        type={type["_type"]}
+        showLabel={showLabel}
+        argName={argName}
+        path={path}
+        inputs={inputs}
+        errors={errors}
+        handleInput={handleInput}
+      />
+    );
+  }
   if (type instanceof IDL.NullClass) {
     return null;
   }
@@ -55,9 +68,8 @@ export const CandidInput = ({
   const label = <Label>{description}</Label>;
   const error = get(errors, path, null);
 
-  if (type instanceof IDL.RecordClass || type instanceof IDL.RecClass) {
-    const fields =
-      type instanceof IDL.RecClass ? type["_type"]["_fields"] : type["_fields"];
+  if (type instanceof IDL.RecordClass) {
+    const fields = type["_fields"];
     const isTuple = type instanceof IDL.TupleClass;
     return (
       <Node label={label} nested>
@@ -249,7 +261,19 @@ export const CandidOutput = ({
   showLabel?: boolean;
   display?: typeof CANDID_OUTPUT_DISPLAYS[number];
 }) => {
-  if (!type) {
+  if (type instanceof IDL.RecClass) {
+    return (
+      <CandidOutput
+        type={type["_type"]}
+        argName={argName}
+        value={value}
+        showLabel={showLabel}
+        display={display}
+      />
+    );
+  }
+  if (!type || value === undefined) {
+    console.log("no type or value in candid output", type, argName, value);
     return <EmptyOutput />;
   }
 
@@ -347,9 +371,8 @@ export const CandidOutput = ({
         );
       }
     }
-  } else if (type instanceof IDL.RecordClass || type instanceof IDL.RecClass) {
-    const fields =
-      type instanceof IDL.RecClass ? type["_type"]["_fields"] : type["_fields"];
+  } else if (type instanceof IDL.RecordClass) {
+    const fields = type["_fields"];
     const isTuple = type instanceof IDL.TupleClass;
     return (
       <Node label={label} nested>

@@ -150,6 +150,7 @@ export default function CandidUI({
         dispatch({ type: "loading", func: method.name, payload: true });
         try {
           const res = await actor[method.name]({});
+          console.log("call", method.name, "res:", res);
           dispatch({ type: "output", func: method.name, payload: { res } });
         } catch (error) {
           console.warn(error);
@@ -193,6 +194,7 @@ export default function CandidUI({
           dispatch({ type: "loading", func: name, payload: true });
           try {
             const res = await actor_[name]();
+            console.log("call", name, "res:", res);
             // If response is > 1kb, default to raw display
             const buf = func.retTypes[0].encodeValue(res);
             if (buf.length > 1000) {
@@ -235,6 +237,8 @@ export default function CandidUI({
         try {
           console.log("call", funcName, args);
           const res = await actor[funcName](...args);
+          console.log("call", funcName, "res:", res);
+
           dispatch({ type: "output", func: funcName, payload: { res } });
         } catch (error) {
           dispatch({

@@ -22,13 +22,15 @@ export const stringify = (data) =>
   );
 
 export function getDefaultValue(type: IDL.Type) {
-  if (type instanceof IDL.RecordClass || type instanceof IDL.RecClass) {
+  if (type instanceof IDL.RecClass) {
+    return getDefaultValue(type["_type"]);
+  }
+  if (type instanceof IDL.RecordClass) {
     if (type instanceof IDL.TupleClass) {
       return type["_fields"].map(([_, t]) => getDefaultValue(t));
     }
 
-    const fields =
-      type instanceof IDL.RecClass ? type["_type"]["_fields"] : type["_fields"];
+    const fields = type["_fields"];
     return Object.fromEntries(fields.map(([k, t]) => [k, getDefaultValue(t)]));
   } else if (type instanceof IDL.VecClass) {
     return [];
@@ -51,9 +53,11 @@ export function getDefaultValue(type: IDL.Type) {
 }
 
 export function getShortname(type: IDL.Type): string {
-  if (type instanceof IDL.RecordClass || type instanceof IDL.RecClass) {
-    const fields =
-      type instanceof IDL.RecClass ? type["_type"]["_fields"] : type["_fields"];
+  if (type instanceof IDL.RecClass) {
+    return getShortname(type["_type"]);
+  }
+  if (type instanceof IDL.RecordClass) {
+    const fields = type["_fields"];
     const recordOrTuple = type instanceof IDL.TupleClass ? "tuple" : "record";
     return `${recordOrTuple} {${fields.length} ${pluralize(
       "field",
@@ -134,7 +138,10 @@ function validateProtobuf(
 }
 
 function validateCandid(type: IDL.Type, input: any): [any, any] {
-  if (type instanceof IDL.RecordClass || type instanceof IDL.RecClass) {
+  if (type instanceof IDL.RecClass) {
+    return validateCandid(type["_type"], input);
+  }
+  if (type instanceof IDL.RecordClass) {
     const inputOrDefault = input || getDefaultValue(type);
     if (type instanceof IDL.TupleClass) {
       if (Array.isArray(input)) {
@@ -153,8 +160,7 @@ function validateCandid(type: IDL.Type, input: any): [any, any] {
       }
     }
 
-    const fields =
-      type instanceof IDL.RecClass ? type["_type"]["_fields"] : type["_fields"];
+    const fields = type["_fields"];
     if (typeof inputOrDefault === "object") {
       const validated = {};
       const errors = {};
