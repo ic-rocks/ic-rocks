@@ -4,16 +4,6 @@ type MethodAuthzChange = record {
   "principal" : opt principal;
   operation : variant { Authorize : record { add_self : bool }; Deauthorize; };
 };
-type AddNnsCanisterProposalPayload  = record {
-  name : text;
-  wasm_module : vec nat8;
-  arg : vec nat8;
-  compute_allocation : opt nat;
-  memory_allocation : opt nat;
-  query_allocation : opt nat;
-  initial_cycles : nat64;
-  authz_changes : vec MethodAuthzChange;
-};
 type ChangeNnsCanisterProposalPayload = record {
   arg : vec nat8;
   wasm_module : vec nat8;
@@ -39,7 +29,7 @@ type ProposalId = nat64;
 type Result_ProposalId_String = variant { Ok : ProposalId; Err : text };
 
 service : {
-  submit_change_nns_canister_proposal : (ChangeNnsCanisterProposalPayload) -> (Result_ProposalId_String);
+  submit_change_nns_canister_proposal : (nat64, ChangeNnsCanisterProposalPayload) -> (Result_ProposalId_String);
   canister_status : (CanisterIdRecord) -> (CanisterStatusResult);
   change_nns_canister : (ChangeNnsCanisterProposalPayload) -> ();
   add_nns_canister : (AddNnsCanisterProposalPayload) -> ();
