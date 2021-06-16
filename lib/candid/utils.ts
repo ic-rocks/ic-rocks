@@ -82,8 +82,6 @@ export const validate = (type: IDL.Type | protobuf.Type, input: any) =>
     ? validateCandid(type, input)
     : validateProtobuf(type, input || {});
 
-function convertProtobufType(type: string, input: any): any {}
-
 function validateProtobuf(
   type: protobuf.Type | string,
   input: any
@@ -233,7 +231,7 @@ function validateCandid(type: IDL.Type, input: any): [any, any] {
       console.warn(type, input, err);
       return [null, err.message];
     }
-    return [Number(input), null];
+    return [BigInt(input), null];
   } else if (type instanceof IDL.BoolClass) {
     return [!!input, null];
   } else {
