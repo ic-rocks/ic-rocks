@@ -1,0 +1,163 @@
+type ViewTargets = Targets;
+type ViewPos = Position;
+type ViewId_2 = ViewId;
+type ViewId = text;
+type ViewGathering = Gathering;
+type Value = 
+ variant {
+   Bool: bool;
+   File: File;
+   Float32: float64;
+   Func: record {
+           principal;
+           text;
+         };
+   Int: int;
+   Int16: int16;
+   Int32: int32;
+   Int64: int64;
+   Int8: int8;
+   Nat: nat;
+   Nat16: nat16;
+   Nat32: nat32;
+   Nat64: nat64;
+   Nat8: nat8;
+   None;
+   Null;
+   Number: text;
+   Opt: Value;
+   Principal: principal;
+   Record: vec Field;
+   Reserved;
+   Service: principal;
+   Text: text;
+   Variant: Field;
+   Vec: vec Value;
+ };
+type UserId_2 = text;
+type UserId = UserId_2;
+type Timestamp = int;
+type TimeMode = 
+ variant {
+   ic;
+   script: Timestamp;
+ };
+type Targets = vec Target;
+type Target = 
+ variant {
+   space: Path;
+   view: ViewId;
+ };
+type SpacePath = Path;
+type SortDir = 
+ variant {
+   decreasing;
+   increasing;
+ };
+type PutValues = 
+ record {
+   path: Path;
+   time: Timestamp;
+   user: UserId_2;
+   values: vec Value;
+ };
+type Put = 
+ record {
+   caller: principal;
+   path: Path_2;
+   user: UserId_2;
+   values: vec Value;
+ };
+type ProfileInfo_2 = record {userName: text;};
+type ProfileInfo = ProfileInfo_2;
+type Position = nat;
+type Path_2 = Path;
+type Path = vec text;
+type NamedFile = 
+ record {
+   file: File;
+   name: text;
+ };
+type Label = 
+ variant {
+   Id: nat32;
+   Named: text;
+   Unnamed: nat32;
+ };
+type Image_2 = 
+ record {
+   pos: Position;
+   putValues: vec PutValues;
+   size: nat;
+   viewId: ViewId;
+   viewer: opt UserId_2;
+ };
+type Image = Image_2;
+type Gathering = 
+ variant {
+   multiset;
+   multisetSort: SortDir;
+   sequence;
+   set;
+ };
+type File = 
+ variant {
+   Args: vec Value;
+   Binary: vec nat8;
+   Directory: vec NamedFile;
+   Text: text;
+   Value: Value;
+ };
+type Field = 
+ record {
+   id: Label;
+   val: Value;
+ };
+type EventKind = 
+ variant {
+   createProfile: CreateProfile;
+   createView: CreateView;
+   put: Put;
+   reset: TimeMode;
+ };
+type Event = 
+ record {
+   id: nat;
+   kind: EventKind;
+   time: int;
+ };
+type CreateViewResponse = 
+ record {
+   putCount: record {
+               target: vec nat;
+               total: nat;
+             };
+   viewId: ViewId;
+ };
+type CreateView = 
+ record {
+   caller: principal;
+   createTime: int;
+   createUser: UserId_2;
+   gathering: Gathering;
+   targets: Targets;
+   ttl: opt nat;
+ };
+type CreateProfile = 
+ record {
+   caller: principal;
+   userName: text;
+ };
+type CandidValue = Value;
+type CandidSpaces = 
+ service {
+   createProfile: (text) -> (opt ProfileInfo);
+   createView: (UserId, ViewTargets, ViewGathering, opt nat) ->
+    (opt CreateViewResponse);
+   getFullImage: (opt UserId, ViewId_2) -> (opt Image) query;
+   getProfileInfo: (opt UserId, UserId) -> (opt ProfileInfo) query;
+   getSubImage: (opt UserId, ViewId_2, ViewPos, nat) -> (opt Image) query;
+   logTail: () -> (opt vec Event) query;
+   put: (UserId, SpacePath, vec CandidValue) -> (opt null);
+ };
+service : () -> CandidSpaces
