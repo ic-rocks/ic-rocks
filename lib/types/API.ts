@@ -1,3 +1,12 @@
+import {
+  Action,
+  ErrorType,
+  NnsFunction,
+  RewardStatus,
+  Status,
+  Topic,
+} from "./governance";
+
 export type SubnetResponse = {
   id: string;
   createdDate: string;
@@ -74,6 +83,8 @@ export type APIPrincipal = {
   operatorOf: CommonNodeResponse[];
   providerOf: CommonNodeResponse[];
   nodeCount?: number;
+  isGenesis: boolean;
+  isKyc: boolean;
 };
 
 export type TransactionsResponse = PagedResponse<Transaction>;
@@ -151,6 +162,33 @@ export type Module = {
   sourceUrl: string;
   source: string;
   candid: string;
+};
+
+export type ProposalsResponse = PagedResponse<Proposal>;
+
+export type Proposal = {
+  action: Action;
+  decidedDate: string;
+  errorMessage: string;
+  errorType: ErrorType | null;
+  executedDate: string;
+  failedDate: string | null;
+  id: number;
+  nnsFunction: NnsFunction;
+  payloadJson: string;
+  proposalDate: string;
+  proposerId: string;
+  rejectCost: string;
+  rewardEventRound: number;
+  rewardStatus: RewardStatus;
+  status: Status;
+  summary: string;
+  tallyDate: string;
+  tallyNo: string;
+  tallyTotal: string;
+  tallyYes: string;
+  topic: Topic;
+  url: string;
 };
 
 export type StatsResponse = {

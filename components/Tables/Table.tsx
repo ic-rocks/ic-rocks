@@ -5,6 +5,7 @@ import { FaSortAmountDown, FaSortAmountUp } from "react-icons/fa";
 import {
   Column,
   SortingRule,
+  useExpanded,
   usePagination,
   useSortBy,
   useTable,
@@ -27,6 +28,7 @@ export const Table = ({
   loading,
   useSort = true,
   usePage = true,
+  useExpand = false,
   initialSortBy,
   manualPagination = true,
   manualSortBy = true,
@@ -42,6 +44,7 @@ export const Table = ({
   loading?: boolean;
   useSort?: boolean;
   usePage?: boolean;
+  useExpand?: boolean;
   initialSortBy?: SortingRule<any>[];
   manualPagination?: boolean;
   manualSortBy?: boolean;
@@ -60,7 +63,7 @@ export const Table = ({
     nextPage,
     previousPage,
     setPageSize,
-    state: { pageIndex, pageSize, sortBy },
+    state: { pageIndex, pageSize, sortBy, expanded },
   } = useTable(
     {
       columns,
@@ -70,7 +73,9 @@ export const Table = ({
       pageCount: count == undefined ? 1 : Math.ceil(count / PAGE_SIZE),
       manualSortBy,
     },
-    ...[useSort && useSortBy, usePagination].filter(Boolean)
+    ...[useSort && useSortBy, useExpand && useExpanded, usePagination].filter(
+      Boolean
+    )
   );
 
   useEffect(() => {

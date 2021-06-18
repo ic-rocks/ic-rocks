@@ -39,6 +39,9 @@ export default function Nav() {
           <ActiveLink href="/canisters">Canisters</ActiveLink>
         </li>
         <li>
+          <ActiveLink href="/proposals">Proposals</ActiveLink>
+        </li>
+        <li>
           <ActiveLink href="/principals">Principals</ActiveLink>
         </li>
         <li>

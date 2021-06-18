@@ -118,6 +118,12 @@ export default function PrincipalDetails({
               className="px-2 py-2 flex-1 flex flex-wrap justify-between"
             >
               Overview
+              {principalData?.isGenesis && (
+                <label className="font-normal label-tag bg-purple-200 dark:bg-purple-400">
+                  Genesis Neuron
+                  {!principalData.isKyc && ` (No KYC)`}
+                </label>
+              )}
               {canisterData?.module?.hasHttp && (
                 <div>
                   {httpResponse && !httpResponse.ok && (
