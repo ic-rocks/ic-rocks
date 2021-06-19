@@ -32,6 +32,7 @@ export const Table = ({
   initialSortBy,
   manualPagination = true,
   manualSortBy = true,
+  initialPageSize = PAGE_SIZE,
 }: {
   className?: string;
   style?: CSSProperties;
@@ -48,6 +49,7 @@ export const Table = ({
   initialSortBy?: SortingRule<any>[];
   manualPagination?: boolean;
   manualSortBy?: boolean;
+  initialPageSize?: number;
 }) => {
   const {
     getTableProps,
@@ -68,9 +70,9 @@ export const Table = ({
     {
       columns,
       data,
-      initialState: { pageSize: PAGE_SIZE, sortBy: initialSortBy },
+      initialState: { pageSize: initialPageSize, sortBy: initialSortBy },
       manualPagination,
-      pageCount: count == undefined ? 1 : Math.ceil(count / PAGE_SIZE),
+      pageCount: count == undefined ? 1 : Math.ceil(count / initialPageSize),
       manualSortBy,
     },
     ...[useSort && useSortBy, useExpand && useExpanded, usePagination].filter(

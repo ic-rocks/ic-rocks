@@ -332,7 +332,7 @@ const ProposalsPage = () => {
       </h1>
       <section className="mb-8">
         <SimpleTable
-          header={{ contents: "Proposal Stats" }}
+          headers={[{ contents: "Proposal Stats" }]}
           rows={summaryRows}
         />
       </section>

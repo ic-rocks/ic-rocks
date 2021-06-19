@@ -1,3 +1,10 @@
+export enum NeuronState {
+  Donated = 0,
+  Locked = 1,
+  Dissolving = 2,
+  Dissolved = 3,
+}
+
 export enum ErrorType {
   "Unspecified" = 0,
   "Ok" = 1,

@@ -1,50 +1,13 @@
-import { Actor, HttpAgent } from "@dfinity/agent";
-import { IDL } from "@dfinity/candid";
-import extendProtobuf from "agent-pb";
-import protobuf from "protobufjs";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { CgSpinner } from "react-icons/cg";
-import protobufJson from "../../lib/canisters/proto.json";
-import fetchJSON from "../../lib/fetch";
-import useInterval from "../../lib/hooks/useInterval";
 import { formatNumber, formatNumberUSD } from "../../lib/numbers";
-import { StatsResponse } from "../../lib/types/API";
-import { UInt64Value } from "../../lib/types/canisters";
 import SparklineChart from "../Charts/SparklineChart";
 import { useGlobalState } from "../StateContext";
-const root = protobuf.Root.fromJSON(protobufJson as protobuf.INamespace);
-const agent = new HttpAgent({ host: "https://ic0.app" });
-const cyclesMinting = Actor.createActor(() => IDL.Service({}), {
-  agent,
-  canisterId: "rkp4c-7iaaa-aaaaa-aaaca-cai",
-});
-extendProtobuf(cyclesMinting, root.lookupService("CyclesMinting"));
 
 export default function StatsBoxes() {
-  const [isLoading, setIsLoading] = useState(true);
-  const [stats, setStats] = useState<StatsResponse>(null);
-  const { markets } = useGlobalState();
+  const { stats, tCycles, markets } = useGlobalState();
 
-  const fetchStats = async () => {
-    fetchJSON("/api/stats").then(
-      (res) => res && setStats((d) => ({ ...d, ...res }))
-    );
-
-    const tCycles =
-      BigInt(
-        ((await cyclesMinting.total_cycles_minted({})) as UInt64Value).value
-      ) / BigInt(1e12);
-    setStats((d) => ({ ...d, tCycles }));
-  };
-
-  useInterval(fetchStats, 10000);
-
-  useEffect(() => {
-    (async () => {
-      await fetchStats();
-      setIsLoading(false);
-    })();
-  }, []);
+  const mergedStats = stats ? { ...stats, tCycles } : null;
 
   const dataLabels = [
     { id: "subnets", label: "Subnets", render: formatNumber },
@@ -83,10 +46,10 @@ export default function StatsBoxes() {
               <div className="flex flex-col items-end">
                 <label>{label}</label>
                 <strong className="text-2xl">
-                  {isLoading ? (
+                  {!mergedStats ? (
                     <CgSpinner className="animate-spin" />
-                  ) : stats[id] != null ? (
-                    render(stats[id])
+                  ) : mergedStats[id] != null ? (
+                    render(mergedStats[id])
                   ) : (
                     "-"
                   )}

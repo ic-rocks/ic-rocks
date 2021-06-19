@@ -128,7 +128,7 @@ const ModuleCanistersPage = () => {
         Module <small className="text-xl break-all">{moduleId}</small>
       </h1>
       <section className="mb-8">
-        <SimpleTable header={header} rows={rows} />
+        <SimpleTable headers={[header]} rows={rows} />
       </section>
       {showInterface && (
         <CodeBlock className="mb-8" candid={data.candid} bindings={bindings} />

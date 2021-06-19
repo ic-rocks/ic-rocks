@@ -7,19 +7,21 @@ type SimpleTableRow = {
 }[];
 
 const SimpleTable = ({
-  header,
+  headers,
   rows,
 }: {
-  header: SimpleTableRow[number];
+  headers: SimpleTableRow;
   rows: SimpleTableRow[];
 }) => {
   return (
     <table className="w-full table-fixed">
       <thead className="bg-heading">
         <tr className="flex">
-          <th className={classNames(header.className, "px-2 py-2")}>
-            {header.contents}
-          </th>
+          {headers.map((header, i) => (
+            <th key={i} className={classNames(header.className, "px-2 py-2")}>
+              {header.contents}
+            </th>
+          ))}
         </tr>
       </thead>
       <tbody className="divide-y divide-default">

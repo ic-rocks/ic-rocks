@@ -1,6 +1,7 @@
 import {
   Action,
   ErrorType,
+  NeuronState,
   NnsFunction,
   RewardStatus,
   Status,
@@ -189,6 +190,46 @@ export type Proposal = {
   tallyYes: string;
   topic: Topic;
   url: string;
+};
+
+export type NeuronsResponse = PagedResponse<Neuron>;
+
+export type Neuron = {
+  id: string;
+  accountId: string;
+  proposalCount: number;
+  state: NeuronState;
+  agingSinceDate: string;
+  createdDate: string;
+  dissolveDate: string;
+  stake: string;
+  originalStake: string;
+  genesisAccountId?: string;
+};
+
+export enum InvestorType {
+  "Seed Round",
+  "Early Contributor",
+  "Both",
+}
+export enum GenesisAccountStatus {
+  Unclaimed,
+  Claimed,
+  Forwarded,
+  Donated,
+}
+export type GenesisAccountsResponse = PagedResponse<GenesisAccount>;
+export type GenesisAccount = {
+  id: string;
+  neuronCount: number;
+  status: GenesisAccountStatus;
+  investorType: InvestorType;
+  isKyc: boolean;
+  icpts: number;
+  contributionType: string;
+  contributionAmount: string;
+  contributionTx: string;
+  neurons: Neuron[];
 };
 
 export type StatsResponse = {
