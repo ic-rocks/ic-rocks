@@ -176,7 +176,7 @@ const ProposalsPage = () => {
                           target="_blank"
                           className="inline-flex items-center oneline link-overflow"
                         >
-                          {row.original.url} <FiExternalLink className="mr-1" />
+                          {row.original.url} <FiExternalLink className="ml-1" />
                         </a>
                       ) : (
                         row.original.url

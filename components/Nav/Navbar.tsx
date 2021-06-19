@@ -38,12 +38,12 @@ export default function Nav() {
         <li>
           <ActiveLink href="/canisters">Canisters</ActiveLink>
         </li>
-        <li>
+        {/* <li>
           <ActiveLink href="/proposals">Proposals</ActiveLink>
         </li>
         <li>
           <ActiveLink href="/neurons">Neurons</ActiveLink>
-        </li>
+        </li> */}
         <li>
           <ActiveLink href="/principals">Principals</ActiveLink>
         </li>

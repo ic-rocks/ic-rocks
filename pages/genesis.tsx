@@ -21,7 +21,7 @@ import {
 const GenesisAccountsPage = () => {
   const { stats } = useGlobalState();
   const [isLoading, setIsLoading] = useState(false);
-  const [genesisStats, setStats] = useState([]);
+  const [genesisStats, setStats] = useState(null);
 
   useEffect(() => {
     fetchJSON("/api/genesis/stats").then((data) => data && setStats(data));
@@ -35,34 +35,45 @@ const GenesisAccountsPage = () => {
     { contents: "Supply %", className: "w-28 text-right" },
   ];
 
-  const statsRows =
-    genesisStats.length > 0
-      ? [genesisStats[1], genesisStats[0], ...genesisStats.slice(2)].map(
-          (row) => [
-            {
-              contents: GenesisAccountStatus[row.status],
-              className: "w-32",
-            },
-            {
-              contents: formatNumber(row.count),
-              className: "w-24 text-right",
-            },
-            {
-              contents: <BalanceLabel value={row.icpts} />,
-              className: "w-40 text-right",
-            },
-            {
-              contents: stats
-                ? (
-                    (100 * Number(BigInt(row.icpts) / BigInt(1e8))) /
-                    Number(BigInt(stats.supply) / BigInt(1e8))
-                  ).toFixed(2) + "%"
-                : "-",
-              className: "w-28 text-right",
-            },
-          ]
-        )
-      : [];
+  const statsRows = useMemo(() => {
+    const order = ["Claimed", "Unclaimed", "Donated", "Forwarded"];
+    return order.map((label, i) => {
+      if (!genesisStats) {
+        return [
+          {
+            contents: label,
+          },
+        ];
+      }
+      const row = genesisStats.find(
+        (row) => row.status === GenesisAccountStatus[label]
+      );
+      return [
+        {
+          contents: label,
+          className: "w-32",
+        },
+        {
+          contents: row ? formatNumber(row.count) : "-",
+          className: "w-24 text-right",
+        },
+        {
+          contents: row ? <BalanceLabel value={row.icpts} /> : "-",
+          className: "w-40 text-right",
+        },
+        {
+          contents:
+            row && stats
+              ? (
+                  (100 * Number(BigInt(row.icpts) / BigInt(1e8))) /
+                  Number(BigInt(stats.supply) / BigInt(1e8))
+                ).toFixed(2) + "%"
+              : "-",
+          className: "w-28 text-right",
+        },
+      ];
+    });
+  }, [genesisStats]);
 
   const [{ ...filters }, setFilters] = useState({
     status: "",
@@ -108,9 +119,14 @@ const GenesisAccountsPage = () => {
         className: "px-2 w-24",
       },
       {
-        Header: "KYCed?",
+        Header: "KYC?",
         accessor: "isKyc",
-        Cell: ({ value }) => (value ? "Yes" : "No"),
+        Cell: ({ value, row }) =>
+          value
+            ? "Yes"
+            : row.original.status === GenesisAccountStatus.Claimed
+            ? "Unknown"
+            : "No",
         className: "px-2 w-24",
       },
       {

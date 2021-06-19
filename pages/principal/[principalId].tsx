@@ -6,6 +6,7 @@ import CandidUI from "../../components/CandidUI";
 import { CanistersTable } from "../../components/CanistersTable";
 import NetworkGraph from "../../components/Charts/NetworkGraph";
 import CodeBlock from "../../components/CodeBlock";
+import GenesisAccount from "../../components/GenesisAccount";
 import { MetaTags } from "../../components/MetaTags";
 import PrincipalDetails from "../../components/PrincipalDetails";
 import { PrincipalNodesTable } from "../../components/PrincipalNodesTable";
@@ -245,6 +246,9 @@ const PrincipalPage = () => {
         canisterData={canisterData}
         className="mb-8"
       />
+      {principalData?.genesisAccount?.id && (
+        <GenesisAccount genesisAccount={principalData.genesisAccount.id} />
+      )}
       {principalData?.canisterCount > 0 && (
         <section className="mb-8">
           <h2 className="text-2xl mb-4">Controlled Canisters</h2>

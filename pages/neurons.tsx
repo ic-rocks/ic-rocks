@@ -6,6 +6,7 @@ import { SecondaryNav } from "../components/Nav/SecondaryNav";
 import NeuronsTable from "../components/NeuronsTable";
 import { useGlobalState } from "../components/StateContext";
 import SimpleTable from "../components/Tables/SimpleTable";
+import { entries } from "../lib/enums";
 import fetchJSON from "../lib/fetch";
 import { formatNumber } from "../lib/numbers";
 import { NeuronState } from "../lib/types/governance";
@@ -28,33 +29,42 @@ const NeuronsPage = () => {
     { contents: "Supply %", className: "w-28 text-right" },
   ];
 
-  const summaryRows = neuronStats.map((row) => [
-    {
-      contents: NeuronState[row.state],
-      className: "w-32",
-    },
-    {
-      contents: formatNumber(row.count),
-      className: "w-24 text-right",
-    },
-    {
-      contents: formatNumber(row.controllers),
-      className: "w-28 text-right",
-    },
-    {
-      contents: <BalanceLabel value={row.stake} />,
-      className: "w-48 text-right",
-    },
-    {
-      contents: stats
-        ? (
-            (100 * Number(BigInt(row.stake) / BigInt(1e8))) /
-            Number(BigInt(stats.supply) / BigInt(1e8))
-          ).toFixed(2) + "%"
-        : "-",
-      className: "w-28 text-right",
-    },
-  ]);
+  const summaryRows =
+    neuronStats.length > 0
+      ? neuronStats.map((row) => [
+          {
+            contents: NeuronState[row.state],
+            className: "w-32",
+          },
+          {
+            contents: formatNumber(row.count),
+            className: "w-24 text-right",
+          },
+          {
+            contents: formatNumber(row.controllers),
+            className: "w-28 text-right",
+          },
+          {
+            contents: <BalanceLabel value={row.stake} />,
+            className: "w-48 text-right",
+          },
+          {
+            contents: stats
+              ? (
+                  (100 * Number(BigInt(row.stake) / BigInt(1e8))) /
+                  Number(BigInt(stats.supply) / BigInt(1e8))
+                ).toFixed(2) + "%"
+              : "-",
+            className: "w-28 text-right",
+          },
+        ])
+      : entries(NeuronState)
+          .slice(0, 3)
+          .map(([label]) => [
+            {
+              contents: label,
+            },
+          ]);
 
   return (
     <div className="pb-16">
