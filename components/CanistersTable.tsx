@@ -97,11 +97,16 @@ export const CanistersTable = ({
           Header: "Subnet",
           accessor: "subnetId",
           disableSortBy: true,
-          Cell: ({ value, row }) => (
-            <Link href={`/subnet/${value}`}>
-              <a className="link-overflow">{row.original.subnet.displayName}</a>
-            </Link>
-          ),
+          Cell: ({ value, row }) =>
+            value ? (
+              <Link href={`/subnet/${value}`}>
+                <a className="link-overflow">
+                  {row.original.subnet.displayName}
+                </a>
+              </Link>
+            ) : (
+              "-"
+            ),
           className: "px-2 sm:flex flex-1 hidden oneline",
         },
         {
