@@ -19,12 +19,27 @@ const ledger = Actor.createActor(ledgerIdl, {
   canisterId: "ryjl3-tyaaa-aaaaa-aaaba-cai",
 });
 
+const hideLeadingZeros = (str: string) => {
+  const parts = str?.match(/(^0+)(.*$)/);
+  if (parts) {
+    return (
+      <>
+        <span className="text-gray-500">{parts[1]}</span>
+        {parts[2]}
+      </>
+    );
+  }
+  return str;
+};
+
 const AccountPage = () => {
   const router = useRouter();
   const [data, setData] = useState(null);
   const [isValid, setIsValid] = useState(true);
-  const { accountId } = router.query as { accountId: string };
+  const { accountId: accountId_ } = router.query as { accountId: string };
   const { markets } = useGlobalState();
+  const accountId = accountId_?.toLowerCase();
+  const [subaccount, setSubaccount] = useState(null);
 
   useEffect(() => {
     if (typeof accountId !== "string" || !accountId) return;
@@ -46,6 +61,11 @@ const AccountPage = () => {
       (async () => {
         const data: Account = await fetchJSON(`/api/accounts/${accountId}`);
         if (data) {
+          if (data.subaccount) {
+            const buf = Buffer.from(data.subaccount, "hex");
+            const filled = Buffer.concat([Buffer.alloc(32 - buf.length), buf]);
+            setSubaccount(filled.toString("hex"));
+          }
           setData(data);
         }
 
@@ -66,7 +86,11 @@ const AccountPage = () => {
     }
   }, [accountId]);
 
-  return isValid ? (
+  if (!isValid) {
+    return <Search404 input={accountId} />;
+  }
+
+  return (
     <div className="pb-16">
       <MetaTags
         title={`Account${accountId ? ` ${accountId}` : ""}`}
@@ -80,30 +104,48 @@ const AccountPage = () => {
       <table className="w-full table-fixed">
         <thead className="bg-heading">
           <tr className="flex">
-            <th colSpan={2} className="px-2 py-2">
+            <th
+              colSpan={2}
+              className="px-2 py-2 flex-1 flex flex-wrap justify-between"
+            >
               Account Details
+              {data?.neuron?.genesisAccountId && (
+                <label className="font-normal label-tag bg-purple-200 dark:bg-purple-400">
+                  Genesis Account
+                </label>
+              )}
             </th>
           </tr>
         </thead>
         <tbody className="divide-y divide-default">
           <tr className="flex">
             <td className="px-2 py-2 w-32">Name</td>
+            <td className="px-2 py-2 flex-1">{data?.name || "-"}</td>
+          </tr>
+          <tr className="flex">
+            <td className="px-2 py-2 w-32">Neuron</td>
             <td className="px-2 py-2 flex-1">
-              {data?.name || (
-                <span className="inline-flex items-center">Unknown</span>
-              )}
+              {data?.neuron?.name || data?.neuron?.id || "-"}
             </td>
           </tr>
           <tr className="flex">
             <td className="px-2 py-2 w-32">Principal</td>
             <td className="px-2 py-2 flex-1 flex oneline">
-              {data?.principal ? (
-                <Link href={`/principal/${data.principal}`}>
-                  <a className="link-overflow">{data.principal}</a>
+              {data?.principalId ? (
+                <Link href={`/principal/${data.principalId}`}>
+                  <a className="link-overflow">
+                    {data.principal?.name || data.principalId}
+                  </a>
                 </Link>
               ) : (
                 "-"
               )}
+            </td>
+          </tr>
+          <tr className="flex">
+            <td className="px-2 py-2 w-32">Subaccount</td>
+            <td className="px-2 py-2 flex-1 flex oneline">
+              {subaccount ? hideLeadingZeros(subaccount) : "-"}
             </td>
           </tr>
           <tr className="flex">
@@ -142,8 +184,6 @@ const AccountPage = () => {
         <TransactionsTable key={accountId} accountId={accountId} />
       </section>
     </div>
-  ) : (
-    <Search404 input={accountId} />
   );
 };
 

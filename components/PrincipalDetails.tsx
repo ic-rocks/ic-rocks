@@ -118,10 +118,9 @@ export default function PrincipalDetails({
               className="px-2 py-2 flex-1 flex flex-wrap justify-between"
             >
               Overview
-              {principalData?.isGenesis && (
+              {principalData?.genesisAccount?.id && (
                 <label className="font-normal label-tag bg-purple-200 dark:bg-purple-400">
-                  Genesis Neuron
-                  {!principalData.isKyc && ` (No KYC)`}
+                  Genesis Account
                 </label>
               )}
               {canisterData?.module?.hasHttp && (
@@ -278,11 +277,11 @@ export default function PrincipalDetails({
             </td>
             <td className="px-2 py-2 flex-1 overflow-hidden">
               <div className="divide-y divide-gray-200 dark:divide-gray-800">
-                {accounts.map(({ id, balance }) => {
+                {accounts.map(({ id, balance, displayName }) => {
                   return (
                     <div key={id} className="flex justify-between">
                       <Link href={`/account/${id}`}>
-                        <a className="link-overflow flex-1">{id}</a>
+                        <a className="link-overflow flex-1">{displayName}</a>
                       </Link>
                       {balance && (
                         <span className="w-32 text-right text-gray-400 dark:text-gray-600">
@@ -292,6 +291,12 @@ export default function PrincipalDetails({
                     </div>
                   );
                 })}
+                {principalData?.accountCount > accounts.length && (
+                  <div className="text-gray-500 text-xs">
+                    Showing {accounts.length} of {principalData.accountCount}{" "}
+                    known accounts
+                  </div>
+                )}
               </div>
             </td>
           </tr>

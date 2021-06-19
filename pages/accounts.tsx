@@ -41,7 +41,9 @@ const Accounts = () => {
         Cell: ({ value, row }) => {
           return (
             <Link href={`/account/${value}`}>
-              <a className="link-overflow">{row.original.name || value}</a>
+              <a className="link-overflow">
+                {row.original.displayName || value}
+              </a>
             </Link>
           );
         },
@@ -49,10 +51,12 @@ const Accounts = () => {
       },
       {
         Header: "Principal",
-        accessor: "principal",
-        Cell: ({ value }) => (
+        accessor: (a) => a.principalId,
+        Cell: ({ value, row }) => (
           <Link href={`/principal/${value}`}>
-            <a className="link-overflow">{value}</a>
+            <a className="link-overflow">
+              {row.original.principal?.name || value}
+            </a>
           </Link>
         ),
         className: "px-2 sm:flex flex-1 hidden oneline",

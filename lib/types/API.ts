@@ -84,8 +84,8 @@ export type APIPrincipal = {
   operatorOf: CommonNodeResponse[];
   providerOf: CommonNodeResponse[];
   nodeCount?: number;
-  isGenesis: boolean;
   isKyc: boolean;
+  genesisAccount?: { id: string };
 };
 
 export type TransactionsResponse = PagedResponse<Transaction>;
@@ -113,11 +113,16 @@ export type AccountsResponse = PagedResponse<Account>;
 export type Account = {
   id: string;
   name: string;
-  principal: string;
+  principalId: string;
+  principal?: {
+    name: string;
+  } | null;
   balance: string;
   first: string;
   sent: number;
   received: number;
+  subaccount?: string;
+  neuron?: Neuron;
 };
 
 export type CanistersResponse = PagedResponse<Canister>;
@@ -221,7 +226,8 @@ export enum GenesisAccountStatus {
 export type GenesisAccountsResponse = PagedResponse<GenesisAccount>;
 export type GenesisAccount = {
   id: string;
-  neuronCount: number;
+  earliestDissolveDate: string;
+  neuronCount?: number;
   status: GenesisAccountStatus;
   investorType: InvestorType;
   isKyc: boolean;
@@ -229,7 +235,6 @@ export type GenesisAccount = {
   contributionType: string;
   contributionAmount: string;
   contributionTx: string;
-  neurons: Neuron[];
 };
 
 export type StatsResponse = {
