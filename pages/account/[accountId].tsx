@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import BalanceLabel from "../../components/Labels/BalanceLabel";
 import { MetaTags } from "../../components/MetaTags";
+import { NeuronLabel } from "../../components/Neurons";
 import Search404 from "../../components/Search404";
 import { useGlobalState } from "../../components/StateContext";
 import { TransactionsTable } from "../../components/TransactionsTable";
@@ -12,6 +13,7 @@ import ledgerIdl from "../../lib/canisters/ledger.did";
 import fetchJSON from "../../lib/fetch";
 import { formatNumber, formatNumberUSD } from "../../lib/numbers";
 import { Account } from "../../lib/types/API";
+import { NeuronState } from "../../lib/types/governance";
 
 const agent = new HttpAgent({ host: "https://ic0.app" });
 const ledger = Actor.createActor(ledgerIdl, {
@@ -34,7 +36,7 @@ const hideLeadingZeros = (str: string) => {
 
 const AccountPage = () => {
   const router = useRouter();
-  const [data, setData] = useState(null);
+  const [data, setData] = useState<Partial<Account>>(null);
   const [isValid, setIsValid] = useState(true);
   const { accountId: accountId_ } = router.query as { accountId: string };
   const { markets } = useGlobalState();
@@ -45,6 +47,7 @@ const AccountPage = () => {
     if (typeof accountId !== "string" || !accountId) return;
 
     setData(null);
+    setSubaccount(null);
 
     let valid = false;
     try {
@@ -122,12 +125,25 @@ const AccountPage = () => {
             <td className="px-2 py-2 w-32">Name</td>
             <td className="px-2 py-2 flex-1">{data?.name || "-"}</td>
           </tr>
-          <tr className="flex">
-            <td className="px-2 py-2 w-32">Neuron</td>
-            <td className="px-2 py-2 flex-1">
-              {data?.neuron?.name || data?.neuron?.id || "-"}
-            </td>
-          </tr>
+          {data?.isNeuron && (
+            <tr className="flex">
+              <td className="px-2 py-2 w-32">Neuron</td>
+              <td className="px-2 py-2 flex-1">
+                {data.neuron ? (
+                  <>
+                    <span className="mr-2">
+                      {data.neuron.name || data.neuron.id}
+                    </span>
+                    <NeuronLabel state={data.neuron.state}>
+                      ({NeuronState[data.neuron.state]})
+                    </NeuronLabel>
+                  </>
+                ) : (
+                  "Unknown"
+                )}
+              </td>
+            </tr>
+          )}
           <tr className="flex">
             <td className="px-2 py-2 w-32">Principal</td>
             <td className="px-2 py-2 flex-1 flex oneline">

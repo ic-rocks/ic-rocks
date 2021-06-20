@@ -123,6 +123,10 @@ export type Account = {
   received: number;
   subaccount?: string;
   neuron?: Neuron;
+  isNeuron: boolean;
+  tx_count: number;
+  tx_received_count: number;
+  tx_sent_count: number;
 };
 
 export type CanistersResponse = PagedResponse<Canister>;
@@ -201,6 +205,7 @@ export type NeuronsResponse = PagedResponse<Neuron>;
 
 export type Neuron = {
   id: string;
+  name: string;
   accountId: string;
   proposalCount: number;
   state: NeuronState;

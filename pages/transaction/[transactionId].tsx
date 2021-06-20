@@ -147,7 +147,7 @@ const TransactionPage = () => {
                 data.fee ? (
                   <>
                     <BalanceLabel value={data.fee} />
-                    {markets && (
+                    {markets?.ticker && (
                       <small className="ml-1 text-xs">
                         (
                         {formatNumberUSD(

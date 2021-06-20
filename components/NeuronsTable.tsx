@@ -1,4 +1,3 @@
-import classNames from "classnames";
 import { DateTime } from "luxon";
 import Link from "next/link";
 import React, { useCallback, useMemo, useState } from "react";
@@ -7,6 +6,7 @@ import fetchJSON from "../lib/fetch";
 import { NeuronsResponse } from "../lib/types/API";
 import { NeuronState } from "../lib/types/governance";
 import BalanceLabel from "./Labels/BalanceLabel";
+import { NeuronLabel } from "./Neurons";
 import { Table } from "./Tables/Table";
 
 const NeuronsTable = ({
@@ -37,15 +37,7 @@ const NeuronsTable = ({
       {
         Header: "State",
         accessor: "state",
-        Cell: ({ value, row }) => (
-          <span
-            className={classNames({
-              "text-gray-500": value === NeuronState.Dissolved,
-            })}
-          >
-            {NeuronState[value]}
-          </span>
-        ),
+        Cell: ({ value, row }) => <NeuronLabel state={value} />,
         className: "px-2 w-20",
       },
       {
@@ -107,7 +99,7 @@ const NeuronsTable = ({
     () => [
       genesisAccount
         ? { id: "dissolveDate", desc: false }
-        : { id: "proposalCount", desc: true },
+        : { id: "stake", desc: true },
     ],
     []
   );
