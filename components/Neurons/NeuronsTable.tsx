@@ -1,6 +1,7 @@
 import { DateTime } from "luxon";
 import Link from "next/link";
 import React, { useCallback, useMemo, useState } from "react";
+import { BsInfoCircle } from "react-icons/bs";
 import { entries } from "../../lib/enums";
 import fetchJSON from "../../lib/fetch";
 import { NeuronsResponse } from "../../lib/types/API";
@@ -32,14 +33,29 @@ const NeuronsTable = ({
       {
         Header: "ID",
         accessor: "id",
-        className: "px-2 flex-1 sm:flex-none w-48 oneline",
+        className: "px-2 flex-1 oneline",
+        Cell: ({ value, row }) => (
+          <>
+            {value}
+            {row.original.name && (
+              <span
+                className="ml-1"
+                aria-label={row.original.name}
+                data-balloon-pos="right"
+                data-balloon-length="xlarge"
+              >
+                <BsInfoCircle className="inline text-xs align-middle" />
+              </span>
+            )}
+          </>
+        ),
         style: { minWidth: "4rem" },
       },
       {
         Header: "State",
         accessor: "state",
         Cell: ({ value, row }) => <NeuronLabel state={value} />,
-        className: "px-2 w-20",
+        className: "px-2 w-16",
       },
       {
         Header: "Proposals",
