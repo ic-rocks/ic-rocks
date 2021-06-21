@@ -1,13 +1,13 @@
 import { DateTime } from "luxon";
 import Link from "next/link";
 import React, { useCallback, useMemo, useState } from "react";
-import { entries } from "../lib/enums";
-import fetchJSON from "../lib/fetch";
-import { NeuronsResponse } from "../lib/types/API";
-import { NeuronState } from "../lib/types/governance";
-import BalanceLabel from "./Labels/BalanceLabel";
-import { NeuronLabel } from "./Neurons";
-import { Table } from "./Tables/Table";
+import { entries } from "../../lib/enums";
+import fetchJSON from "../../lib/fetch";
+import { NeuronsResponse } from "../../lib/types/API";
+import { NeuronState } from "../../lib/types/governance";
+import BalanceLabel from "../Labels/BalanceLabel";
+import { Table } from "../Tables/Table";
+import { NeuronLabel } from "./NeuronLabel";
 
 const NeuronsTable = ({
   genesisAccount,
@@ -32,7 +32,8 @@ const NeuronsTable = ({
       {
         Header: "ID",
         accessor: "id",
-        className: "px-2 w-48 oneline",
+        className: "px-2 flex-1 sm:flex-none w-48 oneline",
+        style: { minWidth: "4rem" },
       },
       {
         Header: "State",
@@ -44,7 +45,7 @@ const NeuronsTable = ({
         Header: "Proposals",
         accessor: "proposalCount",
         sortDescFirst: true,
-        className: "px-2 w-28 text-right",
+        className: "px-2 hidden sm:block w-28 text-right",
       },
       {
         Header: "Account",
@@ -55,6 +56,7 @@ const NeuronsTable = ({
           </Link>
         ),
         className: "px-2 flex-1 flex oneline",
+        style: { minWidth: "6rem" },
       },
       {
         Header: "Staked ICP",
@@ -67,8 +69,6 @@ const NeuronsTable = ({
               row.original.account &&
               row.original.state === NeuronState.Dissolved
                 ? row.original.account.balance
-                : row.original.originalStake != "0"
-                ? row.original.originalStake
                 : value
             }
           />
@@ -185,6 +185,7 @@ const NeuronsTable = ({
         ))}
       </div>
       <Table
+        style={{ minWidth: 480 }}
         columns={columns}
         data={rows}
         count={count}

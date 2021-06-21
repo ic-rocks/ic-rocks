@@ -39,3 +39,18 @@ export const shortPrincipal = (principal: string | Principal) => {
 
 export const capitalize = (string: string) =>
   string[0].toUpperCase() + string.slice(1);
+
+export type SignDisplay = "auto" | "never" | "always" | "exceptZero";
+export const formatPercent = (
+  number: number,
+  signDisplay: SignDisplay = "auto",
+  digits: number = 2
+) => {
+  return Intl.NumberFormat("en-US", {
+    style: "percent",
+    // @ts-ignore
+    signDisplay,
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits,
+  }).format(number);
+};

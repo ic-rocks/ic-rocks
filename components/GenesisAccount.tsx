@@ -1,27 +1,19 @@
 import classNames from "classnames";
-import { DateTime, Duration } from "luxon";
+import { DateTime } from "luxon";
 import Link from "next/link";
 import React, { useEffect, useMemo, useState } from "react";
 import BalanceLabel from "../components/Labels/BalanceLabel";
-import NeuronsTable from "../components/NeuronsTable";
+import NeuronsTable from "../components/Neurons/NeuronsTable";
 import SimpleTable from "../components/Tables/SimpleTable";
 import { groupBy } from "../lib/arrays";
+import { formatDuration } from "../lib/datetime";
 import fetchJSON from "../lib/fetch";
 import { formatNumber } from "../lib/numbers";
-import { pluralize } from "../lib/strings";
 import {
   GenesisAccountStatus,
   InvestorType,
   NeuronsResponse,
 } from "../lib/types/API";
-
-const formatDuration = (d: Duration) => {
-  return (
-    (d.years > 0 ? `${d.years} ${pluralize("year", d.years)}, ` : "") +
-    (d.months > 0 ? `${d.months} ${pluralize("month", d.months)}, ` : "") +
-    (d.days > 0 ? `${Math.floor(d.days)} ${pluralize("day", d.days)}` : "")
-  );
-};
 
 const GenesisAccount = ({ genesisAccount }: { genesisAccount: string }) => {
   const [isLoading, setIsLoading] = useState(true);
@@ -85,6 +77,9 @@ const GenesisAccount = ({ genesisAccount }: { genesisAccount: string }) => {
           contents: data ? (
             <span
               className={classNames({
+                "text-yellow-600 dark:text-yellow-400":
+                  data.status === GenesisAccountStatus.Donated ||
+                  data.status === GenesisAccountStatus.Forwarded,
                 "text-red-500": data.status === GenesisAccountStatus.Unclaimed,
               })}
             >
@@ -128,11 +123,11 @@ const GenesisAccount = ({ genesisAccount }: { genesisAccount: string }) => {
           contents: stats ? (
             <div className="flex">
               <strong className="w-6 pr-2 text-right">{stats[0].count}</strong>
-              <div className="w-36 text-right">
+              <div className="w-44 text-right pr-6">
                 <BalanceLabel value={stats[0].amount} />
               </div>
               {stats[0].count > 0 && (
-                <div className="pl-6 text-gray-500">
+                <div className="text-gray-500">
                   avg. {formatDuration(stats[0].avgDuration)}
                 </div>
               )}
@@ -149,13 +144,13 @@ const GenesisAccount = ({ genesisAccount }: { genesisAccount: string }) => {
         },
         {
           contents: stats ? (
-            <div className="flex">
+            <div className="flex flex-wrap">
               <strong className="w-6 pr-2 text-right">{stats[1].count}</strong>
-              <div className="w-36 text-right">
+              <div className="w-44 text-right pr-6">
                 <BalanceLabel value={stats[1].amount} />
               </div>
               {stats[1].count > 0 && (
-                <div className="pl-6 text-gray-500">
+                <div className="text-gray-500">
                   avg. {formatDuration(stats[1].avgDuration)}
                 </div>
               )}
@@ -217,7 +212,9 @@ const GenesisAccount = ({ genesisAccount }: { genesisAccount: string }) => {
           rows={summaryRows}
         />
       </section>
-      <NeuronsTable genesisAccount={genesisAccount} onFetch={setNeuronData} />
+      {genesisAccount && (
+        <NeuronsTable genesisAccount={genesisAccount} onFetch={setNeuronData} />
+      )}
     </>
   );
 };

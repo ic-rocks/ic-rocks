@@ -217,6 +217,18 @@ export type Neuron = {
   genesisAccountId?: string;
 };
 
+export type NeuronAllocation = {
+  count: number;
+  stake: string;
+  originalstake: string;
+  mindissolvedate: string;
+  maxdissolvedate: string;
+  lockedCount: number;
+  dissolvingCount: number;
+  dissolvedCount: number;
+  name: string;
+};
+
 export enum InvestorType {
   "Seed Round",
   "Early Contributor",

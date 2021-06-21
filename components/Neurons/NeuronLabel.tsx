@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import { ReactNode } from "react";
-import { NeuronState } from "../lib/types/governance";
+import { NeuronState } from "../../lib/types/governance";
 
 export const NeuronLabel = ({
   state,
@@ -13,6 +13,7 @@ export const NeuronLabel = ({
     <span
       className={classNames({
         "text-gray-500": state === NeuronState.Dissolved,
+        "text-yellow-600 dark:text-yellow-400": state === NeuronState.Donated,
       })}
     >
       {children || NeuronState[state]}

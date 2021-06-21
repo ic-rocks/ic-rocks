@@ -2,16 +2,16 @@ import classNames from "classnames";
 import { DateTime } from "luxon";
 import Link from "next/link";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import ActiveLink from "../components/ActiveLink";
 import BalanceLabel from "../components/Labels/BalanceLabel";
 import { MetaTags } from "../components/MetaTags";
-import { SecondaryNav } from "../components/Nav/SecondaryNav";
+import NeuronNav from "../components/Neurons/NeuronNav";
 import { useGlobalState } from "../components/StateContext";
 import SimpleTable from "../components/Tables/SimpleTable";
 import { Table } from "../components/Tables/Table";
 import { entries } from "../lib/enums";
 import fetchJSON from "../lib/fetch";
 import { formatNumber } from "../lib/numbers";
+import { formatPercent } from "../lib/strings";
 import {
   GenesisAccountStatus,
   InvestorType,
@@ -24,18 +24,21 @@ const GenesisAccountsPage = () => {
   const [genesisStats, setStats] = useState(null);
 
   useEffect(() => {
-    fetchJSON("/api/genesis/stats").then((data) => data && setStats(data));
-    setIsLoading(false);
+    fetchJSON("/api/genesis/stats").then((data) => {
+      if (data) {
+        setStats(data);
+      }
+    });
   }, []);
 
-  const statsHeaders = [
-    { contents: "Status", className: "w-32" },
-    { contents: "Count", className: "w-24 text-right" },
-    { contents: "Total ICP", className: "w-40 text-right" },
-    { contents: "Supply %", className: "w-28 text-right" },
+  const statsByStatusHeaders = [
+    { contents: "Account Status", className: "w-36" },
+    { contents: "Count", className: "flex-1 text-right hidden xs:block" },
+    { contents: "Total ICP", className: "flex-2 text-right" },
+    { contents: "Supply %", className: "flex-1 text-right hidden sm:block" },
   ];
 
-  const statsRows = useMemo(() => {
+  const statsByStatusRows = useMemo(() => {
     const order = ["Claimed", "Unclaimed", "Donated", "Forwarded"];
     return order.map((label, i) => {
       if (!genesisStats) {
@@ -45,31 +48,76 @@ const GenesisAccountsPage = () => {
           },
         ];
       }
-      const row = genesisStats.find(
+      const row = genesisStats.byAccountStatus.find(
         (row) => row.status === GenesisAccountStatus[label]
       );
+      return [
+        {
+          contents: label,
+          className: "w-36",
+        },
+        {
+          contents: row ? formatNumber(row.count) : "-",
+          className: "flex-1 text-right hidden xs:block",
+        },
+        {
+          contents: row ? <BalanceLabel value={row.icpts} /> : "-",
+          className: "flex-2 text-right",
+        },
+        {
+          contents:
+            row && stats
+              ? formatPercent(
+                  Number(BigInt(row.icpts) / BigInt(1e8)) /
+                    Number(BigInt(stats.supply) / BigInt(1e8))
+                )
+              : "-",
+          className: "flex-1 text-right hidden sm:block",
+        },
+      ];
+    });
+  }, [genesisStats]);
+
+  const statsByNeuronStateHeaders = [
+    { contents: "Neuron State", className: "w-32" },
+    { contents: "Count", className: "flex-1 text-right hidden xs:block" },
+    { contents: "Total ICP", className: "flex-2 text-right" },
+    { contents: "Supply %", className: "flex-1 text-right hidden sm:block" },
+  ];
+
+  const statsByNeuronStateRows = useMemo(() => {
+    const order = ["Locked", "Dissolving", "Dissolved"];
+    return order.map((label, i) => {
+      if (!genesisStats) {
+        return [
+          {
+            contents: label,
+          },
+        ];
+      }
+      const count = genesisStats.byNeuronState[`${label.toLowerCase()}Count`];
+      const amount = genesisStats.byNeuronState[`${label.toLowerCase()}Amount`];
       return [
         {
           contents: label,
           className: "w-32",
         },
         {
-          contents: row ? formatNumber(row.count) : "-",
-          className: "w-24 text-right",
+          contents: formatNumber(count),
+          className: "flex-1 text-right hidden xs:block",
         },
         {
-          contents: row ? <BalanceLabel value={row.icpts} /> : "-",
-          className: "w-40 text-right",
+          contents: <BalanceLabel value={amount} />,
+          className: "flex-2 text-right",
         },
         {
-          contents:
-            row && stats
-              ? (
-                  (100 * Number(BigInt(row.icpts) / BigInt(1e8))) /
+          contents: stats
+            ? formatPercent(
+                Number(BigInt(amount) / BigInt(1e8)) /
                   Number(BigInt(stats.supply) / BigInt(1e8))
-                ).toFixed(2) + "%"
-              : "-",
-          className: "w-28 text-right",
+              )
+            : "-",
+          className: "flex-1 text-right hidden sm:block",
         },
       ];
     });
@@ -100,6 +148,7 @@ const GenesisAccountsPage = () => {
           </Link>
         ),
         className: "px-2 flex-1 flex oneline",
+        style: { minWidth: "4rem" },
       },
       {
         Header: "Status",
@@ -127,13 +176,13 @@ const GenesisAccountsPage = () => {
             : row.original.status === GenesisAccountStatus.Claimed
             ? "Unknown"
             : "No",
-        className: "px-2 w-24",
+        className: "px-2 hidden md:block w-24",
       },
       {
         Header: "Investor Type",
         accessor: "investorType",
         Cell: ({ value }) => InvestorType[value],
-        className: "px-2 w-36",
+        className: "px-2 w-36 hidden md:block",
       },
       {
         Header: "ICP",
@@ -146,16 +195,6 @@ const GenesisAccountsPage = () => {
         ),
         className: "px-2 w-32 text-right",
       },
-      // {
-      //   Header: "Account",
-      //   accessor: "accountId",
-      //   Cell: ({ value, row }) => (
-      //     <Link href={`/account/${value}`}>
-      //       <a className="link-overflow">{value}</a>
-      //     </Link>
-      //   ),
-      //   className: "px-2 flex-1 flex oneline",
-      // },
       {
         Header: "Next Dissolve Date",
         accessor: "earliestDissolveDate",
@@ -233,17 +272,23 @@ const GenesisAccountsPage = () => {
         title="Genesis Accounts"
         description={`Overview of the Genesis Accounts on the Internet Computer.`}
       />
-      <SecondaryNav
-        items={[
-          <ActiveLink href="/neurons">Neurons</ActiveLink>,
-          <ActiveLink href="/genesis">Genesis Accounts</ActiveLink>,
-        ]}
-      />
+      <NeuronNav />
       <h1 className="text-3xl my-8 overflow-hidden overflow-ellipsis">
         Genesis Accounts
       </h1>
-      <section className="mb-8">
-        <SimpleTable headers={statsHeaders} rows={statsRows} />
+      <section className="mb-8 md:flex-row flex-col flex gap-8">
+        <div className="flex-1" style={{ minWidth: 320 }}>
+          <SimpleTable
+            headers={statsByStatusHeaders}
+            rows={statsByStatusRows}
+          />
+        </div>
+        <div className="flex-1" style={{ minWidth: 320 }}>
+          <SimpleTable
+            headers={statsByNeuronStateHeaders}
+            rows={statsByNeuronStateRows}
+          />
+        </div>
       </section>
       <section>
         <div className="py-2 flex flex-wrap gap-1">
@@ -266,6 +311,7 @@ const GenesisAccountsPage = () => {
           ))}
         </div>
         <Table
+          style={{ minWidth: 480 }}
           columns={columns}
           data={rows}
           count={count}
