@@ -4,7 +4,9 @@ import Link from "next/link";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { BsChevronDown, BsChevronRight } from "react-icons/bs";
 import { FiExternalLink } from "react-icons/fi";
+import ActiveLink from "../components/ActiveLink";
 import { MetaTags } from "../components/MetaTags";
+import { SecondaryNav } from "../components/Nav/SecondaryNav";
 import SimpleTable from "../components/Tables/SimpleTable";
 import { Table } from "../components/Tables/Table";
 import { entries } from "../lib/enums";
@@ -139,6 +141,11 @@ const ProposalsPage = () => {
         {
           Header: "Proposer",
           accessor: "proposerId",
+          Cell: ({ value, row }) => (
+            <Link href={`/neuron/${value}`}>
+              <a className="link-overflow">{value}</a>
+            </Link>
+          ),
           className: "px-2 w-24 overflow-hidden overflow-ellipsis",
         },
         {
@@ -326,6 +333,12 @@ const ProposalsPage = () => {
       <MetaTags
         title="Proposals"
         description={`A list of governance proposals on the Internet Computer.`}
+      />
+      <SecondaryNav
+        items={[
+          <ActiveLink href="/proposals">Proposals</ActiveLink>,
+          <ActiveLink href="/icp">ICP Price Oracle</ActiveLink>,
+        ]}
       />
       <h1 className="text-3xl my-8 overflow-hidden overflow-ellipsis">
         Proposals

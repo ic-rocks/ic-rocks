@@ -213,6 +213,7 @@ export type Neuron = {
   createdDate: string;
   dissolveDate: string;
   stake: string;
+  votingPower: string;
   originalStake: string;
   genesisAccountId?: string;
 };

@@ -53,9 +53,6 @@ export default function Nav() {
         <li>
           <ActiveLink href="/transactions">Transactions</ActiveLink>
         </li>
-        <li>
-          <ActiveLink href="/icp">ICP</ActiveLink>
-        </li>
       </ul>
     </nav>
   );

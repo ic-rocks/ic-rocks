@@ -36,7 +36,9 @@ const NeuronsTable = ({
         className: "px-2 flex-1 oneline",
         Cell: ({ value, row }) => (
           <>
-            {value}
+            <Link href={`/neuron/${value}`}>
+              <a className="link-overflow">{value}</a>
+            </Link>
             {row.original.name && (
               <span
                 className="ml-1"

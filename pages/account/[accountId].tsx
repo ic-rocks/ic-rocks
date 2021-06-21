@@ -159,9 +159,11 @@ const AccountPage = () => {
               <td className="px-2 py-2 flex-1 overflow-hidden break-words">
                 {data.neuron ? (
                   <>
-                    <span className="mr-2">
-                      {data.neuron.name || data.neuron.id}
-                    </span>
+                    <Link href={`/neuron/${data.neuron.id}`}>
+                      <a className="link-overflow mr-2">
+                        {data.neuron.name || data.neuron.id}
+                      </a>
+                    </Link>
                     <NeuronLabel state={data.neuron.state}>
                       ({NeuronState[data.neuron.state]}
                       {neuronDissolveDate})
