@@ -50,11 +50,14 @@ const NeuronsTable = ({
       {
         Header: "Account",
         accessor: "accountId",
-        Cell: ({ value, row }) => (
-          <Link href={`/account/${value}`}>
-            <a className="link-overflow">{value}</a>
-          </Link>
-        ),
+        Cell: ({ value, row }) =>
+          value ? (
+            <Link href={`/account/${value}`}>
+              <a className="link-overflow">{value}</a>
+            </Link>
+          ) : (
+            <span className="text-gray-500">Unknown</span>
+          ),
         className: "px-2 flex-1 flex oneline",
         style: { minWidth: "6rem" },
       },

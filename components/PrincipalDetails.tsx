@@ -281,7 +281,9 @@ export default function PrincipalDetails({
                   return (
                     <div key={id} className="flex justify-between">
                       <Link href={`/account/${id}`}>
-                        <a className="link-overflow flex-1">{displayName}</a>
+                        <a className="link-overflow flex-1">
+                          {displayName || id}
+                        </a>
                       </Link>
                       {balance && (
                         <span className="w-32 text-right text-gray-400 dark:text-gray-600">

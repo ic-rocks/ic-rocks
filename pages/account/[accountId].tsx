@@ -1,5 +1,6 @@
 import { Actor, HttpAgent } from "@dfinity/agent";
 import { getCrc32 } from "@dfinity/principal/lib/cjs/utils/getCrc";
+import { DateTime } from "luxon";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
@@ -93,6 +94,21 @@ const AccountPage = () => {
     return <Search404 input={accountId} />;
   }
 
+  let neuronDissolveDate;
+  if (
+    data?.neuron &&
+    (data.neuron.state === NeuronState.Locked ||
+      data.neuron.state === NeuronState.Dissolving)
+  ) {
+    const date = DateTime.fromISO(data.neuron.dissolveDate);
+    neuronDissolveDate =
+      date.diffNow().toMillis() < 0
+        ? ", dissolvable now"
+        : `, ${
+            data.neuron.state === NeuronState.Locked ? "dissolvable " : ""
+          }${date.toRelative()}`;
+  }
+
   return (
     <div className="pb-16">
       <MetaTags
@@ -147,7 +163,8 @@ const AccountPage = () => {
                       {data.neuron.name || data.neuron.id}
                     </span>
                     <NeuronLabel state={data.neuron.state}>
-                      ({NeuronState[data.neuron.state]})
+                      ({NeuronState[data.neuron.state]}
+                      {neuronDissolveDate})
                     </NeuronLabel>
                   </>
                 ) : (
