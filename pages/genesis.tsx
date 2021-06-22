@@ -165,6 +165,7 @@ const GenesisAccountsPage = () => {
       {
         Header: "KYC?",
         accessor: "isKyc",
+        disableSortBy: true,
         Cell: ({ value, row }) =>
           value
             ? "Yes"
