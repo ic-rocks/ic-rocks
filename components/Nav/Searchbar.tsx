@@ -28,13 +28,11 @@ export default function SearchBar() {
       } catch (error) {
         router.push(`/account/${input}`);
       }
+    } else if (input.match(/^\d+$/)) {
+      router.push(`/neuron/${input}`);
     } else if (input.match(/^[0-9a-fA-F]+$/)) {
       const principal = Principal.fromHex(input).toText();
       router.push(`/principal/${principal}`);
-    } else {
-      if (input.match(/^\d+$/)) {
-        router.push(`/neuron/${input}`);
-      }
     }
     setInput("");
   };
