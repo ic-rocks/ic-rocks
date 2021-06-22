@@ -2,7 +2,9 @@ import { Actor, HttpAgent } from "@dfinity/agent";
 import { IDL } from "@dfinity/candid";
 import { DateTime } from "luxon";
 import React, { useEffect, useState } from "react";
+import ActiveLink from "../components/ActiveLink";
 import { MetaTags } from "../components/MetaTags";
+import { SecondaryNav } from "../components/Nav/SecondaryNav";
 import governanceIdl from "../lib/canisters/governance.did";
 import nnsUiIdl from "../lib/canisters/nns-ui.did";
 import useInterval from "../lib/hooks/useInterval";
@@ -120,6 +122,12 @@ function Prices() {
       <MetaTags
         title="ICP Price"
         description="An overview of the ICP Price Oracle on the Internet Computer."
+      />
+      <SecondaryNav
+        items={[
+          <ActiveLink href="/proposals">Proposals</ActiveLink>,
+          <ActiveLink href="/icp">ICP Price Oracle</ActiveLink>,
+        ]}
       />
       <section className="pb-8">
         <h1 className="text-3xl my-8">ICP Price Oracle</h1>

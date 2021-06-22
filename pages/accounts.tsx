@@ -88,6 +88,7 @@ const Accounts = () => {
         description="A list of accounts on the Internet Computer ledger."
       />
       <Table
+        name="accounts"
         data={rows}
         columns={columns}
         count={count}

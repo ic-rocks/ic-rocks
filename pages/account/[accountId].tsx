@@ -1,10 +1,12 @@
 import { Actor, HttpAgent } from "@dfinity/agent";
 import { getCrc32 } from "@dfinity/principal/lib/cjs/utils/getCrc";
+import { DateTime } from "luxon";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import BalanceLabel from "../../components/Labels/BalanceLabel";
 import { MetaTags } from "../../components/MetaTags";
+import { NeuronLabel } from "../../components/Neurons/NeuronLabel";
 import Search404 from "../../components/Search404";
 import { useGlobalState } from "../../components/StateContext";
 import { TransactionsTable } from "../../components/TransactionsTable";
@@ -12,6 +14,7 @@ import ledgerIdl from "../../lib/canisters/ledger.did";
 import fetchJSON from "../../lib/fetch";
 import { formatNumber, formatNumberUSD } from "../../lib/numbers";
 import { Account } from "../../lib/types/API";
+import { NeuronState } from "../../lib/types/governance";
 
 const agent = new HttpAgent({ host: "https://ic0.app" });
 const ledger = Actor.createActor(ledgerIdl, {
@@ -34,7 +37,7 @@ const hideLeadingZeros = (str: string) => {
 
 const AccountPage = () => {
   const router = useRouter();
-  const [data, setData] = useState(null);
+  const [data, setData] = useState<Partial<Account>>(null);
   const [isValid, setIsValid] = useState(true);
   const { accountId: accountId_ } = router.query as { accountId: string };
   const { markets } = useGlobalState();
@@ -45,6 +48,7 @@ const AccountPage = () => {
     if (typeof accountId !== "string" || !accountId) return;
 
     setData(null);
+    setSubaccount(null);
 
     let valid = false;
     try {
@@ -90,6 +94,21 @@ const AccountPage = () => {
     return <Search404 input={accountId} />;
   }
 
+  let neuronDissolveDate;
+  if (
+    data?.neuron &&
+    (data.neuron.state === NeuronState.Locked ||
+      data.neuron.state === NeuronState.Dissolving)
+  ) {
+    const date = DateTime.fromISO(data.neuron.dissolveDate);
+    neuronDissolveDate =
+      date.diffNow().toMillis() < 0
+        ? ", dissolvable now"
+        : `, ${
+            data.neuron.state === NeuronState.Locked ? "dissolvable " : ""
+          }${date.toRelative()}`;
+  }
+
   return (
     <div className="pb-16">
       <MetaTags
@@ -119,17 +138,45 @@ const AccountPage = () => {
         </thead>
         <tbody className="divide-y divide-default">
           <tr className="flex">
-            <td className="px-2 py-2 w-32">Name</td>
+            <td className="px-2 py-2 w-32 sm:w-40">Name</td>
             <td className="px-2 py-2 flex-1">{data?.name || "-"}</td>
           </tr>
+          {data?.neuron?.genesisAccountId && (
+            <tr className="flex">
+              <td className="px-2 py-2 w-32 sm:w-40">Genesis Account</td>
+              <td className="px-2 py-2 flex-1 flex oneline">
+                <Link href={`/genesis/${data.neuron.genesisAccountId}`}>
+                  <a className="link-overflow">
+                    {data.neuron.genesisAccountId}
+                  </a>
+                </Link>
+              </td>
+            </tr>
+          )}
+          {data?.isNeuron && (
+            <tr className="flex">
+              <td className="px-2 py-2 w-32 sm:w-40">Neuron</td>
+              <td className="px-2 py-2 flex-1 overflow-hidden break-words">
+                {data.neuron ? (
+                  <>
+                    <Link href={`/neuron/${data.neuron.id}`}>
+                      <a className="link-overflow mr-2">
+                        {data.neuron.name || data.neuron.id}
+                      </a>
+                    </Link>
+                    <NeuronLabel state={data.neuron.state}>
+                      ({NeuronState[data.neuron.state]}
+                      {neuronDissolveDate})
+                    </NeuronLabel>
+                  </>
+                ) : (
+                  "Unknown"
+                )}
+              </td>
+            </tr>
+          )}
           <tr className="flex">
-            <td className="px-2 py-2 w-32">Neuron</td>
-            <td className="px-2 py-2 flex-1">
-              {data?.neuron?.name || data?.neuron?.id || "-"}
-            </td>
-          </tr>
-          <tr className="flex">
-            <td className="px-2 py-2 w-32">Principal</td>
+            <td className="px-2 py-2 w-32 sm:w-40">Principal</td>
             <td className="px-2 py-2 flex-1 flex oneline">
               {data?.principalId ? (
                 <Link href={`/principal/${data.principalId}`}>
@@ -143,19 +190,19 @@ const AccountPage = () => {
             </td>
           </tr>
           <tr className="flex">
-            <td className="px-2 py-2 w-32">Subaccount</td>
+            <td className="px-2 py-2 w-32 sm:w-40">Subaccount</td>
             <td className="px-2 py-2 flex-1 flex oneline">
               {subaccount ? hideLeadingZeros(subaccount) : "-"}
             </td>
           </tr>
           <tr className="flex">
-            <td className="px-2 py-2 w-32">Balance</td>
+            <td className="px-2 py-2 w-32 sm:w-40">Balance</td>
             <td className="px-2 py-2 flex-1">
               {data ? <BalanceLabel value={data.balance} /> : "-"}
             </td>
           </tr>
           <tr className="flex">
-            <td className="px-2 py-2 w-32">Value</td>
+            <td className="px-2 py-2 w-32 sm:w-40">Value</td>
             <td className="px-2 py-2 flex-1">
               {data && markets?.ticker ? (
                 <>
@@ -172,7 +219,7 @@ const AccountPage = () => {
             </td>
           </tr>
           <tr className="flex">
-            <td className="px-2 py-2 w-32">Transactions</td>
+            <td className="px-2 py-2 w-32 sm:w-40">Transactions</td>
             <td className="px-2 py-2 flex-1">
               {data?.tx_count ? formatNumber(data.tx_count) : 0}
             </td>

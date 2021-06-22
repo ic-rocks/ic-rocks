@@ -4,9 +4,10 @@ import Link from "next/link";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { BsChevronDown, BsChevronRight } from "react-icons/bs";
 import { FiExternalLink } from "react-icons/fi";
+import ActiveLink from "../components/ActiveLink";
 import { MetaTags } from "../components/MetaTags";
-import SimpleTable from "../components/Tables/SimpleTable";
-import { Table } from "../components/Tables/Table";
+import { SecondaryNav } from "../components/Nav/SecondaryNav";
+import { SelectColumnFilter, Table } from "../components/Tables/Table";
 import { entries } from "../lib/enums";
 import fetchJSON from "../lib/fetch";
 import { isUrl } from "../lib/strings";
@@ -71,23 +72,17 @@ const renderSummary = (p: Proposal) => {
 };
 
 const ProposalsPage = () => {
-  const [{ ...filters }, setFilters] = useState({
-    topic: "",
-    status: "",
-    rewardStatus: "",
-    proposerId: "",
-    action: "",
-    nnsFunction: "",
-  });
   const [isLoading, setIsLoading] = useState(false);
   const [{ rows, count }, setResponse] = useState<ProposalsResponse>({
     count: 0,
     rows: [],
   });
-  const [neurons, setNeurons] = useState(null);
+  const [proposers, setProposers] = useState(null);
 
   useEffect(() => {
-    fetchJSON("/api/neurons").then((data) => data && setNeurons(data));
+    fetchJSON("/api/neurons/proposers").then(
+      (data) => data && setProposers(data)
+    );
   }, []);
 
   const columns = useMemo(
@@ -135,11 +130,27 @@ const ProposalsPage = () => {
             </div>
           ),
           className: "px-2 w-32",
+          Filter: SelectColumnFilter,
+          filterOptions: [["Status...", "" as any]].concat(entries(Status)),
         },
         {
           Header: "Proposer",
           accessor: "proposerId",
+          Cell: ({ value, row }) => (
+            <Link href={`/neuron/${value}`}>
+              <a className="link-overflow">{value}</a>
+            </Link>
+          ),
           className: "px-2 w-24 overflow-hidden overflow-ellipsis",
+          Filter: SelectColumnFilter,
+          filterOptions: [["Proposer...", "" as any]].concat(
+            proposers?.length > 0
+              ? proposers.map(({ id, name, proposalCount }) => [
+                  `${name || id} (${proposalCount})`,
+                  id,
+                ])
+              : []
+          ),
         },
         {
           Header: "Topic, Action & Summary",
@@ -189,6 +200,22 @@ const ProposalsPage = () => {
             </>
           ),
           className: "px-2 flex-1 overflow-hidden",
+          Filter: SelectColumnFilter,
+          filterOptions: [["Topic...", "" as any]].concat(entries(Topic)),
+        },
+        {
+          accessor: "action",
+          hidden: true,
+          Filter: SelectColumnFilter,
+          filterOptions: [["Action...", "" as any]].concat(entries(Action)),
+        },
+        {
+          accessor: "nnsFunction",
+          hidden: true,
+          Filter: SelectColumnFilter,
+          filterOptions: [["NNS Function...", "" as any]].concat(
+            entries(NnsFunction)
+          ),
         },
         {
           Header: "Votes",
@@ -240,13 +267,21 @@ const ProposalsPage = () => {
           className: "px-2 w-32 text-right",
         },
       ].filter(Boolean),
-    []
+    [proposers]
   );
 
   const initialSort = useMemo(() => [{ id: "id", desc: true }], []);
 
   const fetchData = useCallback(
-    async ({ pageSize, pageIndex, sortBy }) => {
+    async ({ pageSize, pageIndex, sortBy, filters }) => {
+      const topicFilter = filters.find(({ id }) => id === "topic");
+      const statusFilter = filters.find(({ id }) => id === "status");
+      const rewardStatusFilter = filters.find(
+        ({ id }) => id === "rewardStatus"
+      );
+      const proposerIdFilter = filters.find(({ id }) => id === "proposerId");
+      const actionFilter = filters.find(({ id }) => id === "action");
+      const nnsFunctionFilter = filters.find(({ id }) => id === "nnsFunction");
       setIsLoading(true);
       const res = await fetchJSON(
         "/api/proposals?" +
@@ -257,17 +292,17 @@ const ProposalsPage = () => {
                   order: sortBy[0].desc ? "desc" : "asc",
                 }
               : {}),
-            ...(filters.topic ? { "topic[]": filters.topic } : {}),
-            ...(filters.status ? { "status[]": filters.status } : {}),
-            ...(filters.rewardStatus
-              ? { "rewardStatus[]": filters.rewardStatus }
+            ...(topicFilter ? { "topic[]": topicFilter.value } : {}),
+            ...(statusFilter ? { "status[]": statusFilter.value } : {}),
+            ...(rewardStatusFilter
+              ? { "rewardStatus[]": rewardStatusFilter.value }
               : {}),
-            ...(filters.proposerId
-              ? { "proposerId[]": filters.proposerId }
+            ...(proposerIdFilter
+              ? { "proposerId[]": proposerIdFilter.value }
               : {}),
-            ...(filters.action ? { "action[]": filters.action } : {}),
-            ...(filters.nnsFunction
-              ? { "nnsFunction[]": filters.nnsFunction }
+            ...(actionFilter ? { "action[]": actionFilter.value } : {}),
+            ...(nnsFunctionFilter
+              ? { "nnsFunction[]": nnsFunctionFilter.value }
               : {}),
             pageSize,
             page: pageIndex,
@@ -276,50 +311,8 @@ const ProposalsPage = () => {
       if (res) setResponse(res);
       setIsLoading(false);
     },
-    [
-      filters.topic,
-      filters.status,
-      filters.rewardStatus,
-      filters.proposerId,
-      filters.action,
-      filters.nnsFunction,
-    ]
+    []
   );
-
-  const toggleFilters = [
-    { id: "status", label: "Status", options: entries(Status) },
-    {
-      id: "rewardStatus",
-      label: "Reward Status",
-      options: entries(RewardStatus),
-    },
-    {
-      id: "proposerId",
-      label: "Proposer",
-      options:
-        neurons?.rows.length > 0
-          ? neurons.rows.map(({ id, proposalCount }) => [
-              `${id} (${proposalCount})`,
-              id,
-            ])
-          : [],
-    },
-    { id: "topic", label: "Topic", options: entries(Topic) },
-    { id: "action", label: "Action", options: entries(Action) },
-    { id: "nnsFunction", label: "NNS Function", options: entries(NnsFunction) },
-  ];
-
-  const summaryRows = [
-    [
-      {
-        contents: "Count",
-        className: "w-24",
-      },
-      {
-        contents: count || "-",
-      },
-    ],
-  ];
 
   return (
     <div className="pb-16">
@@ -327,37 +320,24 @@ const ProposalsPage = () => {
         title="Proposals"
         description={`A list of governance proposals on the Internet Computer.`}
       />
+      <SecondaryNav
+        items={[
+          <ActiveLink href="/proposals">Proposals</ActiveLink>,
+          <ActiveLink href="/icp">ICP Price Oracle</ActiveLink>,
+        ]}
+      />
       <h1 className="text-3xl my-8 overflow-hidden overflow-ellipsis">
         Proposals
       </h1>
       <section className="mb-8">
-        <SimpleTable
-          headers={[{ contents: "Proposal Stats" }]}
-          rows={summaryRows}
-        />
+        <p>
+          This collection is incomplete because proposals are deleted from the
+          governance canister after being finalized.
+        </p>
       </section>
       <section>
-        <div className="py-2 flex flex-wrap gap-1">
-          {toggleFilters.map(({ id, label, options }) => (
-            <select
-              key={id}
-              className="flex-1 p-1 bg-gray-100 dark:bg-gray-800 cursor-pointer"
-              onChange={(e) =>
-                setFilters((s) => ({ ...s, [id]: e.target.value }))
-              }
-              value={filters[id]}
-              style={{ minWidth: "8rem" }}
-            >
-              <option value="">{label}</option>
-              {options.map(([name, value]) => (
-                <option key={value} value={value}>
-                  {name}
-                </option>
-              ))}
-            </select>
-          ))}
-        </div>
         <Table
+          name="proposals"
           columns={columns}
           data={rows}
           count={count}
@@ -365,6 +345,7 @@ const ProposalsPage = () => {
           loading={isLoading}
           initialSortBy={initialSort}
           useExpand={true}
+          useFilter={true}
         />
       </section>
     </div>

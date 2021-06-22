@@ -78,6 +78,8 @@ export default function PrincipalDetails({
 
   const ancestors = useMemo(() => {
     if (!canisterData?.ancestors) return [];
+    if (!canisterData.ancestors.length)
+      return [{ id: null, name: "No controller" }];
     const arr = [...canisterData.ancestors];
     arr.reverse();
     return arr;
@@ -98,7 +100,6 @@ export default function PrincipalDetails({
         )}
         {rest.length > 0 && (
           <div className={classNames({ "pl-3": !isFirst })}>
-            {/* <span className="text-gray-500 mr-1 pointer-events-none">└</span> */}
             <span className="text-gray-500 pointer-events-none">
               <BsArrowReturnRight className="inline mr-0.5" />
             </span>
@@ -246,27 +247,24 @@ export default function PrincipalDetails({
               <tr className="flex">
                 <td className="px-2 py-2 w-24 sm:w-44">Controller Tree</td>
                 <td className="px-2 py-2 flex-1 leading-snug text-xs">
-                  {canisterData &&
-                    renderAncestors(
-                      ancestors
-                        .concat({
-                          id: principalId,
-                          name: `This canister${
-                            principalData?.name
-                              ? ` (${principalData.name})`
-                              : ""
-                          }`,
-                        })
-                        .concat(
-                          principalData?.canisterCount > 0
-                            ? {
-                                id: null,
-                                name: `${principalData.canisterCount} controlled`,
-                              }
-                            : []
-                        ),
-                      true
-                    )}
+                  {renderAncestors(
+                    ancestors
+                      .concat({
+                        id: principalId,
+                        name: `This canister${
+                          principalData?.name ? ` (${principalData.name})` : ""
+                        }`,
+                      })
+                      .concat(
+                        principalData?.canisterCount > 0
+                          ? {
+                              id: null,
+                              name: `${principalData.canisterCount} controlled`,
+                            }
+                          : []
+                      ),
+                    true
+                  )}
                 </td>
               </tr>
             </>
@@ -281,7 +279,9 @@ export default function PrincipalDetails({
                   return (
                     <div key={id} className="flex justify-between">
                       <Link href={`/account/${id}`}>
-                        <a className="link-overflow flex-1">{displayName}</a>
+                        <a className="link-overflow flex-1">
+                          {displayName || id}
+                        </a>
                       </Link>
                       {balance && (
                         <span className="w-32 text-right text-gray-400 dark:text-gray-600">

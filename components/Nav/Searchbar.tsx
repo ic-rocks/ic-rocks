@@ -1,3 +1,4 @@
+import { Principal } from "@dfinity/principal";
 import { getCrc32 } from "@dfinity/principal/lib/cjs/utils/getCrc";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -13,7 +14,7 @@ export default function SearchBar() {
 
     if (input.includes("-")) {
       router.push(`/principal/${input}`);
-    } else {
+    } else if (input.length === 64) {
       try {
         const blob = Buffer.from(input, "hex");
         const crc32Buf = Buffer.alloc(4);
@@ -27,6 +28,11 @@ export default function SearchBar() {
       } catch (error) {
         router.push(`/account/${input}`);
       }
+    } else if (input.match(/^\d+$/)) {
+      router.push(`/neuron/${input}`);
+    } else if (input.match(/^[0-9a-fA-F]+$/)) {
+      const principal = Principal.fromHex(input).toText();
+      router.push(`/principal/${principal}`);
     }
     setInput("");
   };
@@ -37,7 +43,7 @@ export default function SearchBar() {
         type="text"
         name="search"
         className="px-2 py-1 bg-gray-200 dark:bg-gray-800 focus:outline-none focus:border border-black dark:border-gray-200 rounded font-sm flex-1"
-        placeholder="Search for principal, account, tx"
+        placeholder="Search for principal, account, tx, neuron"
         value={input}
         onChange={handleChange}
       />

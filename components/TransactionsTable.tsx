@@ -70,12 +70,12 @@ export const TransactionsTable = ({
           ) : value !== accountId ? (
             <Link href={`/account/${value}`}>
               <a className="link-overflow">
-                {row.original.sender.name || value}
+                {row.original.sender.displayName || value}
               </a>
             </Link>
           ) : (
             <span className="overflow-hidden overflow-ellipsis">
-              {row.original.sender.name || value}
+              {row.original.sender.displayName || value}
             </span>
           ),
         className: "px-2 flex-1 flex oneline",
@@ -91,12 +91,12 @@ export const TransactionsTable = ({
           ) : value !== accountId ? (
             <Link href={`/account/${value}`}>
               <a className="link-overflow">
-                {row.original.receiver.name || value}
+                {row.original.receiver.displayName || value}
               </a>
             </Link>
           ) : (
             <span className="overflow-hidden overflow-ellipsis">
-              {row.original.receiver.name || value}
+              {row.original.receiver.displayName || value}
             </span>
           ),
         className: "px-2 flex-1 flex oneline",
