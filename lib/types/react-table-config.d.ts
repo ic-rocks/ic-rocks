@@ -69,6 +69,7 @@ declare module "react-table" {
       UseSortByColumnProps<D> {
     className: string;
     style: React.CSSProperties;
+    hidden?: boolean;
   }
 
   export interface Cell<

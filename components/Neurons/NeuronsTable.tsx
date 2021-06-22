@@ -7,21 +7,18 @@ import fetchJSON from "../../lib/fetch";
 import { NeuronsResponse } from "../../lib/types/API";
 import { NeuronState } from "../../lib/types/governance";
 import BalanceLabel from "../Labels/BalanceLabel";
-import { Table } from "../Tables/Table";
+import { SelectColumnFilter, Table } from "../Tables/Table";
 import { NeuronLabel } from "./NeuronLabel";
 
 const NeuronsTable = ({
+  name,
   genesisAccount,
   onFetch,
 }: {
+  name?: string;
   genesisAccount?: string;
   onFetch?: (res?) => void;
 }) => {
-  const [{ ...filters }, setFilters] = useState({
-    state: "",
-    hasProposals: "",
-    isGenesis: "",
-  });
   const [isLoading, setIsLoading] = useState(false);
   const [{ rows, count }, setResponse] = useState<NeuronsResponse>({
     count: 0,
@@ -52,18 +49,34 @@ const NeuronsTable = ({
           </>
         ),
         style: { minWidth: "4rem" },
+        Filter: SelectColumnFilter,
+        filterOptions: [
+          ["Genesis...", ""],
+          ["Is Genesis", "1"],
+          ["Is not Genesis", "0"],
+        ],
       },
       {
         Header: "State",
         accessor: "state",
         Cell: ({ value, row }) => <NeuronLabel state={value} />,
         className: "px-2 w-16",
+        Filter: SelectColumnFilter,
+        filterOptions: [["State...", "" as any]].concat(
+          entries(NeuronState).filter(([_, n]) => n > 0)
+        ),
       },
       {
         Header: "Proposals",
         accessor: "proposalCount",
         sortDescFirst: true,
         className: "px-2 hidden sm:block w-28 text-right",
+        Filter: SelectColumnFilter,
+        filterOptions: [
+          ["Proposals...", ""],
+          ["Has Proposals", "1"],
+          ["No Proposals", "0"],
+        ],
       },
       {
         Header: "Account",
@@ -126,7 +139,10 @@ const NeuronsTable = ({
   );
 
   const fetchData = useCallback(
-    async ({ pageSize, pageIndex, sortBy }) => {
+    async ({ pageSize, pageIndex, sortBy, filters }) => {
+      const stateFilter = filters.find(({ id }) => id === "state");
+      const proposalFilter = filters.find(({ id }) => id === "proposalCount");
+      const genesisFilter = filters.find(({ id }) => id === "id");
       setIsLoading(true);
       const res = await fetchJSON(
         "/api/neurons?" +
@@ -140,83 +156,32 @@ const NeuronsTable = ({
               : {}),
             pageSize,
             page: pageIndex,
-            ...(filters.state ? { state: filters.state } : {}),
-            ...(filters.hasProposals
-              ? { hasProposals: filters.hasProposals }
-              : {}),
-            ...(filters.isGenesis ? { isGenesis: filters.isGenesis } : {}),
+            ...(stateFilter ? { state: stateFilter.value } : {}),
+            ...(proposalFilter ? { hasProposals: proposalFilter.value } : {}),
+            ...(genesisFilter ? { isGenesis: genesisFilter.value } : {}),
           })
       );
       if (onFetch) onFetch(res);
       if (res) setResponse(res);
       setIsLoading(false);
     },
-    [filters.state, filters.hasProposals, filters.isGenesis]
+    []
   );
 
-  const toggleFilters = genesisAccount
-    ? []
-    : [
-        {
-          id: "state",
-          label: "State",
-          options: [["State...", "" as any]].concat(
-            entries(NeuronState).filter(([_, n]) => n > 0)
-          ),
-        },
-        {
-          id: "hasProposals",
-          label: "hasProposals",
-          options: [
-            ["Proposals...", ""],
-            ["Has Proposals", "1"],
-            ["No Proposals", "0"],
-          ],
-        },
-        {
-          id: "isGenesis",
-          label: "isGenesis",
-          options: [
-            ["Genesis...", ""],
-            ["Is Genesis", "1"],
-            ["Is not Genesis", "0"],
-          ],
-        },
-      ];
-
   return (
-    <section>
-      <div className="py-2 flex flex-wrap gap-1">
-        {toggleFilters.map(({ id, label, options }) => (
-          <select
-            key={id}
-            className="flex-1 p-1 bg-gray-100 dark:bg-gray-800 cursor-pointer"
-            onChange={(e) =>
-              setFilters((s) => ({ ...s, [id]: e.target.value }))
-            }
-            value={filters[id]}
-            style={{ minWidth: "8rem" }}
-          >
-            {options.map(([name, value]) => (
-              <option key={value} value={value}>
-                {name}
-              </option>
-            ))}
-          </select>
-        ))}
-      </div>
-      <Table
-        style={{ minWidth: 480 }}
-        columns={columns}
-        data={rows}
-        count={count}
-        fetchData={fetchData}
-        loading={isLoading}
-        initialSortBy={initialSort}
-        useExpand={true}
-        initialPageSize={genesisAccount ? 50 : undefined}
-      />
-    </section>
+    <Table
+      name={`${name}.neurons`}
+      style={{ minWidth: 480 }}
+      columns={columns}
+      data={rows}
+      count={count}
+      fetchData={fetchData}
+      loading={isLoading}
+      initialSortBy={initialSort}
+      useExpand={true}
+      initialPageSize={genesisAccount ? 50 : undefined}
+      useFilter={true}
+    />
   );
 };
 

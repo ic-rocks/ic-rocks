@@ -7,7 +7,7 @@ import { MetaTags } from "../components/MetaTags";
 import NeuronNav from "../components/Neurons/NeuronNav";
 import { useGlobalState } from "../components/StateContext";
 import SimpleTable from "../components/Tables/SimpleTable";
-import { Table } from "../components/Tables/Table";
+import { SelectColumnFilter, Table } from "../components/Tables/Table";
 import { entries } from "../lib/enums";
 import fetchJSON from "../lib/fetch";
 import { formatNumber } from "../lib/numbers";
@@ -123,19 +123,10 @@ const GenesisAccountsPage = () => {
     });
   }, [genesisStats]);
 
-  const [{ ...filters }, setFilters] = useState({
-    status: "",
-    investorType: "",
-    isKyc: "",
-  });
   const [{ rows, count }, setResponse] = useState<NeuronsResponse>({
     count: 0,
     rows: [],
   });
-
-  useEffect(() => {
-    fetchJSON("/api/genesis").then((data) => data && setResponse(data));
-  }, []);
 
   const columns = useMemo(
     () => [
@@ -166,6 +157,10 @@ const GenesisAccountsPage = () => {
           </span>
         ),
         className: "px-2 w-24",
+        Filter: SelectColumnFilter,
+        filterOptions: [["Status...", "" as any]].concat(
+          entries(GenesisAccountStatus)
+        ),
       },
       {
         Header: "KYC?",
@@ -177,12 +172,22 @@ const GenesisAccountsPage = () => {
             ? "Unknown"
             : "No",
         className: "px-2 hidden md:block w-24",
+        Filter: SelectColumnFilter,
+        filterOptions: [
+          ["KYC...", ""],
+          ["Yes", "1"],
+          ["No", "0"],
+        ],
       },
       {
         Header: "Investor Type",
         accessor: "investorType",
         Cell: ({ value }) => InvestorType[value],
         className: "px-2 w-36 hidden md:block",
+        Filter: SelectColumnFilter,
+        filterOptions: [["Investor Type...", "" as any]].concat(
+          entries(InvestorType)
+        ),
       },
       {
         Header: "ICP",
@@ -216,7 +221,12 @@ const GenesisAccountsPage = () => {
   const initialSort = useMemo(() => [{ id: "icpts", desc: true }], []);
 
   const fetchData = useCallback(
-    async ({ pageSize, pageIndex, sortBy }) => {
+    async ({ pageSize, pageIndex, sortBy, filters }) => {
+      const statusFilter = filters.find(({ id }) => id === "status");
+      const investorTypeFilter = filters.find(
+        ({ id }) => id === "investorType"
+      );
+      const isKycFilter = filters.find(({ id }) => id === "isKyc");
       setIsLoading(true);
       const res = await fetchJSON(
         "/api/genesis?" +
@@ -229,42 +239,18 @@ const GenesisAccountsPage = () => {
               : {}),
             pageSize,
             page: pageIndex,
-            ...(filters.status ? { status: filters.status } : {}),
-            ...(filters.investorType
-              ? { investorType: filters.investorType }
+            ...(statusFilter ? { status: statusFilter.value } : {}),
+            ...(investorTypeFilter
+              ? { investorType: investorTypeFilter.value }
               : {}),
-            ...(filters.isKyc ? { isKyc: filters.isKyc } : {}),
+            ...(isKycFilter ? { isKyc: isKycFilter.value } : {}),
           })
       );
       if (res) setResponse(res);
       setIsLoading(false);
     },
-    [filters.status, filters.investorType, filters.isKyc]
+    []
   );
-
-  const toggleFilters = [
-    {
-      id: "status",
-      label: "Status",
-      options: [["Status...", "" as any]].concat(
-        entries(GenesisAccountStatus).filter(([_, n]) => n > 0)
-      ),
-    },
-    {
-      id: "investorType",
-      label: "Investor Type",
-      options: [["Investor Type...", "" as any]].concat(entries(InvestorType)),
-    },
-    {
-      id: "isKyc",
-      label: "isKyc",
-      options: [
-        ["KYC...", ""],
-        ["Yes", "1"],
-        ["No", "0"],
-      ],
-    },
-  ];
 
   return (
     <div className="pb-16">
@@ -291,26 +277,8 @@ const GenesisAccountsPage = () => {
         </div>
       </section>
       <section>
-        <div className="py-2 flex flex-wrap gap-1">
-          {toggleFilters.map(({ id, label, options }) => (
-            <select
-              key={id}
-              className="flex-1 p-1 bg-gray-100 dark:bg-gray-800 cursor-pointer"
-              onChange={(e) =>
-                setFilters((s) => ({ ...s, [id]: e.target.value }))
-              }
-              value={filters[id]}
-              style={{ minWidth: "8rem" }}
-            >
-              {options.map(([name, value]) => (
-                <option key={value} value={value}>
-                  {name}
-                </option>
-              ))}
-            </select>
-          ))}
-        </div>
         <Table
+          name="genesis-accounts"
           style={{ minWidth: 480 }}
           columns={columns}
           data={rows}
@@ -318,7 +286,7 @@ const GenesisAccountsPage = () => {
           fetchData={fetchData}
           loading={isLoading}
           initialSortBy={initialSort}
-          useExpand={true}
+          useFilter={true}
         />
       </section>
     </div>

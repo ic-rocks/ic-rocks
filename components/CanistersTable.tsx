@@ -4,24 +4,19 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { FiExternalLink, FiFileText } from "react-icons/fi";
 import fetchJSON from "../lib/fetch";
 import { CanistersResponse, SubnetResponse } from "../lib/types/API";
-import { Table } from "./Tables/Table";
+import { SelectColumnFilter, Table } from "./Tables/Table";
 
 export const CanistersTable = ({
+  name,
   controllerId,
   moduleId,
   onFetch,
 }: {
+  name?: string;
   controllerId?: string;
   moduleId?: string;
   onFetch?: (res?) => void;
 }) => {
-  const [{ subnetId, ...filters }, setFilters] = useState({
-    hasInterface: "",
-    hasName: "",
-    hasModule: "",
-    hasController: "",
-    subnetId: "",
-  });
   const [isLoading, setIsLoading] = useState(false);
   const [{ rows, count }, setResponse] = useState<CanistersResponse>({
     count: 0,
@@ -50,6 +45,12 @@ export const CanistersTable = ({
           },
           defaultClass: false,
           className: "flex w-6 items-center justify-center dark:text-gray-500",
+          Filter: SelectColumnFilter,
+          filterOptions: [
+            ["Interface...", ""],
+            ["Has Interface", "1"],
+            ["No Interface", "0"],
+          ],
         },
         {
           Header: "Canister",
@@ -66,6 +67,12 @@ export const CanistersTable = ({
             );
           },
           className: "pr-2 flex-1 flex oneline",
+          Filter: SelectColumnFilter,
+          filterOptions: [
+            ["Name...", ""],
+            ["Has Name", "1"],
+            ["No Name", "0"],
+          ],
         },
         !controllerId && {
           Header: "Controller",
@@ -79,9 +86,16 @@ export const CanistersTable = ({
             </Link>
           ),
           className: "px-2 sm:flex flex-1 hidden oneline",
+          Filter: SelectColumnFilter,
+          filterOptions: [
+            ["Controller...", ""],
+            ["Has Controller", "1"],
+            ["No Controller", "0"],
+          ],
         },
         !moduleId && {
           Header: "Module",
+          id: "moduleId",
           accessor: (d) => d.module?.id,
           disableSortBy: true,
           Cell: ({ value, row }) => (
@@ -92,6 +106,12 @@ export const CanistersTable = ({
             </Link>
           ),
           className: "px-2 xs:flex flex-1 hidden oneline",
+          Filter: SelectColumnFilter,
+          filterOptions: [
+            ["Module...", ""],
+            ["Has Module", "1"],
+            ["No Module", "0"],
+          ],
         },
         {
           Header: "Subnet",
@@ -108,6 +128,10 @@ export const CanistersTable = ({
               "-"
             ),
           className: "px-2 sm:flex flex-1 hidden oneline",
+          Filter: SelectColumnFilter,
+          filterOptions: [["Subnet...", ""]].concat(
+            subnets.map(({ displayName, id }) => [displayName, id])
+          ),
         },
         {
           Header: "Last Updated",
@@ -133,7 +157,7 @@ export const CanistersTable = ({
           className: "w-16 text-center hidden sm:block",
         },
       ].filter(Boolean),
-    []
+    [subnets]
   );
 
   const initialSort = useMemo(
@@ -142,7 +166,14 @@ export const CanistersTable = ({
   );
 
   const fetchData = useCallback(
-    async ({ pageSize, pageIndex, sortBy }) => {
+    async ({ pageSize, pageIndex, sortBy, filters }) => {
+      const hasInterfaceFilter = filters.find(
+        ({ id }) => id === "hasInterface"
+      );
+      const controllerFilter = filters.find(({ id }) => id === "controllerId");
+      const moduleFilter = filters.find(({ id }) => id === "moduleId");
+      const canisterFilter = filters.find(({ id }) => id === "id");
+      const subnetFilter = filters.find(({ id }) => id === "subnetId");
       setIsLoading(true);
       const res = await fetchJSON(
         "/api/canisters?" +
@@ -155,15 +186,15 @@ export const CanistersTable = ({
               : {}),
             ...(controllerId ? { controllerId } : {}),
             ...(moduleId ? { moduleId } : {}),
-            ...(filters.hasInterface
-              ? { hasInterface: filters.hasInterface }
+            ...(hasInterfaceFilter
+              ? { hasInterface: hasInterfaceFilter.value }
               : {}),
-            ...(filters.hasName ? { hasName: filters.hasName } : {}),
-            ...(filters.hasModule ? { hasModule: filters.hasModule } : {}),
-            ...(filters.hasController
-              ? { hasController: filters.hasController }
+            ...(canisterFilter ? { hasName: canisterFilter.value } : {}),
+            ...(moduleFilter ? { hasModule: moduleFilter.value } : {}),
+            ...(controllerFilter
+              ? { hasController: controllerFilter.value }
               : {}),
-            ...(subnetId ? { subnetId } : {}),
+            ...(subnetFilter ? { subnetId: subnetFilter.value } : {}),
             pageSize,
             page: pageIndex,
           })
@@ -172,69 +203,19 @@ export const CanistersTable = ({
       if (res) setResponse(res);
       setIsLoading(false);
     },
-    [
-      controllerId,
-      moduleId,
-      subnetId,
-      filters.hasInterface,
-      filters.hasName,
-      filters.hasModule,
-      filters.hasController,
-    ]
+    [controllerId, moduleId]
   );
 
-  const toggleFilters = [
-    { id: "hasName", label: "Canister Name" },
-    { id: "hasInterface", label: "Interface" },
-    !controllerId && { id: "hasController", label: "Controller" },
-    !moduleId && { id: "hasModule", label: "Module" },
-  ].filter(Boolean);
-
   return (
-    <section>
-      <div className="py-2 flex flex-wrap gap-1">
-        {!controllerId && (
-          <select
-            className="flex-1 p-1 bg-gray-100 dark:bg-gray-800 cursor-pointer"
-            onChange={(e) =>
-              setFilters((s) => ({ ...s, subnetId: e.target.value }))
-            }
-            value={subnetId}
-          >
-            <option value={""}>All Subnets</option>
-            {subnets.length > 0
-              ? subnets.map(({ displayName, id }) => (
-                  <option key={id} value={id}>
-                    {displayName}
-                  </option>
-                ))
-              : null}
-          </select>
-        )}
-        {toggleFilters.map(({ id, label }) => (
-          <select
-            key={id}
-            className="flex-1 p-1 bg-gray-100 dark:bg-gray-800 cursor-pointer"
-            onChange={(e) =>
-              setFilters((s) => ({ ...s, [id]: e.target.value }))
-            }
-            value={filters[id]}
-            style={{ minWidth: "8rem" }}
-          >
-            <option value="">{label}</option>
-            <option value="1">With {label}</option>
-            <option value="0">Without {label}</option>
-          </select>
-        ))}
-      </div>
-      <Table
-        columns={columns}
-        data={rows}
-        count={count}
-        fetchData={fetchData}
-        loading={isLoading}
-        initialSortBy={initialSort}
-      />
-    </section>
+    <Table
+      name={name}
+      columns={columns}
+      data={rows}
+      count={count}
+      fetchData={fetchData}
+      loading={isLoading}
+      initialSortBy={initialSort}
+      useFilter={true}
+    />
   );
 };

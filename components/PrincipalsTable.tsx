@@ -88,6 +88,7 @@ export const PrincipalsTable = () => {
 
   return (
     <Table
+      name="principals"
       columns={columns}
       data={rows}
       count={count}

@@ -1,20 +1,88 @@
 import classNames from "classnames";
-import React, { CSSProperties, useEffect } from "react";
+import { useAtom } from "jotai";
+import React, { CSSProperties, useEffect, useMemo } from "react";
 import { CgSpinner } from "react-icons/cg";
 import { FaSortAmountDown, FaSortAmountUp } from "react-icons/fa";
 import {
   Column,
+  Filters,
   SortingRule,
   useExpanded,
+  useFilters,
   usePagination,
   useSortBy,
   useTable,
 } from "react-table";
+import { atomWithLocalStorage } from "../../lib/atoms/atomWithLocalStorage";
+import ClientOnly from "../ClientOnly";
 import { Pagination } from "./Pagination";
+
+const STORAGE_KEY = "tables";
 
 export const PAGE_SIZE = 25;
 
-export const Table = ({
+export function SelectColumnFilter({
+  column: { filterValue, setFilter, filterOptions },
+}) {
+  return (
+    <select
+      className="flex-1 p-1 bg-gray-100 dark:bg-gray-800 cursor-pointer"
+      onChange={(e) => setFilter(e.target.value)}
+      value={filterValue}
+      style={{ minWidth: "8rem" }}
+    >
+      {filterOptions.map(([name, value]) => (
+        <option key={value} value={value}>
+          {name}
+        </option>
+      ))}
+    </select>
+  );
+}
+
+type TableProps = {
+  name?: string;
+  className?: string;
+  style?: CSSProperties;
+  tableBodyProps?: any;
+  tableHeaderGroupProps?: any;
+  columns: Column<any>[];
+  data: any[];
+  count?: number;
+  fetchData?: ({
+    pageSize,
+    pageIndex,
+    sortBy,
+    filters,
+  }: {
+    pageSize: number;
+    pageIndex: number;
+    sortBy: SortingRule<any>[];
+    filters: Filters<any>;
+  }) => void;
+  loading?: boolean;
+  useSort?: boolean;
+  manualSortBy?: boolean;
+  initialSortBy?: SortingRule<any>[];
+  usePage?: boolean;
+  manualPagination?: boolean;
+  initialPageSize?: number;
+  useExpand?: boolean;
+  useFilter?: boolean;
+  manualFilters?: boolean;
+};
+
+/** Table should only be rendered client-side so localStorage is available */
+export const Table = (props: TableProps) => {
+  return (
+    <ClientOnly>
+      <TableWrapped {...props} />
+    </ClientOnly>
+  );
+};
+
+export const TableWrapped = ({
+  name,
   className,
   style,
   tableBodyProps = {},
@@ -27,34 +95,25 @@ export const Table = ({
   fetchData = () => {},
   loading,
   useSort = true,
-  usePage = true,
-  useExpand = false,
-  initialSortBy,
-  manualPagination = true,
   manualSortBy = true,
+  initialSortBy,
+  usePage = true,
+  manualPagination = true,
   initialPageSize = PAGE_SIZE,
-}: {
-  className?: string;
-  style?: CSSProperties;
-  tableBodyProps?: any;
-  tableHeaderGroupProps?: any;
-  columns: Column<any>[];
-  data: any[];
-  count?: number;
-  fetchData?: ({ pageSize, pageIndex, sortBy }) => void;
-  loading?: boolean;
-  useSort?: boolean;
-  usePage?: boolean;
-  useExpand?: boolean;
-  initialSortBy?: SortingRule<any>[];
-  manualPagination?: boolean;
-  manualSortBy?: boolean;
-  initialPageSize?: number;
-}) => {
+  useExpand = false,
+  useFilter = false,
+  manualFilters = true,
+}: TableProps) => {
+  // Create the atom here so localStorage is defined
+  const tablesAtom = useMemo(() => atomWithLocalStorage(STORAGE_KEY, {}), []);
+  const [tableState, setTableState] = useAtom(tablesAtom);
+  const savedTableState = tableState[name];
+
   const {
     getTableProps,
     getTableBodyProps,
     headerGroups,
+    allColumns,
     prepareRow,
     page,
     canPreviousPage,
@@ -65,27 +124,49 @@ export const Table = ({
     nextPage,
     previousPage,
     setPageSize,
-    state: { pageIndex, pageSize, sortBy, expanded },
+    state: { pageIndex, pageSize, sortBy, expanded, filters },
   } = useTable(
     {
       columns,
       data,
-      initialState: { pageSize: initialPageSize, sortBy: initialSortBy },
+      initialState: savedTableState || {
+        pageSize: initialPageSize,
+        sortBy: initialSortBy,
+      },
       manualPagination,
       pageCount: count == undefined ? 1 : Math.ceil(count / initialPageSize),
       manualSortBy,
+      manualFilters,
     },
-    ...[useSort && useSortBy, useExpand && useExpanded, usePagination].filter(
-      Boolean
-    )
+    ...[
+      useFilter && useFilters,
+      useSort && useSortBy,
+      useExpand && useExpanded,
+      usePagination,
+    ].filter(Boolean)
   );
 
   useEffect(() => {
-    fetchData({ pageIndex, pageSize, sortBy });
-  }, [fetchData, pageIndex, pageSize, sortBy]);
+    if (name) {
+      setTableState((s) => ({
+        ...s,
+        [name]: { pageIndex, pageSize, sortBy, filters },
+      }));
+    }
+    fetchData({ pageIndex, pageSize, sortBy, filters });
+  }, [fetchData, pageIndex, pageSize, sortBy, filters]);
 
   return (
     <div className="max-w-full overflow-x-auto">
+      {useFilter && (
+        <div className="py-2 flex flex-wrap gap-1">
+          {allColumns.map((column) =>
+            column.canFilter && column.Filter
+              ? column.render("Filter", { key: column.id })
+              : null
+          )}
+        </div>
+      )}
       <table
         {...getTableProps([
           {
@@ -107,26 +188,28 @@ export const Table = ({
                 tableHeaderGroupProps,
               ])}
             >
-              {headerGroup.headers.map((column) => (
-                <th
-                  {...column.getHeaderProps([
-                    {
-                      className: "items-center",
-                    },
-                    { className: column.className },
-                    { style: column.style },
-                    useSort && column.getSortByToggleProps(),
-                  ])}
-                >
-                  {column.render("Header")}
-                  {column.isSorted &&
-                    (column.isSortedDesc ? (
-                      <FaSortAmountDown className="ml-1 inline" />
-                    ) : (
-                      <FaSortAmountUp className="ml-1 inline" />
-                    ))}
-                </th>
-              ))}
+              {headerGroup.headers
+                .filter((c) => !c.hidden)
+                .map((column) => (
+                  <th
+                    {...column.getHeaderProps([
+                      {
+                        className: "items-center",
+                      },
+                      { className: column.className },
+                      { style: column.style },
+                      useSort && column.getSortByToggleProps(),
+                    ])}
+                  >
+                    {column.render("Header")}
+                    {column.isSorted &&
+                      (column.isSortedDesc ? (
+                        <FaSortAmountDown className="ml-1 inline" />
+                      ) : (
+                        <FaSortAmountUp className="ml-1 inline" />
+                      ))}
+                  </th>
+                ))}
             </tr>
           ))}
         </thead>
@@ -142,18 +225,20 @@ export const Table = ({
             prepareRow(row);
             return (
               <tr {...row.getRowProps({ className: "flex" })}>
-                {row.cells.map((cell) => {
-                  return (
-                    <td
-                      {...cell.getCellProps([
-                        { className: cell.column.className },
-                        { style: cell.column.style },
-                      ])}
-                    >
-                      {cell.render("Cell")}
-                    </td>
-                  );
-                })}
+                {row.cells
+                  .filter((c) => !c.column.hidden)
+                  .map((cell) => {
+                    return (
+                      <td
+                        {...cell.getCellProps([
+                          { className: cell.column.className },
+                          { style: cell.column.style },
+                        ])}
+                      >
+                        {cell.render("Cell")}
+                      </td>
+                    );
+                  })}
               </tr>
             );
           })}

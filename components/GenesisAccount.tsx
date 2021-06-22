@@ -213,7 +213,11 @@ const GenesisAccount = ({ genesisAccount }: { genesisAccount: string }) => {
         />
       </section>
       {genesisAccount && (
-        <NeuronsTable genesisAccount={genesisAccount} onFetch={setNeuronData} />
+        <NeuronsTable
+          genesisAccount={genesisAccount}
+          onFetch={setNeuronData}
+          name="genesis"
+        />
       )}
     </>
   );

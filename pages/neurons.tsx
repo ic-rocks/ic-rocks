@@ -79,7 +79,7 @@ const NeuronsPage = () => {
       <section className="mb-8">
         <SimpleTable headers={headers} rows={summaryRows} />
       </section>
-      <NeuronsTable />
+      <NeuronsTable name="neurons" />
     </div>
   );
 };

@@ -1,3 +1,4 @@
+import { Principal } from "@dfinity/principal";
 import { getCrc32 } from "@dfinity/principal/lib/cjs/utils/getCrc";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -27,6 +28,9 @@ export default function SearchBar() {
       } catch (error) {
         router.push(`/account/${input}`);
       }
+    } else if (input.match(/^[0-9a-fA-F]+$/)) {
+      const principal = Principal.fromHex(input).toText();
+      router.push(`/principal/${principal}`);
     } else {
       if (input.match(/^\d+$/)) {
         router.push(`/neuron/${input}`);
