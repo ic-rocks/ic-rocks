@@ -1,11 +1,185 @@
 import { IDL } from "@dfinity/candid";
+import * as leb128 from "@dfinity/candid/lib/cjs/utils/leb128";
 import { Principal } from "@dfinity/principal";
+import BufferPipe from "buffer-pipe";
 import protobuf from "protobufjs";
 import { isNumberType } from "../../components/CanisterUI/ProtobufElements";
 import { pluralize } from "../strings";
 
-export const any = (arr: any[]): boolean =>
-  arr.reduce((prev, curr) => prev || curr, false);
+const DIDC_BUFFER = Buffer.from("4449444c", "hex");
+
+export const decodeBlob = (bytes: Buffer) => {
+  const b =
+    bytes.slice(0, 4).compare(DIDC_BUFFER) === 0 ? bytes.slice(4) : bytes;
+
+  const pipe = new BufferPipe(b);
+  const rawTable = [];
+  const len = Number(leb128.lebDecode(pipe));
+  for (let i = 0; i < len; i++) {
+    const ty = Number(leb128.slebDecode(pipe));
+    switch (ty) {
+      case -18 /* Opt */:
+      case -19 /* Vector */: {
+        const t = Number(leb128.slebDecode(pipe));
+        rawTable.push([ty, t]);
+        break;
+      }
+      case -20 /* Record */:
+      case -21 /* Variant */: {
+        const fields = [];
+        let objectLength = Number(leb128.lebDecode(pipe));
+        let prevHash;
+        while (objectLength--) {
+          const hash = Number(leb128.lebDecode(pipe));
+          if (hash >= Math.pow(2, 32)) {
+            throw new Error("field id out of 32-bit range");
+          }
+          if (typeof prevHash === "number" && prevHash >= hash) {
+            throw new Error("field id collision or not sorted");
+          }
+          prevHash = hash;
+          const t = Number(leb128.slebDecode(pipe));
+          fields.push([hash, t]);
+        }
+        rawTable.push([ty, fields]);
+        break;
+      }
+      case -22 /* Func */: {
+        for (let k = 0; k < 2; k++) {
+          let funcLength = Number(leb128.lebDecode(pipe));
+          while (funcLength--) {
+            leb128.slebDecode(pipe);
+          }
+        }
+        const annLen = Number(leb128.lebDecode(pipe));
+        leb128.safeRead(pipe, annLen);
+        rawTable.push([ty, undefined]);
+        break;
+      }
+      case -23 /* Service */: {
+        let servLength = Number(leb128.lebDecode(pipe));
+        while (servLength--) {
+          const l = Number(leb128.lebDecode(pipe));
+          leb128.safeRead(pipe, l);
+          leb128.slebDecode(pipe);
+        }
+        rawTable.push([ty, undefined]);
+        break;
+      }
+      default:
+        throw new Error("Illegal op_code: " + ty);
+    }
+  }
+  const rawTypes = [];
+  const length = Number(leb128.lebDecode(pipe));
+  for (let i = 0; i < length; i++) {
+    rawTypes.push(Number(leb128.slebDecode(pipe)));
+  }
+  const table = rawTable.map((_) => IDL.Rec());
+  function getType(t) {
+    if (t < -24) {
+      throw new Error("future value not supported");
+    }
+    if (t < 0) {
+      switch (t) {
+        case -1:
+          return IDL.Null;
+        case -2:
+          return IDL.Bool;
+        case -3:
+          return IDL.Nat;
+        case -4:
+          return IDL.Int;
+        case -5:
+          return IDL.Nat8;
+        case -6:
+          return IDL.Nat16;
+        case -7:
+          return IDL.Nat32;
+        case -8:
+          return IDL.Nat64;
+        case -9:
+          return IDL.Int8;
+        case -10:
+          return IDL.Int16;
+        case -11:
+          return IDL.Int32;
+        case -12:
+          return IDL.Int64;
+        case -13:
+          return IDL.Float32;
+        case -14:
+          return IDL.Float64;
+        case -15:
+          return IDL.Text;
+        case -16:
+          return IDL.Reserved;
+        case -17:
+          return IDL.Empty;
+        case -24:
+          return IDL.Principal;
+        default:
+          throw new Error("Illegal op_code: " + t);
+      }
+    }
+    if (t >= rawTable.length) {
+      throw new Error("type index out of range");
+    }
+    return table[t];
+  }
+  function buildType(entry) {
+    switch (entry[0]) {
+      case -19 /* Vector */: {
+        const ty = getType(entry[1]);
+        return IDL.Vec(ty);
+      }
+      case -18 /* Opt */: {
+        const ty = getType(entry[1]);
+        return IDL.Opt(ty);
+      }
+      case -20 /* Record */: {
+        const fields = {};
+        for (const [hash, ty] of entry[1]) {
+          const name = `_${hash}_`;
+          fields[name] = getType(ty);
+        }
+        const record = IDL.Record(fields);
+        const tuple = record.tryAsTuple();
+        if (Array.isArray(tuple)) {
+          return IDL.Tuple(...tuple);
+        } else {
+          return record;
+        }
+      }
+      case -21 /* Variant */: {
+        const fields = {};
+        for (const [hash, ty] of entry[1]) {
+          const name = `_${hash}_`;
+          fields[name] = getType(ty);
+        }
+        return IDL.Variant(fields);
+      }
+      case -22 /* Func */: {
+        return IDL.Func([], [], []);
+      }
+      case -23 /* Service */: {
+        return IDL.Service({});
+      }
+      default:
+        throw new Error("Illegal op_code: " + entry[0]);
+    }
+  }
+  rawTable.forEach((entry, i) => {
+    const t = buildType(entry);
+    table[i].fill(t);
+  });
+  const types = rawTypes.map((t) => getType(t));
+  const output = types.map((t) => t.decodeValue(pipe, t));
+  if (pipe.buffer.length > 0) {
+    console.log("decode: Left-over bytes");
+  }
+  return { types, output };
+};
 
 export const stringify = (data) =>
   JSON.stringify(
