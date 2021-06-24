@@ -69,6 +69,20 @@ export type PagedResponse<T> = {
   rows: T[];
 };
 
+export type EntitysResponse = PagedResponse<Entity>;
+
+export type Entity = {
+  id: string;
+  name: string;
+  imageUrl: string;
+  url: string;
+  description: string;
+  principalCount: number;
+  canisterCount: number;
+  accountCount: number;
+  neuronCount: number;
+};
+
 export type PrincipalsResponse = PagedResponse<APIPrincipal>;
 
 export type APIPrincipal = {
