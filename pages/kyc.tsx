@@ -1,6 +1,7 @@
 import { DateTime } from "luxon";
 import Link from "next/link";
 import React, { useCallback, useMemo, useState } from "react";
+import { BsInfoCircle } from "react-icons/bs";
 import { MetaTags } from "../components/MetaTags";
 import ProposalNav from "../components/Proposals/ProposalNav";
 import { Table } from "../components/Tables/Table";
@@ -31,7 +32,18 @@ const KycPage = () => {
         className: "px-2 flex-1 flex oneline",
       },
       {
-        Header: "Ledger Accounts",
+        Header: (
+          <>
+            Ledger Accounts
+            <span
+              aria-label="These are accounts directly owned by a Principal. Genesis accounts control neurons, which are always owned by the Governance canister"
+              data-balloon-pos="down"
+              data-balloon-length="large"
+            >
+              <BsInfoCircle className="ml-1 inline text-xs align-middle" />
+            </span>
+          </>
+        ),
         id: "accounts",
         accessor: (d) => d.principal.accounts[0]?.id,
         disableSortBy: true,
@@ -46,10 +58,22 @@ const KycPage = () => {
             ))}
           </div>
         ),
+        headerClassName: "px-2 flex-1",
         className: "px-2 flex-1 overflow-hidden",
       },
       {
-        Header: "Type",
+        Header: (
+          <>
+            Type
+            <span
+              aria-label="Principals not associated with genesis accounts may be participants in the presale or other fundraising rounds"
+              data-balloon-pos="down"
+              data-balloon-length="large"
+            >
+              <BsInfoCircle className="ml-1 inline text-xs align-middle" />
+            </span>
+          </>
+        ),
         id: "genesisAccount",
         disableSortBy: true,
         accessor: (d) => d.principal.genesisAccount?.id,
@@ -59,16 +83,20 @@ const KycPage = () => {
               <a className="link-overflow">Genesis</a>
             </Link>
           ) : (
-            "Presale/Other"
+            "Other"
           ),
-        className: "px-1 w-36",
+        className: "px-1 w-28",
       },
       {
         Header: "Proposal",
         id: "proposalId",
         accessor: (d) => d.proposal.id,
         sortDescFirst: true,
-        Cell: ({ value }) => formatNumber(value),
+        Cell: ({ value }) => (
+          <Link href={`/proposal/${value}`}>
+            <a className="link-overflow">{formatNumber(value)}</a>
+          </Link>
+        ),
         className: "px-1 w-16 xs:w-24 text-right",
       },
       {
@@ -76,7 +104,7 @@ const KycPage = () => {
         accessor: (d) => d.proposal.decidedDate,
         disableSortBy: true,
         Cell: ({ value }) => DateTime.fromISO(value).toLocaleString(),
-        className: "px-1 w-24 text-right",
+        className: "pr-2 w-24 text-right hidden sm:block",
       },
     ],
     []

@@ -196,7 +196,7 @@ export const TableWrapped = ({
                       {
                         className: "items-center",
                       },
-                      { className: column.className },
+                      { className: column.headerClassName || column.className },
                       { style: column.style },
                       useSort && column.getSortByToggleProps(),
                     ])}

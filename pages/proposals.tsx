@@ -3,72 +3,20 @@ import { DateTime } from "luxon";
 import Link from "next/link";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { BsChevronDown, BsChevronRight } from "react-icons/bs";
-import { FiExternalLink } from "react-icons/fi";
 import { MetaTags } from "../components/MetaTags";
 import ProposalNav from "../components/Proposals/ProposalNav";
+import {
+  ProposalRewardStatusLabel,
+  ProposalStatusLabel,
+} from "../components/Proposals/ProposalStatusLabel";
+import { ProposalSummary } from "../components/Proposals/ProposalSummary";
+import { ProposalUrl } from "../components/Proposals/ProposalUrl";
 import { SelectColumnFilter, Table } from "../components/Tables/Table";
 import { entries } from "../lib/enums";
 import fetchJSON from "../lib/fetch";
-import { isUrl } from "../lib/strings";
-import { Proposal, ProposalsResponse } from "../lib/types/API";
-import {
-  Action,
-  NnsFunction,
-  RewardStatus,
-  Status,
-  Topic,
-} from "../lib/types/governance";
-
-const renderSummary = (p: Proposal) => {
-  if (p.action === Action["Approve Genesis KYC"]) {
-    const data = JSON.parse(p.payloadJson);
-    return (
-      <ul className="text-xs">
-        {data.map((pid) => (
-          <li key={pid}>
-            <Link href={`/principal/${pid}`}>
-              <a className="link-overflow">{pid}</a>
-            </Link>
-          </li>
-        ))}
-      </ul>
-    );
-  }
-
-  if (p.nnsFunction === NnsFunction["Set Authorized Subnetworks"]) {
-    const data = JSON.parse(p.payloadJson);
-    return (
-      <div className="text-xs">
-        <div>
-          <label>Who</label>
-          <ul>
-            {data.who.map((pid) => (
-              <li key={pid}>
-                <Link href={`/principal/${pid}`}>
-                  <a className="link-overflow">{pid}</a>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div>
-          <label>Subnets</label>
-          <ul>
-            {data.subnets.map((id) => (
-              <li key={id}>
-                <Link href={`/subnet/${id}`}>
-                  <a className="link-overflow">{id}</a>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-    );
-  }
-
-  return <pre className="text-xs mb-1">{p.payloadJson}</pre>;
-};
+import { formatNumber } from "../lib/numbers";
+import { ProposalsResponse } from "../lib/types/API";
+import { Action, NnsFunction, Status, Topic } from "../lib/types/governance";
 
 const ProposalsPage = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -91,6 +39,11 @@ const ProposalsPage = () => {
           Header: "ID",
           accessor: "id",
           sortDescFirst: true,
+          Cell: ({ value, row }) => (
+            <Link href={`/proposal/${value}`}>
+              <a className="link-overflow">{value}</a>
+            </Link>
+          ),
           className: "px-2 w-14 oneline",
         },
         {
@@ -104,28 +57,12 @@ const ProposalsPage = () => {
           accessor: "status",
           disableSortBy: true,
           Cell: ({ value, row }) => (
-            <div>
-              <label
-                className={classNames("block", {
-                  "text-green-500": value === Status.Open,
-                  "text-red-500":
-                    value === Status.Rejected || value === Status.Failed,
-                })}
-              >
-                {Status[value]}
-              </label>
-              <label
-                className={classNames("block", {
-                  "text-green-500":
-                    row.original.rewardStatus ===
-                      RewardStatus["Accept Votes"] &&
-                    !(value === Status.Rejected || value === Status.Failed),
-                  "text-red-500":
-                    row.original.rewardStatus === RewardStatus.Ineligible,
-                })}
-              >
-                {RewardStatus[row.original.rewardStatus]}
-              </label>
+            <div className="flex flex-col">
+              <ProposalStatusLabel status={value} />
+              <ProposalRewardStatusLabel
+                status={value}
+                rewardStatus={row.original.rewardStatus}
+              />
             </div>
           ),
           className: "px-2 w-32",
@@ -140,7 +77,8 @@ const ProposalsPage = () => {
               <a className="link-overflow">{value}</a>
             </Link>
           ),
-          className: "px-2 w-24 overflow-hidden overflow-ellipsis",
+          className:
+            "px-2 w-24 hidden md:block overflow-hidden overflow-ellipsis",
           Filter: SelectColumnFilter,
           filterOptions: [["Proposer...", "" as any]].concat(
             proposers?.length > 0
@@ -176,24 +114,14 @@ const ProposalsPage = () => {
                 <p className="text-xs">{row.original.summary}</p>
               </div>
               {row.isExpanded && (
-                <div className="overflow-auto text-xs">
+                <div className="overflow-auto flex flex-col gap-2">
                   {row.original.url && (
-                    <>
-                      <strong className="mr-2">URL</strong>
-                      {isUrl(row.original.url) ? (
-                        <a
-                          href={row.original.url}
-                          target="_blank"
-                          className="inline-flex items-center oneline link-overflow"
-                        >
-                          {row.original.url} <FiExternalLink className="ml-1" />
-                        </a>
-                      ) : (
-                        row.original.url
-                      )}
-                    </>
+                    <div className="text-xs">
+                      <strong className="block">URL</strong>
+                      <ProposalUrl url={row.original.url} />
+                    </div>
                   )}
-                  {renderSummary(row.original)}
+                  <ProposalSummary proposal={row.original} />
                 </div>
               )}
             </>
@@ -221,14 +149,16 @@ const ProposalsPage = () => {
           accessor: "tallyTotal",
           disableSortBy: true,
           Cell: ({ value, row }) => {
-            const tallyYes = BigInt(row.original.tallyYes);
-            const tallyNo = BigInt(row.original.tallyNo);
+            const tallyYes = Number(
+              BigInt(row.original.tallyYes) / BigInt(1e8)
+            );
+            const tallyNo = Number(BigInt(row.original.tallyNo) / BigInt(1e8));
             const sum = tallyYes + tallyNo;
             const open = row.original.status === Status.Open;
 
             return (
               <div>
-                {Number(sum).toExponential(2)}
+                {formatNumber(sum)}
                 {(open || tallyYes > tallyNo) && (
                   <span
                     className={classNames("block", {
@@ -241,29 +171,25 @@ const ProposalsPage = () => {
                         row.original.status === Status.Failed,
                     })}
                   >
-                    {(Number((tallyYes * BigInt(10000)) / sum) / 100).toFixed(
-                      2
-                    )}
-                    % Yes
+                    {(tallyYes / sum).toFixed(2)}% Yes
                   </span>
                 )}
                 {(open || tallyYes < tallyNo) && (
                   <span className="block text-red-500">
-                    {(Number((tallyNo * BigInt(10000)) / sum) / 100).toFixed(2)}
-                    % No
+                    {(tallyNo / sum).toFixed(2)}% No
                   </span>
                 )}
               </div>
             );
           },
-          className: "px-2 w-28",
+          className: "px-2 w-28 hidden md:block",
         },
         {
           Header: "Proposal Date",
           accessor: "proposalDate",
           disableSortBy: true,
           Cell: ({ value }) => DateTime.fromISO(value).toRelative(),
-          className: "px-2 w-32 text-right",
+          className: "px-2 w-32 text-right hidden sm:block",
         },
       ].filter(Boolean),
     [proposers]
@@ -332,6 +258,7 @@ const ProposalsPage = () => {
       <section>
         <Table
           name="proposals"
+          style={{ minWidth: 480 }}
           columns={columns}
           data={rows}
           count={count}

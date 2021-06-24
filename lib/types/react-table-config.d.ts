@@ -68,6 +68,7 @@ declare module "react-table" {
       UseResizeColumnsColumnProps<D>,
       UseSortByColumnProps<D> {
     className: string;
+    headerClassName?: string;
     style: React.CSSProperties;
     hidden?: boolean;
   }

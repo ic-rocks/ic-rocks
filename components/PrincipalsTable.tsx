@@ -38,6 +38,14 @@ export const PrincipalsTable = () => {
         Header: "Name",
         accessor: "name",
         disableSortBy: true,
+        Cell: ({ value, row }) =>
+          row.original.entityId ? (
+            <Link href={`/page/${row.original.entityId}`}>
+              <a className="link-overflow hidden sm:block">{value}</a>
+            </Link>
+          ) : (
+            value
+          ),
         className: "px-1 hidden sm:block w-32 oneline",
       },
       {

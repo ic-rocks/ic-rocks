@@ -86,4 +86,5 @@ export enum NnsFunction {
   "Set Firewall Config" = 15,
   "Update Node Operator Config" = 16,
   "Stop or Start NNS Canister" = 17,
+  "Remove Nodes From Registry" = 18,
 }

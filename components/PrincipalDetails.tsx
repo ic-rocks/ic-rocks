@@ -6,7 +6,7 @@ import classNames from "classnames";
 import { DateTime } from "luxon";
 import Link from "next/link";
 import React, { useEffect, useMemo, useState } from "react";
-import { BsArrowReturnRight } from "react-icons/bs";
+import { BsArrowReturnRight, BsChevronRight } from "react-icons/bs";
 import { FiExternalLink } from "react-icons/fi";
 import { APIPrincipal, Canister } from "../lib/types/API";
 import { PrincipalType } from "../pages/principal/[principalId]";
@@ -119,37 +119,47 @@ export default function PrincipalDetails({
               className="px-2 py-2 flex-1 flex flex-wrap justify-between"
             >
               Overview
-              {principalData?.genesisAccount?.id && (
-                <label className="font-normal label-tag bg-purple-200 dark:bg-purple-400">
-                  Genesis Account
-                </label>
-              )}
-              {canisterData?.module?.hasHttp && (
-                <div>
-                  {httpResponse && !httpResponse.ok && (
-                    <span
-                      className={classNames("font-normal text-xs mr-1", {
-                        "text-yellow-400":
-                          httpResponse.status >= 300 &&
-                          httpResponse.status < 400,
-                        "text-red-400": httpResponse.status >= 400,
-                      })}
+              <div className="flex gap-2">
+                {principalData?.entityId && (
+                  <Link href={`/page/${principalData.entityId}`}>
+                    <a className="hover:underline font-normal label-tag bg-blue-200 dark:bg-blue-400 inline-flex items-center">
+                      {principalData.entity.name}
+                      <BsChevronRight className="ml-1" />
+                    </a>
+                  </Link>
+                )}
+                {principalData?.genesisAccount?.id && (
+                  <label className="font-normal label-tag bg-purple-200 dark:bg-purple-400">
+                    Genesis Account
+                  </label>
+                )}
+                {canisterData?.module?.hasHttp && (
+                  <div>
+                    {httpResponse && !httpResponse.ok && (
+                      <span
+                        className={classNames("font-normal text-xs mr-1", {
+                          "text-yellow-400":
+                            httpResponse.status >= 300 &&
+                            httpResponse.status < 400,
+                          "text-red-400": httpResponse.status >= 400,
+                        })}
+                      >
+                        {httpResponse.status}{" "}
+                        {httpResponse.status === 404
+                          ? "Not Found"
+                          : httpResponse.statusText}
+                      </span>
+                    )}
+                    <a
+                      className="hover:underline font-normal label-tag bg-green-label inline-flex items-center"
+                      href={`https://${principalId}.raw.ic0.app`}
+                      target="_blank"
                     >
-                      {httpResponse.status}{" "}
-                      {httpResponse.status === 404
-                        ? "Not Found"
-                        : httpResponse.statusText}
-                    </span>
-                  )}
-                  <a
-                    className="hover:underline font-normal label-tag bg-green-label"
-                    href={`https://${principalId}.raw.ic0.app`}
-                    target="_blank"
-                  >
-                    View URL <FiExternalLink className="inline ml-1" />
-                  </a>
-                </div>
-              )}
+                      View URL <FiExternalLink className="ml-1" />
+                    </a>
+                  </div>
+                )}
+              </div>
             </th>
           </tr>
         </thead>
