@@ -6,8 +6,8 @@ import BalanceLabel from "../../components/Labels/BalanceLabel";
 import { TimestampLabel } from "../../components/Labels/TimestampLabel";
 import { MetaTags } from "../../components/MetaTags";
 import { NeuronLabel } from "../../components/Neurons/NeuronLabel";
+import Search404 from "../../components/Search404";
 import SimpleTable from "../../components/Tables/SimpleTable";
-import fetchJSON from "../../lib/fetch";
 import { formatNumber } from "../../lib/numbers";
 import { formatPercent } from "../../lib/strings";
 import { Neuron } from "../../lib/types/API";
@@ -20,20 +20,26 @@ const NeuronIdPage = () => {
   const router = useRouter();
   const { neuronId } = router.query as { neuronId: string };
   const [isLoading, setIsLoading] = useState(true);
+  const [isValid, setIsValid] = useState(true);
   const [data, setData] = useState<Neuron>(null);
 
   useEffect(() => {
     if (!neuronId) return;
-
-    fetchJSON(`/api/neurons/${neuronId}`).then((data) => {
-      if (data) {
-        setData(data);
+    (async () => {
+      const res = await fetch(`/api/neurons/${neuronId}`);
+      if (res.status === 404) {
+        setIsValid(false);
+        return;
       }
+      try {
+        const data = await res.json();
+        if (data) {
+          setData(data);
+        }
+      } catch (error) {}
       setIsLoading(false);
-    });
+    })();
   }, [neuronId]);
-
-  const headers = [{ contents: "Neuron Details" }];
 
   const summaryRows = useMemo(() => {
     let dissolveDate,
@@ -152,6 +158,12 @@ const NeuronIdPage = () => {
       ],
     ];
   }, [data]);
+
+  if (!isValid) {
+    return <Search404 input={neuronId} />;
+  }
+
+  const headers = [{ contents: "Neuron Details" }];
 
   return (
     <div className="pb-16">
