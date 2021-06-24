@@ -86,6 +86,26 @@ export type APIPrincipal = {
   nodeCount?: number;
   isKyc: boolean;
   genesisAccount?: { id: string };
+  entityId: string | null;
+  entity?: { id: number; name: string };
+};
+
+export type KycsResponse = PagedResponse<Kyc>;
+
+export type Kyc = {
+  id: string;
+  principal: {
+    id: string;
+    name: string;
+    accounts: Partial<Account>[];
+    genesisAccount: {
+      id: string;
+    };
+  };
+  proposal: {
+    id: number;
+    decidedDate: string;
+  };
 };
 
 export type TransactionsResponse = PagedResponse<Transaction>;
