@@ -28,7 +28,8 @@ td {
 
 input,
 button,
-select {
+select,
+textarea {
   @apply focus:outline-none;
 }
 

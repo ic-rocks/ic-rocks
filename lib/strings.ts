@@ -27,6 +27,7 @@ export enum IdentityKind {
   Transaction,
   NeuronId,
   Candid,
+  Wasm,
 }
 export const getIdentityKind = (
   blob: string
@@ -57,6 +58,9 @@ export const getIdentityKind = (
     } else if (input.match(/^[0-9a-fA-F]+$/)) {
       if (input.match(/^4449444C/i)) {
         return [IdentityKind.Candid, input];
+      }
+      if (input.match(/^0061736d/i)) {
+        return [IdentityKind.Wasm, input];
       }
       if (input.length <= 58) {
         const principal = Principal.fromHex(input);

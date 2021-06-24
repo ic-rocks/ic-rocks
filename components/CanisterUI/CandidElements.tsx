@@ -302,7 +302,7 @@ export const CandidOutput = ({
           </Label>
         }
       >
-        <OutputWrapper force={true} value={"0x" + raw.toString("hex")} />
+        <OutputWrapper force={true} value={raw.toString("hex")} />
       </Node>
     );
   }

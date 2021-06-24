@@ -9,14 +9,49 @@ import {
   CandidInput,
   CandidOutput,
   CandidOutputDisplay,
+  CANDID_OUTPUT_DISPLAYS,
 } from "./CandidElements";
-import { Message, ProtobufOutputDisplay } from "./ProtobufElements";
+import {
+  Message,
+  ProtobufOutputDisplay,
+  PROTOBUF_OUTPUT_DISPLAYS,
+} from "./ProtobufElements";
 
 export type Format = "candid" | "protobuf";
 
 export const DELETE_ITEM = Symbol("DELETE_ITEM");
 
 export const BUFFER_ENCODINGS = ["Hex", "UTF-8", "Base64", "Raw"] as const;
+
+export const OutputDisplayButtons = ({
+  format,
+  value,
+  onClick,
+}: {
+  format: Format;
+  value: CandidOutputDisplay | ProtobufOutputDisplay;
+  onClick: (option: CandidOutputDisplay | ProtobufOutputDisplay) => void;
+}) => {
+  return (
+    <div className="text-xs">
+      {(format === "candid"
+        ? CANDID_OUTPUT_DISPLAYS
+        : PROTOBUF_OUTPUT_DISPLAYS
+      ).map((option) => (
+        <button
+          key={option}
+          type="button"
+          className={classNames("px-1 py-0.5 btn-default", {
+            "text-gray-500": option !== value,
+          })}
+          onClick={() => onClick(option)}
+        >
+          {option}
+        </button>
+      ))}
+    </div>
+  );
+};
 
 export const Node = ({
   label,
@@ -330,7 +365,7 @@ export const BufferDisplay = ({
   const buf = Buffer.from(value);
   const out =
     bufDisplay === "Hex"
-      ? "0x" + buf.toString("hex")
+      ? buf.toString("hex")
       : bufDisplay === "Base64"
       ? buf.toString("base64")
       : bufDisplay === "Raw"

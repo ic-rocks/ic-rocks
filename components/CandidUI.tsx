@@ -21,7 +21,12 @@ import {
   Message as PbMessage,
   PROTOBUF_OUTPUT_DISPLAYS,
 } from "./CanisterUI/ProtobufElements";
-import { DELETE_ITEM, Output, QueryButton } from "./CanisterUI/Shared";
+import {
+  DELETE_ITEM,
+  Output,
+  OutputDisplayButtons,
+  QueryButton,
+} from "./CanisterUI/Shared";
 
 const root = protobuf.Root.fromJSON(protobufJson as protobuf.INamespace);
 const CANDID_UI_URL = "https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.ic0.app/";
@@ -350,6 +355,7 @@ export default function CandidUI({
           : CANDID_OUTPUT_DISPLAYS;
         const outputDisplay =
           state.outputDisplays[funcName] || OUTPUT_DISPLAYS[0];
+        const format = isPb ? "protobuf" : "candid";
 
         return (
           <form
@@ -368,7 +374,7 @@ export default function CandidUI({
                   "bg-blue-400": !isPb,
                 })}
               >
-                {isPb ? "protobuf" : "candid"}
+                {format}
               </label>
             </div>
             <div className="px-2 py-2">
@@ -377,38 +383,29 @@ export default function CandidUI({
                 isLoading={state.isLoading[funcName]}
                 isQuery={isQuery}
               />
-              <div className="mt-2 flex items-center">
+              <div className="mt-2 flex items-center gap-2">
                 <span className="text-xs italic text-gray-500">
                   <BsArrowReturnRight className="inline" />
                   {responseTypes}
                 </span>
                 {state.outputs[funcName] && !state.outputs[funcName].err && (
-                  <div className="text-xs ml-2">
-                    {OUTPUT_DISPLAYS.map((display) => (
-                      <button
-                        key={display}
-                        type="button"
-                        className={classNames("px-1 py-0.5 btn-default", {
-                          "text-gray-500": display !== outputDisplay,
-                        })}
-                        onClick={() =>
-                          dispatch({
-                            type: "outputDisplay",
-                            func: funcName,
-                            payload: display,
-                          })
-                        }
-                      >
-                        {display}
-                      </button>
-                    ))}
-                  </div>
+                  <OutputDisplayButtons
+                    format={format}
+                    value={outputDisplay}
+                    onClick={(value) =>
+                      dispatch({
+                        type: "outputDisplay",
+                        func: funcName,
+                        payload: value,
+                      })
+                    }
+                  />
                 )}
               </div>
               {state.outputs[funcName] ? (
                 <div className="mt-1">
                   <Output
-                    format={isPb ? "protobuf" : "candid"}
+                    format={format}
                     display={outputDisplay}
                     type={
                       isPb

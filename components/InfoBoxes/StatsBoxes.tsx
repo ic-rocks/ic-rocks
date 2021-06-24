@@ -33,7 +33,9 @@ export default function StatsBoxes() {
       <div className="flex-none flex flex-col w-full xs:w-64">
         <div className="flex justify-between">
           <label>ICP Price</label>
-          {markets && <strong>{formatNumberUSD(markets.ticker.price)}</strong>}
+          {markets?.ticker && (
+            <strong>{formatNumberUSD(markets.ticker.price)}</strong>
+          )}
         </div>
 
         {!markets ? <CgSpinner className="animate-spin" /> : <SparklineChart />}

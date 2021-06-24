@@ -174,11 +174,11 @@ export const decodeBlob = (bytes: Buffer) => {
     table[i].fill(t);
   });
   const types = rawTypes.map((t) => getType(t));
-  const output = types.map((t) => t.decodeValue(pipe, t));
+  const outputs = types.map((t) => t.decodeValue(pipe, t));
   if (pipe.buffer.length > 0) {
     console.log("decode: Left-over bytes");
   }
-  return { types, output };
+  return { types, outputs };
 };
 
 export const stringify = (data) =>

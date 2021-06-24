@@ -1,7 +1,16 @@
+import * as cbor from "@dfinity/agent/lib/cjs/cbor";
 import { Principal } from "@dfinity/principal";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import ActiveLink from "../../components/ActiveLink";
+import {
+  CandidOutputDisplay,
+  CANDID_OUTPUT_DISPLAYS,
+} from "../../components/CanisterUI/CandidElements";
+import {
+  Output,
+  OutputDisplayButtons,
+} from "../../components/CanisterUI/Shared";
 import { MetaTags } from "../../components/MetaTags";
 import { SecondaryNav } from "../../components/Nav/SecondaryNav";
 import { decodeBlob, stringify } from "../../lib/candid/utils";
@@ -12,13 +21,21 @@ export default function BlobDebugger() {
   const [output, setOutput] = useState("");
   const [asPrincipal, setAsPrincipal] = useState("");
   const [asHex, setAsHex] = useState("");
+  const [asCbor, setAsCbor] = useState("");
+  const [asCandid, setAsCandid] = useState(null);
+  const [candidOutput, setCandidOutput] = useState<CandidOutputDisplay>(
+    CANDID_OUTPUT_DISPLAYS[0]
+  );
   const [outputType, setOutputType] = useState(IdentityKind.None);
   useEffect(() => {
+    setAsPrincipal("");
+    setAsHex("");
+    setOutput("");
+    setAsCbor("");
+    setAsCandid(null);
+    setOutputType(IdentityKind.None);
+
     if (!input) {
-      setAsPrincipal("");
-      setAsHex("");
-      setOutput("");
-      setOutputType(IdentityKind.None);
       return;
     }
 
@@ -26,30 +43,40 @@ export default function BlobDebugger() {
     const [kind, value] = getIdentityKind(trimmed);
     setOutputType(kind);
     if (kind === IdentityKind.Candid) {
-      setAsPrincipal("");
-      setAsHex("");
       try {
-        const { types, output } = decodeBlob(
-          Buffer.from(value as string, "hex")
-        );
-        setOutput(stringify(output));
+        const candid = decodeBlob(Buffer.from(value as string, "hex"));
+        setAsCandid(candid);
       } catch (error) {
         console.warn(error.message);
       }
-    } else if (value instanceof Principal) {
-      setAsPrincipal(value.toText());
-      setAsHex(value.toHex().toLowerCase());
-      setOutput("");
+    } else if (kind === IdentityKind.Wasm) {
+      // not supported yet
     } else {
-      if (isHex(trimmed)) {
-        const principal = Principal.fromHex(trimmed);
-        setAsPrincipal(principal.toText());
-        setAsHex(principal.toHex().toLowerCase());
-        setOutput(value);
+      if (value instanceof Principal) {
+        setAsPrincipal(value.toText());
+        setAsHex(value.toHex().toLowerCase());
       } else {
-        setAsPrincipal("");
-        setAsHex(Buffer.from(input).toString("hex"));
-        setOutput(value);
+        if (isHex(value)) {
+          if (value.length <= 58) {
+            const principal = Principal.fromHex(value);
+            setAsPrincipal(principal.toText());
+          }
+          setAsHex(value.toLowerCase());
+          setOutput(value);
+        } else {
+          setAsHex(Buffer.from(trimmed).toString("hex"));
+          setOutput(value);
+        }
+      }
+
+      // Try cbor
+      if (isHex(trimmed)) {
+        try {
+          const decoded = cbor.decode(Buffer.from(trimmed, "hex"));
+          if (decoded) {
+            setAsCbor(stringify(decoded));
+          }
+        } catch (error) {}
       }
     }
   }, [input]);
@@ -106,6 +133,16 @@ export default function BlobDebugger() {
         >
           Candid
         </a>
+        <a
+          className="cursor-pointer link-overflow"
+          onClick={() =>
+            setInput(
+              "d9d9f7a266737461747573677265706c696564657265706c79a1636172674908ef81c184dccb801b"
+            )
+          }
+        >
+          CBOR
+        </a>
       </div>
       <textarea
         className="w-full p-4 rounded bg-gray-100 dark:bg-gray-800 text-xs font-mono"
@@ -157,13 +194,41 @@ export default function BlobDebugger() {
           />
         </div>
       )}
-      {(outputType === IdentityKind.Candid ||
-        outputType === IdentityKind.None) && (
+      {!!asCbor && (
+        <div className="my-4">
+          <p>As CBOR</p>
+          <textarea
+            readOnly
+            className="w-full p-4 rounded bg-gray-100 dark:bg-gray-800 text-xs font-mono"
+            style={{ minHeight: asCbor.split("\n").length * 20 }}
+            value={asCbor}
+          />
+        </div>
+      )}
+      {!!asCandid && (
+        <div className="my-4">
+          <p>As Candid</p>
+          <OutputDisplayButtons
+            format="candid"
+            value={candidOutput}
+            onClick={(value) => setCandidOutput(value)}
+          />
+          {asCandid.types.map((type, i) => (
+            <Output
+              key={i}
+              format="candid"
+              display={candidOutput}
+              type={type}
+              value={{ res: asCandid.outputs[i] }}
+            />
+          ))}
+        </div>
+      )}
+      {outputType === IdentityKind.None && !asCbor && (
         <textarea
           readOnly
           className="w-full p-4 rounded bg-gray-100 dark:bg-gray-800 text-xs font-mono"
           placeholder="Results will appear here..."
-          style={{ minHeight: outputType === IdentityKind.Candid ? 300 : 100 }}
           value={output}
         />
       )}
