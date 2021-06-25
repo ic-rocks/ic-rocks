@@ -403,7 +403,9 @@ function validateCandid(type: IDL.Type, input: any): [any, any] {
     }
   } else if (
     type instanceof IDL.FixedNatClass ||
-    type instanceof IDL.FixedIntClass
+    type instanceof IDL.FixedIntClass ||
+    type instanceof IDL.NatClass ||
+    type instanceof IDL.IntClass
   ) {
     try {
       BigInt(input);
@@ -412,6 +414,8 @@ function validateCandid(type: IDL.Type, input: any): [any, any] {
       return [null, err.message];
     }
     return [BigInt(input), null];
+  } else if (type instanceof IDL.FloatClass) {
+    return [Number(input), null];
   } else if (type instanceof IDL.BoolClass) {
     return [!!input, null];
   } else {

@@ -1,4 +1,5 @@
 import { IDL } from "@dfinity/candid";
+import { Principal } from "@dfinity/principal";
 import { useRouter } from "next/router";
 import { get } from "object-path-immutable";
 import React, { useState } from "react";
@@ -220,7 +221,8 @@ export const CandidInput = ({
     type instanceof IDL.FixedNatClass ||
     type instanceof IDL.FixedIntClass ||
     type instanceof IDL.NatClass ||
-    type instanceof IDL.IntClass
+    type instanceof IDL.IntClass ||
+    type instanceof IDL.FloatClass
       ? "number"
       : "text";
   let min, max;
@@ -289,9 +291,9 @@ export const CandidOutput = ({
   } else if (display === "Raw") {
     let raw;
     try {
-      raw = type.encodeValue(value);
+      raw = IDL.encode([type], [value]);
     } catch (error) {
-      console.warn("failed to decode", type, argName, value, error);
+      console.warn("failed to encode", type, argName, value, error);
       raw = String(value);
     }
     return (
@@ -470,7 +472,7 @@ export const CandidOutput = ({
       </Node>
     );
   } else if (type instanceof IDL.PrincipalClass) {
-    const principal = value.toText();
+    const principal = value instanceof Principal ? value.toText() : value;
     const router = useRouter();
     const { principalId } = router.query;
     return (
