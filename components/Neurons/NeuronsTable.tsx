@@ -60,7 +60,7 @@ const NeuronsTable = ({
         Header: "State",
         accessor: "state",
         Cell: ({ value, row }) => <NeuronLabel state={value} />,
-        className: "px-2 w-16",
+        className: "px-2 w-24",
         Filter: SelectColumnFilter,
         filterOptions: [["State...", "" as any]].concat(
           entries(NeuronState).filter(([_, n]) => n > 0)
@@ -172,6 +172,7 @@ const NeuronsTable = ({
     <Table
       name={`${name}.neurons`}
       style={{ minWidth: 480 }}
+      className="text-xs sm:text-base"
       columns={columns}
       data={rows}
       count={count}

@@ -156,7 +156,7 @@ const GenesisAccountsPage = () => {
             {GenesisAccountStatus[value]}
           </span>
         ),
-        className: "px-2 w-24",
+        className: "px-2 w-16 sm:w-24",
         Filter: SelectColumnFilter,
         filterOptions: [["Status...", "" as any]].concat(
           entries(GenesisAccountStatus)
@@ -184,7 +184,7 @@ const GenesisAccountsPage = () => {
         Header: "Investor Type",
         accessor: "investorType",
         Cell: ({ value }) => InvestorType[value],
-        className: "px-2 w-36 hidden md:block",
+        className: "px-2 w-24 sm:w-36 hidden md:block",
         Filter: SelectColumnFilter,
         filterOptions: [["Investor Type...", "" as any]].concat(
           entries(InvestorType)
@@ -199,7 +199,7 @@ const GenesisAccountsPage = () => {
             {formatNumber(value)} <span className="text-xs">ICP</span>
           </>
         ),
-        className: "px-2 w-32 text-right",
+        className: "px-2 w-28 sm:w-32 text-right",
       },
       {
         Header: "Next Dissolve Date",
@@ -213,7 +213,7 @@ const GenesisAccountsPage = () => {
             ? "Dissolvable"
             : date.toRelative();
         },
-        className: "px-2 w-48 text-right",
+        className: "px-2 w-32 sm:w-48 text-right",
       },
     ],
     []
@@ -280,7 +280,8 @@ const GenesisAccountsPage = () => {
       <section>
         <Table
           name="genesis-accounts"
-          style={{ minWidth: 480 }}
+          style={{ minWidth: 400 }}
+          className="text-xs sm:text-base"
           columns={columns}
           data={rows}
           count={count}

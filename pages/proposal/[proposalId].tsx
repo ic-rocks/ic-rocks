@@ -108,7 +108,7 @@ const ProposalIdPage = () => {
       [
         { contents: "Decided Date", className: "w-36" },
         {
-          contents: data ? (
+          contents: data?.decidedDate ? (
             <TimestampLabel dt={DateTime.fromISO(data.decidedDate)} />
           ) : (
             "-"
@@ -145,11 +145,20 @@ const ProposalIdPage = () => {
         { contents: "URL", className: "w-36" },
         {
           contents: data ? <ProposalUrl url={data.url} /> : "-",
-          className: classNames({ "text-xs self-end": data?.url?.length > 50 }),
+          className: classNames("overflow-hidden", {
+            "text-xs self-end": data?.url?.length > 50,
+          }),
         },
       ],
       [
         { contents: "Summary", className: "w-36" },
+        {
+          contents: data ? data.summary : "-",
+          className: "sm:flex-1 break-word overflow-hidden",
+        },
+      ],
+      [
+        { contents: "Payload", className: "w-36" },
         {
           contents: data ? <ProposalSummary proposal={data} /> : "-",
         },
