@@ -84,6 +84,7 @@ export type APIPrincipal = {
   operatorOf: CommonNodeResponse[];
   providerOf: CommonNodeResponse[];
   nodeCount?: number;
+  providerOfCount?: number;
   isKyc: boolean;
   genesisAccount?: { id: string };
   entityId: string | null;
@@ -106,6 +107,15 @@ export type Kyc = {
     id: number;
     decidedDate: string;
   };
+};
+
+export type NodeProviderRewardsResponse = PagedResponse<NodeProviderReward>;
+
+export type NodeProviderReward = {
+  id: string;
+  proposalId: number;
+  principal: APIPrincipal;
+  account: Account;
 };
 
 export type TransactionsResponse = PagedResponse<Transaction>;

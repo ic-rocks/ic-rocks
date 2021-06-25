@@ -7,8 +7,9 @@ export default function ProposalNav() {
     <SecondaryNav
       items={[
         <ActiveLink href="/proposals">Proposals</ActiveLink>,
-        <ActiveLink href="/kyc">KYC</ActiveLink>,
-        <ActiveLink href="/icp">ICP Price Oracle</ActiveLink>,
+        <ActiveLink href="/proposal/kyc">KYC</ActiveLink>,
+        <ActiveLink href="/proposal/node-rewards">Node Rewards</ActiveLink>,
+        <ActiveLink href="/proposal/icp">Exchange Rate</ActiveLink>,
       ]}
     />
   );

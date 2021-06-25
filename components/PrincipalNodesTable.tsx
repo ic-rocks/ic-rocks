@@ -28,7 +28,7 @@ export const PrincipalNodesTable = ({ data }: { data: APIPrincipal }) => {
             </Link>
           );
         },
-        className: "pr-2 flex-1 flex oneline",
+        className: "px-2 flex-1 flex oneline",
       },
       {
         Header: `Subnet (${countBy(rows, (d) => d.subnet.id)} unique)`,

@@ -2,12 +2,12 @@ import { DateTime } from "luxon";
 import Link from "next/link";
 import React, { useCallback, useMemo, useState } from "react";
 import { BsInfoCircle } from "react-icons/bs";
-import { MetaTags } from "../components/MetaTags";
-import ProposalNav from "../components/Proposals/ProposalNav";
-import { Table } from "../components/Tables/Table";
-import fetchJSON from "../lib/fetch";
-import { formatNumber } from "../lib/numbers";
-import { KycsResponse } from "../lib/types/API";
+import { MetaTags } from "../../components/MetaTags";
+import ProposalNav from "../../components/Proposals/ProposalNav";
+import { Table } from "../../components/Tables/Table";
+import fetchJSON from "../../lib/fetch";
+import { formatNumber } from "../../lib/numbers";
+import { KycsResponse } from "../../lib/types/API";
 
 const KycPage = () => {
   const [isLoading, setIsLoading] = useState(false);

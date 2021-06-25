@@ -2,11 +2,11 @@ import { Actor, HttpAgent } from "@dfinity/agent";
 import { IDL } from "@dfinity/candid";
 import { DateTime } from "luxon";
 import React, { useEffect, useState } from "react";
-import { MetaTags } from "../components/MetaTags";
-import ProposalNav from "../components/Proposals/ProposalNav";
-import governanceIdl from "../lib/canisters/governance.did";
-import nnsUiIdl from "../lib/canisters/nns-ui.did";
-import useInterval from "../lib/hooks/useInterval";
+import { MetaTags } from "../../components/MetaTags";
+import ProposalNav from "../../components/Proposals/ProposalNav";
+import governanceIdl from "../../lib/canisters/governance.did";
+import nnsUiIdl from "../../lib/canisters/nns-ui.did";
+import useInterval from "../../lib/hooks/useInterval";
 declare const Buffer;
 
 const UpdateIcpXdrConversionRatePayload = (IDL) =>
