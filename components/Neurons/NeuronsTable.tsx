@@ -113,11 +113,7 @@ const NeuronsTable = ({
         Header: "Dissolve Date",
         accessor: "dissolveDate",
         Cell: ({ value, row }) => {
-          if (
-            row.original.state === NeuronState.Dissolved ||
-            DateTime.fromISO(row.original.createdDate).toSeconds() === 0
-          )
-            return "-";
+          if (row.original.state === NeuronState.Dissolved) return "-";
           const date = DateTime.fromISO(value);
           return date.diffNow().toMillis() < 0
             ? "Dissolvable"
