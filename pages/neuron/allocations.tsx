@@ -60,13 +60,16 @@ const NeuronAllocationsPage = () => {
         Header: "ICP",
         accessor: "originalStake",
         Cell: ({ value, row }) => {
-          const originalPercent =
-            row.original.name === "Total"
-              ? 1
-              : Number(BigInt(value) / BigInt(1e8)) /
-                Number(BigInt(stats.supply) / BigInt(1e8));
+          const originalPercent = stats
+            ? formatPercent(
+                row.original.name === "Total"
+                  ? 1
+                  : Number(BigInt(value) / BigInt(1e8)) /
+                      Number(BigInt(stats.supply) / BigInt(1e8))
+              )
+            : "-";
           const current =
-            row.original.name === "Total" ? stats.supply : row.original.stake;
+            row.original.name === "Total" ? stats?.supply : row.original.stake;
           return (
             <div className="flex flex-col">
               <div className="flex">
@@ -79,7 +82,7 @@ const NeuronAllocationsPage = () => {
                     "text-gray-500": value === "0",
                   })}
                 >
-                  {formatPercent(originalPercent)}
+                  {originalPercent}
                 </div>
               </div>
               <div className="flex">

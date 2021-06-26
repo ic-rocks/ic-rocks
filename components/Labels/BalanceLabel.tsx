@@ -8,10 +8,11 @@ export default function BalanceLabel({
   value: number | string | bigint;
   digits?: number;
 }) {
+  const num = Number(value);
+  if (isNaN(num)) return <>-</>;
   return (
     <>
-      {formatNumber(Number(value) / 1e8, digits)}{" "}
-      <span className="text-xs">ICP</span>
+      {formatNumber(num / 1e8, digits)} <span className="text-xs">ICP</span>
     </>
   );
 }

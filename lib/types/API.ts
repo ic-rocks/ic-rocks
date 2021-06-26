@@ -89,6 +89,7 @@ export type APIPrincipal = {
   genesisAccount?: { id: string };
   entityId: string | null;
   entity?: { id: number; name: string };
+  kyc?: { proposalId: number }[];
 };
 
 export type KycsResponse = PagedResponse<Kyc>;
@@ -146,6 +147,8 @@ export type Account = {
   principalId: string;
   principal?: {
     name: string;
+    isKyc: boolean;
+    kyc?: { proposalId: number }[];
   } | null;
   balance: string;
   first: string;

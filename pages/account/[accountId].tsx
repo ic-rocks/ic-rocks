@@ -128,11 +128,18 @@ const AccountPage = () => {
               className="px-2 py-2 flex-1 flex flex-wrap justify-between"
             >
               Account Details
-              {data?.neuron?.genesisAccountId && (
-                <label className="font-normal label-tag bg-purple-200 dark:bg-purple-400">
-                  Genesis Account
-                </label>
-              )}
+              <div>
+                {data?.principal?.isKyc && (
+                  <label className="font-normal label-tag bg-purple-200 dark:bg-purple-400">
+                    KYC
+                  </label>
+                )}
+                {data?.neuron?.genesisAccountId && (
+                  <label className="font-normal label-tag bg-purple-200 dark:bg-purple-400">
+                    Genesis Account
+                  </label>
+                )}
+              </div>
             </th>
           </tr>
         </thead>
@@ -189,6 +196,18 @@ const AccountPage = () => {
               )}
             </td>
           </tr>
+          {data?.principal?.isKyc && (
+            <tr className="flex">
+              <td className="px-2 py-2 w-32 sm:w-40">KYC Proposal</td>
+              <td className="px-2 py-2 flex-1 flex oneline">
+                <Link href={`/proposal/${data.principal.kyc[0].proposalId}`}>
+                  <a className="link-overflow">
+                    {data.principal.kyc[0].proposalId}
+                  </a>
+                </Link>
+              </td>
+            </tr>
+          )}
           <tr className="flex">
             <td className="px-2 py-2 w-32 sm:w-40">Subaccount</td>
             <td className="px-2 py-2 flex-1 flex oneline">

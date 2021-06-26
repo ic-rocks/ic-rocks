@@ -92,17 +92,25 @@ const GenesisAccount = ({ genesisAccount }: { genesisAccount: string }) => {
       ],
       [
         {
-          contents: "KYC?",
+          contents: "KYC Proposal",
           className: "w-36",
         },
         {
-          contents: data
-            ? data.isKyc
-              ? "Yes"
-              : data.status === GenesisAccountStatus.Claimed
-              ? "Unknown"
-              : "No"
-            : "-",
+          contents: data ? (
+            data.principal?.kyc[0] ? (
+              <Link href={`/proposal/${data.principal?.kyc[0].proposalId}`}>
+                <a className="link-overflow">
+                  {data.principal?.kyc[0].proposalId}
+                </a>
+              </Link>
+            ) : data.status === GenesisAccountStatus.Claimed ? (
+              "Not Found"
+            ) : (
+              "No"
+            )
+          ) : (
+            "-"
+          ),
         },
       ],
       [
@@ -169,7 +177,7 @@ const GenesisAccount = ({ genesisAccount }: { genesisAccount: string }) => {
           contents: stats ? (
             <div className="flex">
               <strong className="w-6 pr-2 text-right">{stats[2].count}</strong>
-              <div className="w-36 text-right">
+              <div className="w-44 text-right pr-6">
                 <BalanceLabel value={stats[2].amount} />
               </div>
             </div>
@@ -185,14 +193,14 @@ const GenesisAccount = ({ genesisAccount }: { genesisAccount: string }) => {
         },
         {
           contents: data ? (
-            <>
+            <div className="flex">
               <strong className="w-6 pr-2 text-right inline-block">
                 {data.neuronCount}
               </strong>
-              <div className="inline-block w-36 text-right">
+              <div className="w-44 text-right pr-6">
                 {formatNumber(data.icpts)} <span className="text-xs">ICP</span>
               </div>
-            </>
+            </div>
           ) : (
             "-"
           ),
