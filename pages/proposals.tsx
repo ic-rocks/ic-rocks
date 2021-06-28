@@ -232,31 +232,49 @@ const ProposalsPage = () => {
         params.append("order", sortBy[0].desc ? "desc" : "asc");
       }
       if (topicFilter) {
+        if (!Array.isArray(topicFilter.value)) {
+          topicFilter.value = [{ value: topicFilter.value }];
+        }
         topicFilter.value.forEach(({ value }) =>
           params.append("topic[]", value)
         );
       }
       if (statusFilter) {
+        if (!Array.isArray(statusFilter.value)) {
+          statusFilter.value = [{ value: statusFilter.value }];
+        }
         statusFilter.value.forEach(({ value }) =>
           params.append("status[]", value)
         );
       }
       if (rewardStatusFilter) {
+        if (!Array.isArray(rewardStatusFilter.value)) {
+          rewardStatusFilter.value = [{ value: rewardStatusFilter.value }];
+        }
         rewardStatusFilter.value.forEach(({ value }) =>
           params.append("rewardStatus[]", value)
         );
       }
       if (proposerIdFilter) {
+        if (!Array.isArray(proposerIdFilter.value)) {
+          proposerIdFilter.value = [{ value: proposerIdFilter.value }];
+        }
         proposerIdFilter.value.forEach(({ value }) =>
           params.append("proposerId[]", value)
         );
       }
       if (actionFilter) {
+        if (!Array.isArray(actionFilter.value)) {
+          actionFilter.value = [{ value: actionFilter.value }];
+        }
         actionFilter.value.forEach(({ value }) =>
           params.append("action[]", value)
         );
       }
       if (nnsFunctionFilter) {
+        if (!Array.isArray(nnsFunctionFilter.value)) {
+          nnsFunctionFilter.value = [{ value: nnsFunctionFilter.value }];
+        }
         nnsFunctionFilter.value.forEach(({ value }) =>
           params.append("nnsFunction[]", value)
         );
