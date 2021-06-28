@@ -3,6 +3,7 @@ import { useAtom } from "jotai";
 import React, { CSSProperties, useEffect, useMemo } from "react";
 import { CgSpinner } from "react-icons/cg";
 import { FaSortAmountDown, FaSortAmountUp } from "react-icons/fa";
+import MultiSelect from "react-multi-select-component";
 import {
   Column,
   Filters,
@@ -37,6 +38,26 @@ export function SelectColumnFilter({
         </option>
       ))}
     </select>
+  );
+}
+
+export function MultiSelectColumnFilter({
+  column: { filterValue, setFilter, filterOptions, filterLabel },
+}) {
+  return (
+    <MultiSelect
+      labelledBy=""
+      className="flex-1 text-xs"
+      onChange={setFilter}
+      value={filterValue || []}
+      disableSearch={true}
+      options={filterOptions}
+      valueRenderer={(selected, _options) =>
+        selected.length
+          ? `${filterLabel}: ${selected.length} selected`
+          : `${filterLabel}: Select...`
+      }
+    />
   );
 }
 

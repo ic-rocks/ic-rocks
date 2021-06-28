@@ -60,3 +60,10 @@ textarea {
 .bg-green-label {
   @apply bg-green-200 dark:bg-green-400;
 }
+
+.dark .rmsc {
+  --rmsc-bg: theme("colors.gray.800");
+  --rmsc-hover: theme("colors.gray.700");
+  --rmsc-border: theme("colors.gray.700");
+  --rmsc-selected: theme("colors.gray.700");
+}

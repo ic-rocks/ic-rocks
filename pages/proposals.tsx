@@ -11,7 +11,7 @@ import {
 } from "../components/Proposals/ProposalStatusLabel";
 import { ProposalSummary } from "../components/Proposals/ProposalSummary";
 import { ProposalUrl } from "../components/Proposals/ProposalUrl";
-import { SelectColumnFilter, Table } from "../components/Tables/Table";
+import { MultiSelectColumnFilter, Table } from "../components/Tables/Table";
 import { entries } from "../lib/enums";
 import fetchJSON from "../lib/fetch";
 import { formatNumber } from "../lib/numbers";
@@ -66,8 +66,12 @@ const ProposalsPage = () => {
             </div>
           ),
           className: "px-2 w-32",
-          Filter: SelectColumnFilter,
-          filterOptions: [["Status...", "" as any]].concat(entries(Status)),
+          Filter: MultiSelectColumnFilter,
+          filterOptions: entries(Status).map(([label, value]) => ({
+            label,
+            value,
+          })),
+          filterLabel: "Status",
         },
         {
           Header: "Proposer",
@@ -79,15 +83,15 @@ const ProposalsPage = () => {
           ),
           className:
             "px-2 w-24 hidden md:block overflow-hidden overflow-ellipsis",
-          Filter: SelectColumnFilter,
-          filterOptions: [["Proposer...", "" as any]].concat(
+          Filter: MultiSelectColumnFilter,
+          filterOptions:
             proposers?.length > 0
-              ? proposers.map(({ id, name, proposalCount }) => [
-                  `${name || id} (${proposalCount})`,
-                  id,
-                ])
-              : []
-          ),
+              ? proposers.map(({ id, name, proposalCount }) => ({
+                  label: `${name || id} (${proposalCount})`,
+                  value: id,
+                }))
+              : [],
+          filterLabel: "Proposer",
         },
         {
           Header: "Topic, Action & Summary",
@@ -127,22 +131,32 @@ const ProposalsPage = () => {
             </>
           ),
           className: "px-2 flex-1 overflow-hidden",
-          Filter: SelectColumnFilter,
-          filterOptions: [["Topic...", "" as any]].concat(entries(Topic)),
+          Filter: MultiSelectColumnFilter,
+          filterOptions: entries(Topic).map(([label, value]) => ({
+            label,
+            value,
+          })),
+          filterLabel: "Topic",
         },
         {
           accessor: "action",
           hidden: true,
-          Filter: SelectColumnFilter,
-          filterOptions: [["Action...", "" as any]].concat(entries(Action)),
+          Filter: MultiSelectColumnFilter,
+          filterOptions: entries(Action).map(([label, value]) => ({
+            label,
+            value,
+          })),
+          filterLabel: "Action",
         },
         {
           accessor: "nnsFunction",
           hidden: true,
-          Filter: SelectColumnFilter,
-          filterOptions: [["NNS Function...", "" as any]].concat(
-            entries(NnsFunction)
-          ),
+          Filter: MultiSelectColumnFilter,
+          filterOptions: entries(NnsFunction).map(([label, value]) => ({
+            label,
+            value,
+          })),
+          filterLabel: "NNS Function",
         },
         {
           Header: "Votes",
@@ -208,31 +222,46 @@ const ProposalsPage = () => {
       const actionFilter = filters.find(({ id }) => id === "action");
       const nnsFunctionFilter = filters.find(({ id }) => id === "nnsFunction");
       setIsLoading(true);
-      const res = await fetchJSON(
-        "/api/proposals?" +
-          new URLSearchParams({
-            ...(sortBy.length > 0
-              ? {
-                  orderBy: sortBy[0].id,
-                  order: sortBy[0].desc ? "desc" : "asc",
-                }
-              : {}),
-            ...(topicFilter ? { "topic[]": topicFilter.value } : {}),
-            ...(statusFilter ? { "status[]": statusFilter.value } : {}),
-            ...(rewardStatusFilter
-              ? { "rewardStatus[]": rewardStatusFilter.value }
-              : {}),
-            ...(proposerIdFilter
-              ? { "proposerId[]": proposerIdFilter.value }
-              : {}),
-            ...(actionFilter ? { "action[]": actionFilter.value } : {}),
-            ...(nnsFunctionFilter
-              ? { "nnsFunction[]": nnsFunctionFilter.value }
-              : {}),
-            pageSize,
-            page: pageIndex,
-          })
-      );
+      const params = new URLSearchParams({
+        pageSize,
+        page: pageIndex,
+      });
+
+      if (sortBy.length > 0) {
+        params.append("orderBy", sortBy[0].id);
+        params.append("order", sortBy[0].desc ? "desc" : "asc");
+      }
+      if (topicFilter) {
+        topicFilter.value.forEach(({ value }) =>
+          params.append("topic[]", value)
+        );
+      }
+      if (statusFilter) {
+        statusFilter.value.forEach(({ value }) =>
+          params.append("status[]", value)
+        );
+      }
+      if (rewardStatusFilter) {
+        rewardStatusFilter.value.forEach(({ value }) =>
+          params.append("rewardStatus[]", value)
+        );
+      }
+      if (proposerIdFilter) {
+        proposerIdFilter.value.forEach(({ value }) =>
+          params.append("proposerId[]", value)
+        );
+      }
+      if (actionFilter) {
+        actionFilter.value.forEach(({ value }) =>
+          params.append("action[]", value)
+        );
+      }
+      if (nnsFunctionFilter) {
+        nnsFunctionFilter.value.forEach(({ value }) =>
+          params.append("nnsFunction[]", value)
+        );
+      }
+      const res = await fetchJSON("/api/proposals?" + params);
       if (res) setResponse(res);
       setIsLoading(false);
     },
