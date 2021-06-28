@@ -18,7 +18,7 @@ const NEURON_ID_LABELS = {
   "1000 - 1141": "",
   "2000 - 2055": "",
   "3000 - 3039": "Internet Computer Association",
-  "4000 - 4000": "Team?",
+  "4000 - 4000": "",
   "4001 - 4037": "",
 };
 
