@@ -42,12 +42,17 @@ const NeuronIdPage = () => {
   }, [neuronId]);
 
   const summaryRows = useMemo(() => {
-    let dissolveDate,
+    let createdDate,
+      dissolveDate,
       dissolveDateRelative,
       dissolveBonus,
       agingSinceDate,
       ageBonus;
     if (data) {
+      createdDate = DateTime.fromISO(data.createdDate);
+      if (createdDate.toMillis() === 0) {
+        createdDate = null;
+      }
       dissolveDate = DateTime.fromISO(data.dissolveDate);
       dissolveDateRelative = dissolveDate.diffNow().toMillis();
       dissolveBonus =
@@ -98,11 +103,7 @@ const NeuronIdPage = () => {
       [
         { contents: "Created", className: "w-32" },
         {
-          contents: data?.createdDate ? (
-            <TimestampLabel dt={DateTime.fromISO(data.createdDate)} />
-          ) : (
-            "-"
-          ),
+          contents: createdDate ? <TimestampLabel dt={createdDate} /> : "-",
         },
       ],
       [
@@ -151,9 +152,17 @@ const NeuronIdPage = () => {
       [
         { contents: "Voting Power", className: "w-32" },
         {
-          contents: data
-            ? `${formatNumber(Number(data.votingPower) / 1e8)} ×10⁸`
-            : "-",
+          contents: data ? (
+            data.votingPower ? (
+              `${formatNumber(Number(data.votingPower) / 1e8)} ×10⁸`
+            ) : (
+              <span className="text-gray-500">
+                Dissolve date {"<"} 6 months, no voting power
+              </span>
+            )
+          ) : (
+            "-"
+          ),
         },
       ],
     ];
