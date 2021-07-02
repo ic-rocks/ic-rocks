@@ -4,6 +4,7 @@ import React, { useCallback, useMemo, useState } from "react";
 import { BsArrowRight } from "react-icons/bs";
 import fetchJSON from "../../lib/fetch";
 import { CanistersResponse } from "../../lib/types/API";
+import PrincipalLink from "../Labels/PrincipalLink";
 import { Table } from "../Tables/Table";
 import InfoBox from "./InfoBox";
 
@@ -32,11 +33,10 @@ export default function RecentCanistersBox({}: {}) {
         accessor: "id",
         Cell: ({ value, row }) => {
           return (
-            <Link href={`/principal/${value}`}>
-              <a className="link-overflow">
-                {row.original.principal?.name || value}
-              </a>
-            </Link>
+            <PrincipalLink
+              principalId={value}
+              name={row.original.principal?.name}
+            />
           );
         },
         className: "pr-2 flex-1 flex oneline",
@@ -45,11 +45,10 @@ export default function RecentCanistersBox({}: {}) {
         Header: "Controller",
         accessor: "controllerId",
         Cell: ({ value, row }) => (
-          <Link href={`/principal/${value}`}>
-            <a className="link-overflow">
-              {row.original.controller?.name || value}
-            </a>
-          </Link>
+          <PrincipalLink
+            principalId={value}
+            name={row.original.controller?.name}
+          />
         ),
         className: "px-2 sm:flex flex-1 hidden oneline",
       },

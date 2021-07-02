@@ -5,7 +5,9 @@ import { decodeBlob } from "../../lib/candid/utils";
 import { addCrc32 } from "../../lib/identifiers";
 import { Proposal } from "../../lib/types/API";
 import { Action, NnsFunction } from "../../lib/types/governance";
+import AccountLink from "../Labels/AccountLink";
 import BalanceLabel from "../Labels/BalanceLabel";
+import PrincipalLink from "../Labels/PrincipalLink";
 import { TimestampLabel } from "../Labels/TimestampLabel";
 
 export const ProposalSummary = ({ proposal }: { proposal: Proposal }) => {
@@ -43,9 +45,7 @@ export const ProposalSummary = ({ proposal }: { proposal: Proposal }) => {
       <div className="text-xs">
         <strong>Principal</strong>
         <div>
-          <Link href={`/principal/${data}`}>
-            <a className="link-overflow">{data}</a>
-          </Link>
+          <PrincipalLink principalId={data} />
         </div>
       </div>
     );
@@ -59,9 +59,7 @@ export const ProposalSummary = ({ proposal }: { proposal: Proposal }) => {
         <ul>
           {data.map((pid) => (
             <li key={pid}>
-              <Link href={`/principal/${pid}`}>
-                <a className="link-overflow">{pid}</a>
-              </Link>
+              <PrincipalLink principalId={pid} />
             </li>
           ))}
         </ul>
@@ -78,9 +76,7 @@ export const ProposalSummary = ({ proposal }: { proposal: Proposal }) => {
           <ul>
             {data.who.map((pid) => (
               <li key={pid}>
-                <Link href={`/principal/${pid}`}>
-                  <a className="link-overflow">{pid}</a>
-                </Link>
+                <PrincipalLink principalId={pid} />
               </li>
             ))}
           </ul>
@@ -118,9 +114,7 @@ export const ProposalSummary = ({ proposal }: { proposal: Proposal }) => {
           <ul>
             {data.node_ids.map((pid) => (
               <li key={pid}>
-                <Link href={`/principal/${pid}`}>
-                  <a className="link-overflow">{pid}</a>
-                </Link>
+                <PrincipalLink principalId={pid} />
               </li>
             ))}
           </ul>
@@ -145,24 +139,14 @@ export const ProposalSummary = ({ proposal }: { proposal: Proposal }) => {
           <ul>
             {data.node_provider.map(({ id }) => (
               <li key={id}>
-                <Link href={`/principal/${id}`}>
-                  <a className="link-overflow">{id}</a>
-                </Link>
+                <PrincipalLink principalId={id} />
               </li>
             ))}
           </ul>
         </div>
         <div>
           <strong>Account</strong>
-          <div>
-            {!!account ? (
-              <Link href={`/account/${account}`}>
-                <a className="link-overflow">{account}</a>
-              </Link>
-            ) : (
-              "-"
-            )}
-          </div>
+          <div>{!!account ? <AccountLink accountId={account} /> : "-"}</div>
         </div>
         <div>
           <strong>Amount</strong>
@@ -188,9 +172,7 @@ export const ProposalSummary = ({ proposal }: { proposal: Proposal }) => {
                 const pid = principal.toText();
                 return (
                   <li key={pid}>
-                    <Link href={`/principal/${pid}`}>
-                      <a className="link-overflow">{pid}</a>
-                    </Link>
+                    <PrincipalLink principalId={pid} />
                   </li>
                 );
               })}

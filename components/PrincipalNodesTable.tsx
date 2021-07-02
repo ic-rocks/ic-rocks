@@ -3,6 +3,7 @@ import React, { useMemo } from "react";
 import { countBy } from "../lib/arrays";
 import { capitalize } from "../lib/strings";
 import { APIPrincipal } from "../lib/types/API";
+import PrincipalLink from "./Labels/PrincipalLink";
 import { Table } from "./Tables/Table";
 
 export const PrincipalNodesTable = ({ data }: { data: APIPrincipal }) => {
@@ -49,11 +50,10 @@ export const PrincipalNodesTable = ({ data }: { data: APIPrincipal }) => {
         id: "other",
         accessor: (d) => d[otherRole].id,
         Cell: ({ value, row }) => (
-          <Link href={`/principal/${value}`}>
-            <a className="link-overflow">
-              {row.original[otherRole].name || value}
-            </a>
-          </Link>
+          <PrincipalLink
+            principalId={value}
+            name={row.original[otherRole].name}
+          />
         ),
         className: "px-2 flex-1 flex oneline",
       },

@@ -2,7 +2,9 @@ import { DateTime } from "luxon";
 import Link from "next/link";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { BsInfoCircle } from "react-icons/bs";
+import AccountLink from "../../components/Labels/AccountLink";
 import BalanceLabel from "../../components/Labels/BalanceLabel";
+import PrincipalLink from "../../components/Labels/PrincipalLink";
 import { MetaTags } from "../../components/MetaTags";
 import ProposalNav from "../../components/Proposals/ProposalNav";
 import SimpleTable from "../../components/Tables/SimpleTable";
@@ -25,11 +27,10 @@ export default function NodeRewardsPage() {
         accessor: (d) => d.principal.id,
         disableSortBy: true,
         Cell: ({ value, row }) => (
-          <Link href={`/principal/${value}`}>
-            <a className="link-overflow">
-              {row.original.principal.name || value}
-            </a>
-          </Link>
+          <PrincipalLink
+            name={row.original.principal.name}
+            principalId={value}
+          />
         ),
         className: "px-2 flex-1 flex oneline",
       },
@@ -40,11 +41,7 @@ export default function NodeRewardsPage() {
         disableSortBy: true,
         Cell: ({ value, row }) =>
           value ? (
-            <Link href={`/account/${value}`}>
-              <a className="link-overflow">
-                {row.original.account.name || value}
-              </a>
-            </Link>
+            <AccountLink name={row.original.account.name} accountId={value} />
           ) : (
             "-"
           ),

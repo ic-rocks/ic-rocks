@@ -9,3 +9,20 @@ const fetchJSON = (url, opts?) =>
     .catch((e) => {});
 
 export default fetchJSON;
+
+const authHeaders = (auth: string) => ({
+  headers: {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${auth}`,
+  },
+});
+
+export const fetchAuthed = (url, auth, opts?) =>
+  fetch(url, { ...authHeaders(auth), ...opts })
+    .then((res) => {
+      if (!res.ok) {
+        throw res.statusText;
+      }
+      return res.json();
+    })
+    .catch((e) => {});

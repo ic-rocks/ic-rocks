@@ -14,6 +14,7 @@ import {
   InvestorType,
   NeuronsResponse,
 } from "../lib/types/API";
+import PrincipalLink from "./Labels/PrincipalLink";
 
 const GenesisAccount = ({ genesisAccount }: { genesisAccount: string }) => {
   const [isLoading, setIsLoading] = useState(true);
@@ -58,11 +59,10 @@ const GenesisAccount = ({ genesisAccount }: { genesisAccount: string }) => {
         },
         {
           contents: data?.principal ? (
-            <Link href={`/principal/${data.principal.id}`}>
-              <a className="link-overflow">
-                {data.principal.name || data.principal.id}
-              </a>
-            </Link>
+            <PrincipalLink
+              principalId={data.principal.id}
+              name={data.principal.name}
+            />
           ) : (
             "-"
           ),

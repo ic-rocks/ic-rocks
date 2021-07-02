@@ -3,6 +3,7 @@ import Link from "next/link";
 import React, { useCallback, useMemo, useState } from "react";
 import fetchJSON from "../lib/fetch";
 import { TransactionsResponse } from "../lib/types/API";
+import AccountLink from "./Labels/AccountLink";
 import BalanceLabel from "./Labels/BalanceLabel";
 import { TransactionTypeLabel } from "./Labels/TransactionTypeLabel";
 import { Table } from "./Tables/Table";
@@ -67,16 +68,12 @@ export const TransactionsTable = ({
         Cell: ({ value, row }) =>
           row.original.type === "MINT" ? (
             <TransactionTypeLabel type={row.original.type} />
-          ) : value !== accountId ? (
-            <Link href={`/account/${value}`}>
-              <a className="link-overflow">
-                {row.original.sender.displayName || value}
-              </a>
-            </Link>
           ) : (
-            <span className="overflow-hidden overflow-ellipsis">
-              {row.original.sender.displayName || value}
-            </span>
+            <AccountLink
+              accountId={value}
+              name={row.original.sender.displayName}
+              isLink={value !== accountId}
+            />
           ),
         className: "px-2 flex-1 flex oneline",
         style: { minWidth: "4rem" },
@@ -88,16 +85,12 @@ export const TransactionsTable = ({
         Cell: ({ value, row }) =>
           row.original.type === "BURN" ? (
             <TransactionTypeLabel type={row.original.type} />
-          ) : value !== accountId ? (
-            <Link href={`/account/${value}`}>
-              <a className="link-overflow">
-                {row.original.receiver.displayName || value}
-              </a>
-            </Link>
           ) : (
-            <span className="overflow-hidden overflow-ellipsis">
-              {row.original.receiver.displayName || value}
-            </span>
+            <AccountLink
+              accountId={value}
+              name={row.original.receiver.displayName}
+              isLink={value !== accountId}
+            />
           ),
         className: "px-2 flex-1 flex oneline",
         style: { minWidth: "4rem" },

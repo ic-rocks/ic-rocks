@@ -13,6 +13,7 @@ export default function Dropdown() {
   const [_agent, setAgent] = useAtom(agentAtom);
   const [_auth, setAuth] = useAtom(authAtom);
   const resetAgent = useResetAtom(agentAtom);
+  const resetAuth = useResetAtom(authAtom);
   const [authClient, setAuthClient] = useState<AuthClient>(null);
 
   const handleAuthenticated = async (authClient: AuthClient) => {
@@ -22,14 +23,13 @@ export default function Dropdown() {
     setAgent(agent);
 
     const principal = await agent.getPrincipal();
-    const signature = (
-      await identity.sign(principal.toHex().toLowerCase())
-    ).toString("hex");
+    const principalId = principal.toHex().toLowerCase();
+    const signature = (await identity.sign(principal.toUint8Array())).toString(
+      "hex"
+    );
     const publicKey = identity._inner._publicKey.rawKey.toString("hex");
-    console.log("principal", principal);
 
-    setAuth({ signature, principal, publicKey });
-    console.log({ signature, principal, publicKey });
+    setAuth(`${principalId}.${signature}.${publicKey}`);
 
     setPrincipal(principal);
   };
@@ -43,6 +43,8 @@ export default function Dropdown() {
   const handleLogout = async () => {
     await authClient.logout();
     resetAgent();
+    resetAuth();
+    setPrincipal(null);
   };
 
   useEffect(() => {

@@ -11,6 +11,8 @@ import {
   Output,
   OutputDisplayButtons,
 } from "../../components/CanisterUI/Shared";
+import AccountLink from "../../components/Labels/AccountLink";
+import PrincipalLink from "../../components/Labels/PrincipalLink";
 import { MetaTags } from "../../components/MetaTags";
 import { SecondaryNav } from "../../components/Nav/SecondaryNav";
 import { decodeBlob, stringify } from "../../lib/candid/utils";
@@ -163,9 +165,7 @@ export default function BlobDebugger() {
       {outputType === IdentityKind.AccountIdentifier && (
         <div className="my-4">
           <p>{IdentityKind[outputType]}</p>
-          <Link href={`/account/${output}`}>
-            <a className="link-overflow">{output}</a>
-          </Link>
+          <AccountLink accountId={output} />
         </div>
       )}
       {outputType === IdentityKind.Transaction && (
@@ -179,9 +179,7 @@ export default function BlobDebugger() {
       {!!asPrincipal && (
         <div className="my-4">
           <p>As Principal</p>
-          <Link href={`/principal/${asPrincipal}`}>
-            <a className="link-overflow">{asPrincipal}</a>
-          </Link>
+          <PrincipalLink principalId={asPrincipal} />
         </div>
       )}
       {!!asHex && (

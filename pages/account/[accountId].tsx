@@ -1,11 +1,15 @@
 import { Actor, HttpAgent } from "@dfinity/agent";
 import { getCrc32 } from "@dfinity/principal/lib/cjs/utils/getCrc";
+import { useAtom } from "jotai";
 import { DateTime } from "luxon";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import BalanceLabel from "../../components/Labels/BalanceLabel";
+import PrincipalLink from "../../components/Labels/PrincipalLink";
+import { TaggedLabel } from "../../components/Labels/TaggedLabel";
 import { MetaTags } from "../../components/MetaTags";
+import TagModal from "../../components/Modals/TagModal";
 import { NeuronLabel } from "../../components/Neurons/NeuronLabel";
 import Search404 from "../../components/Search404";
 import { useGlobalState } from "../../components/StateContext";
@@ -15,6 +19,7 @@ import fetchJSON from "../../lib/fetch";
 import { formatNumber, formatNumberUSD } from "../../lib/numbers";
 import { Account } from "../../lib/types/API";
 import { NeuronState } from "../../lib/types/governance";
+import { userTagAtom } from "../../state/tags";
 
 const agent = new HttpAgent({ host: "https://ic0.app" });
 const ledger = Actor.createActor(ledgerIdl, {
@@ -43,6 +48,10 @@ const AccountPage = () => {
   const { markets } = useGlobalState();
   const accountId = accountId_?.toLowerCase();
   const [subaccount, setSubaccount] = useState(null);
+  const [allTags] = useAtom(userTagAtom);
+  const tags = allTags.private
+    .filter((t) => t.accountId === accountId)
+    .concat(allTags.public.filter((t) => t.accountId === accountId));
 
   useEffect(() => {
     if (typeof accountId !== "string" || !accountId) return;
@@ -127,26 +136,32 @@ const AccountPage = () => {
               colSpan={2}
               className="px-2 py-2 flex-1 flex flex-wrap justify-between"
             >
-              Account Details
-              <div>
-                {data?.principal?.isKyc && (
-                  <label className="font-normal label-tag bg-purple-200 dark:bg-purple-400">
-                    KYC
-                  </label>
-                )}
+              <div className="flex gap-1">
+                <label className="mr-4">Account Details</label>
                 {data?.neuron?.genesisAccountId && (
                   <label className="font-normal label-tag bg-purple-200 dark:bg-purple-400">
                     Genesis Account
                   </label>
                 )}
+                {data?.principal?.isKyc && (
+                  <label className="font-normal label-tag bg-purple-200 dark:bg-purple-400">
+                    KYC
+                  </label>
+                )}
               </div>
+              <TagModal key={accountId} account={accountId} />
             </th>
           </tr>
         </thead>
         <tbody className="divide-y divide-default">
           <tr className="flex">
             <td className="px-2 py-2 w-32 sm:w-40">Name</td>
-            <td className="px-2 py-2 flex-1">{data?.name || "-"}</td>
+            <td className="px-2 py-2 flex-1 flex items-center gap-2">
+              {data?.name || (tags.length === 0 ? "-" : null)}
+              {tags.map((tag, i) => (
+                <TaggedLabel key={i} label={tag.label} />
+              ))}
+            </td>
           </tr>
           {data?.neuron?.genesisAccountId && (
             <tr className="flex">
@@ -186,11 +201,10 @@ const AccountPage = () => {
             <td className="px-2 py-2 w-32 sm:w-40">Principal</td>
             <td className="px-2 py-2 flex-1 flex oneline">
               {data?.principalId ? (
-                <Link href={`/principal/${data.principalId}`}>
-                  <a className="link-overflow">
-                    {data.principal?.name || data.principalId}
-                  </a>
-                </Link>
+                <PrincipalLink
+                  principalId={data.principalId}
+                  name={data.principal?.name}
+                />
               ) : (
                 "-"
               )}

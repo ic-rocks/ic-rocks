@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import { BiMinus, BiPlus } from "react-icons/bi";
 import { CgSpinner } from "react-icons/cg";
 import { maybeTimestamp } from "../../lib/numbers";
+import { Label } from "../Forms/Label";
 import {
   CandidInput,
   CandidOutput,
@@ -103,20 +104,6 @@ export const QueryButton = ({
     </button>
   );
 };
-
-export const Label = ({
-  children,
-  className,
-}: {
-  children?: React.ReactNode;
-  className?: string;
-}) => (
-  <label
-    className={classNames(className, "block text-xs italic text-gray-500")}
-  >
-    {children}
-  </label>
-);
 
 export const Nested = ({ children }) => (
   <div className="flex flex-col pl-2 border-l border-gray-300 dark:border-gray-700 gap-1">

@@ -3,10 +3,13 @@ import React from "react";
 import { Footer } from "../components/Footer";
 import Nav from "../components/Nav/Navbar";
 import { StateProvider } from "../components/StateContext";
+import useAuth from "../lib/hooks/useAuth";
 import "../styles/index.css";
 import "../styles/svg.css";
 
-function MyApp({ Component, pageProps }) {
+function App({ Component, pageProps }) {
+  useAuth();
+
   return (
     <StateProvider>
       <div className="flex flex-col items-center">
@@ -22,4 +25,4 @@ function MyApp({ Component, pageProps }) {
   );
 }
 
-export default MyApp;
+export default App;

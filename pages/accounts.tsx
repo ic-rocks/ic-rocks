@@ -1,6 +1,7 @@
-import Link from "next/link";
 import React, { useCallback, useMemo, useState } from "react";
+import AccountLink from "../components/Labels/AccountLink";
 import BalanceLabel from "../components/Labels/BalanceLabel";
+import PrincipalLink from "../components/Labels/PrincipalLink";
 import Ledger from "../components/LedgerPage";
 import { MetaTags } from "../components/MetaTags";
 import { Table } from "../components/Tables/Table";
@@ -40,11 +41,7 @@ const Accounts = () => {
         disableSortBy: true,
         Cell: ({ value, row }) => {
           return (
-            <Link href={`/account/${value}`}>
-              <a className="link-overflow">
-                {row.original.displayName || value}
-              </a>
-            </Link>
+            <AccountLink accountId={value} name={row.original.displayName} />
           );
         },
         className: "px-2 flex-2 flex oneline",
@@ -53,11 +50,10 @@ const Accounts = () => {
         Header: "Principal",
         accessor: (a) => a.principalId,
         Cell: ({ value, row }) => (
-          <Link href={`/principal/${value}`}>
-            <a className="link-overflow">
-              {row.original.principal?.name || value}
-            </a>
-          </Link>
+          <PrincipalLink
+            principalId={value}
+            name={row.original.principal?.name}
+          />
         ),
         className: "px-2 sm:flex flex-1 hidden oneline",
       },

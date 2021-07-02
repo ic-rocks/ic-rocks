@@ -1,11 +1,11 @@
 import { DateTime } from "luxon";
 import Link from "next/link";
 import React, { useCallback, useMemo, useState } from "react";
-import { BsInfoCircle } from "react-icons/bs";
 import { entries } from "../../lib/enums";
 import fetchJSON from "../../lib/fetch";
 import { NeuronsResponse } from "../../lib/types/API";
 import { NeuronState } from "../../lib/types/governance";
+import AccountLink from "../Labels/AccountLink";
 import BalanceLabel from "../Labels/BalanceLabel";
 import { SelectColumnFilter, Table } from "../Tables/Table";
 import { NeuronLabel } from "./NeuronLabel";
@@ -34,18 +34,11 @@ const NeuronsTable = ({
         Cell: ({ value, row }) => (
           <>
             <Link href={`/neuron/${value}`}>
-              <a className="link-overflow">{value}</a>
+              <a className="link-overflow" title={row.original.name}>
+                {value}
+                {row.original.name && ` (${row.original.name})`}
+              </a>
             </Link>
-            {row.original.name && (
-              <span
-                className="ml-1"
-                aria-label={row.original.name}
-                data-balloon-pos="right"
-                data-balloon-length="xlarge"
-              >
-                <BsInfoCircle className="inline text-xs align-middle" />
-              </span>
-            )}
           </>
         ),
         style: { minWidth: "4rem" },
@@ -83,9 +76,7 @@ const NeuronsTable = ({
         accessor: "accountId",
         Cell: ({ value, row }) =>
           value ? (
-            <Link href={`/account/${value}`}>
-              <a className="link-overflow">{value}</a>
-            </Link>
+            <AccountLink accountId={value} />
           ) : (
             <span className="text-gray-500">Unknown</span>
           ),

@@ -1,8 +1,8 @@
-import Link from "next/link";
 import React, { useCallback, useMemo, useState } from "react";
 import fetchJSON from "../lib/fetch";
 import { formatNumber } from "../lib/numbers";
 import { PrincipalsResponse } from "../lib/types/API";
+import PrincipalLink from "./Labels/PrincipalLink";
 import { Table } from "./Tables/Table";
 
 export const PrincipalsTable = () => {
@@ -18,34 +18,10 @@ export const PrincipalsTable = () => {
         Header: "Principal",
         accessor: "id",
         disableSortBy: true,
-        Cell: ({ value, row }) => {
-          return (
-            <>
-              <Link href={`/principal/${value}`}>
-                <a className="link-overflow hidden sm:block">{value}</a>
-              </Link>
-              <Link href={`/principal/${value}`}>
-                <a className="link-overflow sm:hidden">
-                  {row.original.name || value}
-                </a>
-              </Link>
-            </>
-          );
-        },
+        Cell: ({ value, row }) => (
+          <PrincipalLink principalId={value} name={row.original.name} />
+        ),
         className: "pl-2 flex-1 flex oneline",
-      },
-      {
-        Header: "Name",
-        accessor: "name",
-        disableSortBy: true,
-        Cell: ({ value, row }) =>
-          // row.original.entityId ? (
-          //   <Link href={`/page/${row.original.entityId}`}>
-          //     <a className="link-overflow hidden sm:block">{value}</a>
-          //   </Link>
-          // ) : (
-          value,
-        className: "px-1 hidden sm:block w-32 oneline",
       },
       {
         Header: "Canisters",

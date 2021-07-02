@@ -90,6 +90,7 @@ export type APIPrincipal = {
   entityId: string | null;
   entity?: { id: number; name: string };
   kyc?: { proposalId: number }[];
+  publicTags: LabelTag[];
 };
 
 export type KycsResponse = PagedResponse<Kyc>;
@@ -331,3 +332,16 @@ export type NomicsTickerResponse = {
       }
     | undefined;
 };
+
+export type LabelTag = {
+  label: string;
+  count: number;
+};
+
+export type Tag = LabelTag & {
+  accountId: string;
+  principalId: string;
+  note: string;
+};
+
+export type UserTags = { private: Tag[]; public: Tag[] };

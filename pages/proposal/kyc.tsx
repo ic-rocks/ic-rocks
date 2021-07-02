@@ -2,6 +2,8 @@ import { DateTime } from "luxon";
 import Link from "next/link";
 import React, { useCallback, useMemo, useState } from "react";
 import { BsInfoCircle } from "react-icons/bs";
+import AccountLink from "../../components/Labels/AccountLink";
+import PrincipalLink from "../../components/Labels/PrincipalLink";
 import { MetaTags } from "../../components/MetaTags";
 import ProposalNav from "../../components/Proposals/ProposalNav";
 import { Table } from "../../components/Tables/Table";
@@ -23,11 +25,10 @@ const KycPage = () => {
         accessor: (d) => d.principal.id,
         disableSortBy: true,
         Cell: ({ value, row }) => (
-          <Link href={`/principal/${value}`}>
-            <a className="link-overflow">
-              {row.original.principal.name || value}
-            </a>
-          </Link>
+          <PrincipalLink
+            name={row.original.principal.name}
+            principalId={value}
+          />
         ),
         className: "px-2 flex-1 flex oneline",
       },
@@ -51,9 +52,7 @@ const KycPage = () => {
           <div className="flex flex-col">
             {row.original.principal.accounts.map(({ id, name }) => (
               <div key={id} className="flex oneline">
-                <Link href={`/account/${id}`}>
-                  <a className="link-overflow">{name || id}</a>
-                </Link>
+                <AccountLink accountId={id} name={name} />
               </div>
             ))}
           </div>

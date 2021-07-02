@@ -1,6 +1,6 @@
 import classnames from "classnames";
-import Link from "next/link";
 import React from "react";
+import PrincipalLink from "./Labels/PrincipalLink";
 
 export default function MatchingCanistersList({
   className,
@@ -19,9 +19,7 @@ export default function MatchingCanistersList({
         <ul>
           {canisterIds.map((canisterId) => (
             <li key={canisterId}>
-              <Link href={`/principal/${canisterId}`}>
-                <a className="hover:underline text-blue-600">{canisterId}</a>
-              </Link>
+              <PrincipalLink principalId={canisterId} />
             </li>
           ))}
         </ul>

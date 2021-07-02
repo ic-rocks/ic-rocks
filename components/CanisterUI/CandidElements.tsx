@@ -9,6 +9,7 @@ import {
   stringify,
 } from "../../lib/candid/utils";
 import { isUrl, pluralize } from "../../lib/strings";
+import { Label } from "../Forms/Label";
 import {
   ArrayInput,
   BufferDisplay,
@@ -16,7 +17,6 @@ import {
   BufferInput,
   BUFFER_ENCODINGS,
   EmptyOutput,
-  Label,
   Node,
   NumberDisplay,
   OutputWrapper,

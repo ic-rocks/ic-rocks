@@ -3,15 +3,21 @@ import { getCrc32 } from "@dfinity/principal/lib/cjs/utils/getCrc.js";
 import { sha224 } from "@dfinity/principal/lib/cjs/utils/sha224.js";
 import { Buffer } from "buffer/";
 import classNames from "classnames";
+import { useAtom } from "jotai";
 import { DateTime } from "luxon";
 import Link from "next/link";
 import React, { useEffect, useMemo, useState } from "react";
-import { BsArrowReturnRight, BsChevronRight } from "react-icons/bs";
+import { BsArrowReturnRight } from "react-icons/bs";
 import { FiExternalLink } from "react-icons/fi";
 import { APIPrincipal, Canister } from "../lib/types/API";
 import { PrincipalType } from "../pages/principal/[principalId]";
+import { userTagAtom } from "../state/tags";
+import AccountLink from "./Labels/AccountLink";
 import BalanceLabel from "./Labels/BalanceLabel";
+import PrincipalLink from "./Labels/PrincipalLink";
+import { TaggedLabel } from "./Labels/TaggedLabel";
 import { TimestampLabel } from "./Labels/TimestampLabel";
+import TagModal from "./Modals/TagModal";
 
 export default function PrincipalDetails({
   className,
@@ -27,9 +33,10 @@ export default function PrincipalDetails({
   principalData?: APIPrincipal;
   canisterData?: Canister;
 }) {
-  if (typeof window === "undefined") {
-    return null;
-  }
+  const [allTags] = useAtom(userTagAtom);
+  const tags = allTags.private
+    .filter((t) => t.principalId === principalId)
+    .concat(allTags.public.filter((t) => t.principalId === principalId));
 
   const [generatedAccounts, setGeneratedAccounts] = useState([]);
 
@@ -91,12 +98,14 @@ export default function PrincipalDetails({
   ) =>
     head && (
       <>
-        {head.id && head.id !== principalId ? (
-          <Link href={`/principal/${head.id}`}>
-            <a className="link-overflow">{head.name || head.id}</a>
-          </Link>
+        {head.id ? (
+          <PrincipalLink
+            principalId={head.id}
+            name={head.name}
+            isLink={head.id !== principalId}
+          />
         ) : (
-          <span>{head.name || head.id}</span>
+          head.name
         )}
         {rest.length > 0 && (
           <div className={classNames({ "pl-3": !isFirst })}>
@@ -118,15 +127,13 @@ export default function PrincipalDetails({
               colSpan={2}
               className="px-2 py-2 flex-1 flex flex-wrap justify-between"
             >
-              Overview
-              <div className="flex gap-2">
+              <div className="flex gap-1">
+                <label className="mr-4">Overview</label>
                 {principalData?.entityId && (
-                  <Link href={`/page/${principalData.entityId}`}>
-                    <a className="hover:underline font-normal label-tag bg-blue-200 dark:bg-blue-400 inline-flex items-center">
-                      {principalData.entity.name}
-                      <BsChevronRight className="ml-1" />
-                    </a>
-                  </Link>
+                  <a className="cursor-default font-normal label-tag bg-blue-200 dark:bg-blue-400 inline-flex items-center">
+                    {principalData.entity.name}
+                    {/* <BsChevronRight className="ml-1" /> */}
+                  </a>
                 )}
                 {principalData?.genesisAccount?.id && (
                   <label className="font-normal label-tag bg-purple-200 dark:bg-purple-400">
@@ -138,6 +145,8 @@ export default function PrincipalDetails({
                     KYC
                   </label>
                 )}
+              </div>
+              <div className="flex gap-1">
                 {canisterData?.module?.hasHttp && (
                   <div>
                     {httpResponse && !httpResponse.ok && (
@@ -164,6 +173,12 @@ export default function PrincipalDetails({
                     </a>
                   </div>
                 )}
+                <TagModal
+                  name={principalData?.name}
+                  publicTags={principalData?.publicTags}
+                  principal={principalId}
+                  key={principalId}
+                />
               </div>
             </th>
           </tr>
@@ -171,8 +186,11 @@ export default function PrincipalDetails({
         <tbody className="block divide-y divide-gray-300 dark:divide-gray-700">
           <tr className="flex">
             <td className="px-2 py-2 w-24 sm:w-44">Name</td>
-            <td className="px-2 py-2 flex-1">
-              {principalData?.name ? principalData.name : "Unknown"}
+            <td className="px-2 py-2 flex-1 flex items-center gap-2">
+              {principalData?.name || (tags.length === 0 ? "-" : null)}
+              {tags.map((tag, i) => (
+                <TaggedLabel key={i} label={tag.label} />
+              ))}
             </td>
           </tr>
           <tr className="flex">
@@ -309,11 +327,7 @@ export default function PrincipalDetails({
                 {accounts.map(({ id, balance, displayName }) => {
                   return (
                     <div key={id} className="flex justify-between">
-                      <Link href={`/account/${id}`}>
-                        <a className="link-overflow flex-1">
-                          {displayName || id}
-                        </a>
-                      </Link>
+                      <AccountLink key={id} accountId={id} name={displayName} />
                       {balance && (
                         <span className="w-32 text-right text-gray-400 dark:text-gray-600">
                           <BalanceLabel value={balance} />

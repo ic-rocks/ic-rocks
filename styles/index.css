@@ -33,12 +33,21 @@ textarea {
   @apply focus:outline-none;
 }
 
+.btn-base {
+  @apply rounded cursor-pointer transition-colors;
+}
 .btn-default {
-  @apply rounded bg-gray-100 dark:bg-gray-800 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors;
+  @apply btn-base bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700;
+}
+.btn-default-2 {
+  @apply btn-base bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600;
 }
 
+.link-default {
+  @apply hover:underline text-blue-600;
+}
 .link-overflow {
-  @apply hover:underline text-blue-600 overflow-hidden overflow-ellipsis;
+  @apply link-default overflow-hidden overflow-ellipsis;
 }
 
 .divide-default {

@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { FiExternalLink, FiFileText } from "react-icons/fi";
 import fetchJSON from "../lib/fetch";
 import { CanistersResponse, SubnetResponse } from "../lib/types/API";
+import PrincipalLink from "./Labels/PrincipalLink";
 import { SelectColumnFilter, Table } from "./Tables/Table";
 
 export const CanistersTable = ({
@@ -57,15 +58,12 @@ export const CanistersTable = ({
           id: "id",
           accessor: "id",
           disableSortBy: true,
-          Cell: ({ value, row }) => {
-            return (
-              <Link href={`/principal/${value}`}>
-                <a className="link-overflow">
-                  {row.original.principal?.name || value}
-                </a>
-              </Link>
-            );
-          },
+          Cell: ({ value, row }) => (
+            <PrincipalLink
+              principalId={value}
+              name={row.original.principal?.name}
+            />
+          ),
           className: "pr-2 flex-1 flex oneline",
           Filter: SelectColumnFilter,
           filterOptions: [
@@ -79,11 +77,10 @@ export const CanistersTable = ({
           accessor: "controllerId",
           disableSortBy: true,
           Cell: ({ value, row }) => (
-            <Link href={`/principal/${value}`}>
-              <a className="link-overflow">
-                {row.original.controller?.name || value}
-              </a>
-            </Link>
+            <PrincipalLink
+              principalId={value}
+              name={row.original.controller?.name}
+            />
           ),
           className: "px-2 sm:flex flex-1 hidden oneline",
           Filter: SelectColumnFilter,

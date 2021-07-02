@@ -1,7 +1,7 @@
 import { DateTime } from "luxon";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useMemo, useState } from "react";
+import AccountLink from "../../components/Labels/AccountLink";
 import BalanceLabel from "../../components/Labels/BalanceLabel";
 import { TimestampLabel } from "../../components/Labels/TimestampLabel";
 import { MetaTags } from "../../components/MetaTags";
@@ -80,9 +80,7 @@ const NeuronIdPage = () => {
         { contents: "Account", className: "w-32" },
         {
           contents: data?.accountId ? (
-            <Link href={`/account/${data.accountId}`}>
-              <a className="link-overflow">{data.accountId}</a>
-            </Link>
+            <AccountLink accountId={data.accountId} />
           ) : (
             "-"
           ),
