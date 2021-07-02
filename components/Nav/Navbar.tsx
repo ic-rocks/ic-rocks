@@ -1,14 +1,14 @@
 import Link from "next/link";
 import React from "react";
 import ActiveLink from "../ActiveLink";
-import DarkModeToggle from "./DarkModeToggle";
+import Dropdown from "./Dropdown";
 import SearchBar from "./Searchbar";
 
 export default function Nav() {
   return (
     <nav className="pt-4 flex flex-col gap-4">
-      <div className="flex flex-wrap justify-between gap-2">
-        <div className="flex-none pr-8">
+      <div className="flex flex-col xs:flex-row items-stretch xs:justify-between gap-2">
+        <div className="flex-none xs:pr-8">
           <Link href="/">
             <img
               src="/img/icrocks-light.svg"
@@ -25,9 +25,9 @@ export default function Nav() {
           </Link>
         </div>
 
-        <div className="flex-1 flex items-start max-w-sm gap-4">
+        <div className="flex-1 flex flex-col xs:flex-row items-stretch xs:items-start max-w-sm gap-4">
           <SearchBar />
-          <DarkModeToggle />
+          <Dropdown />
         </div>
       </div>
 

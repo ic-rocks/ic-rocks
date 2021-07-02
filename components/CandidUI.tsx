@@ -1,8 +1,9 @@
-import { Actor, HttpAgent } from "@dfinity/agent";
+import { Actor } from "@dfinity/agent";
 import { IDL } from "@dfinity/candid";
 import extendProtobuf from "agent-pb";
 import classNames from "classnames";
 import { Bindings } from "didc";
+import { useAtom } from "jotai";
 import Link from "next/link";
 import { del, set } from "object-path-immutable";
 import protobuf, { Method } from "protobufjs/light";
@@ -13,6 +14,7 @@ import { FiExternalLink } from "react-icons/fi";
 import { getShortname, validate } from "../lib/candid/utils";
 import protobufJson from "../lib/canisters/proto.json";
 import { pluralize } from "../lib/strings";
+import { agentAtom } from "../state/auth";
 import {
   CandidInput,
   CANDID_OUTPUT_DISPLAYS,
@@ -30,7 +32,6 @@ import {
 
 const root = protobuf.Root.fromJSON(protobufJson as protobuf.INamespace);
 const CANDID_UI_URL = "https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.ic0.app/";
-const agent = new HttpAgent({ host: "https://ic0.app" });
 
 export type Type = "loading" | "input" | "output" | "error" | "outputDisplay";
 type CanisterMethod = Record<string, IDL.FuncClass | Method>;
@@ -119,6 +120,7 @@ export default function CandidUI({
   protobuf?: string;
   isAttached?: boolean;
 }) {
+  const [agent] = useAtom(agentAtom);
   const [methods, setMethods] = useState<CanisterMethod>({});
   const [actor, setActor] = useState(null);
   const [state, dispatch] = useReducer(reducer, {
@@ -215,10 +217,15 @@ export default function CandidUI({
           }
         });
     })();
-  }, [jsBindings]);
+  }, [jsBindings, agent]);
 
   const call = useCallback(
     async (funcName: string, func: IDL.FuncClass | Method, inputs = []) => {
+      if (!actor[funcName]) {
+        console.warn(`function not found`, funcName);
+        return;
+      }
+
       let args = [],
         errors = [];
       if (isProtobufMethod(func)) {

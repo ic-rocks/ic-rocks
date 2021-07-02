@@ -1,23 +1,36 @@
 import useDarkMode from "use-dark-mode";
+import ClientOnly from "../ClientOnly";
 
-export default function DarkModeToggle() {
-  if (typeof window === "undefined") {
-    return null;
-  }
-
+function DarkModeToggle({ className }: { className: string }) {
   const darkMode = useDarkMode(undefined, {
     classNameDark: "dark",
     classNameLight: "light",
     element: document.documentElement,
   });
 
+  const onClick = (e) => {
+    darkMode.toggle();
+    e.stopPropagation();
+  };
+
   return (
-    <button
-      type="button"
-      onClick={darkMode.toggle}
-      className="px-2 py-1 rounded focus:outline-none bg-gray-200 dark:bg-gray-800"
-    >
-      {darkMode.value ? "☀" : "☾"}
+    <button className={className} onClick={onClick}>
+      <span className="inline-block w-4 mr-2">
+        {darkMode.value ? "☀" : "☾"}
+      </span>
+      {darkMode.value ? "Light Mode" : "Dark Mode"}
     </button>
+  );
+}
+
+export default function DarkModeToggleWrapped({
+  className,
+}: {
+  className: string;
+}) {
+  return (
+    <ClientOnly>
+      <DarkModeToggle className={className} />
+    </ClientOnly>
   );
 }
