@@ -4,8 +4,8 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { BsArrowRight } from "react-icons/bs";
 import fetchJSON from "../../lib/fetch";
 import { Transaction } from "../../lib/types/API";
-import AccountLink from "../Labels/AccountLink";
 import BalanceLabel from "../Labels/BalanceLabel";
+import IdentifierLink from "../Labels/IdentifierLink";
 import { TransactionTypeLabel } from "../Labels/TransactionTypeLabel";
 import { Table } from "../Tables/Table";
 import InfoBox from "./InfoBox";
@@ -44,8 +44,9 @@ export default function RecentTransactionsBox() {
             row.original.type === "MINT" ? (
               <TransactionTypeLabel type={row.original.type} />
             ) : (
-              <AccountLink
-                accountId={row.original.senderId}
+              <IdentifierLink
+                type="account"
+                id={row.original.senderId}
                 name={row.original.sender.name}
               />
             );
@@ -53,8 +54,9 @@ export default function RecentTransactionsBox() {
             row.original.type === "BURN" ? (
               <TransactionTypeLabel type={row.original.type} />
             ) : (
-              <AccountLink
-                accountId={row.original.receiverId}
+              <IdentifierLink
+                type="account"
+                id={row.original.receiverId}
                 name={row.original.receiver.name}
               />
             );

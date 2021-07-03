@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import BalanceLabel from "../../components/Labels/BalanceLabel";
-import PrincipalLink from "../../components/Labels/PrincipalLink";
+import IdentifierLink from "../../components/Labels/IdentifierLink";
 import { TaggedLabel } from "../../components/Labels/TaggedLabel";
 import { MetaTags } from "../../components/MetaTags";
 import TagModal from "../../components/Modals/TagModal";
@@ -149,7 +149,11 @@ const AccountPage = () => {
                   </label>
                 )}
               </div>
-              <TagModal key={accountId} account={accountId} />
+              <TagModal
+                publicTags={data?.publicTags}
+                key={accountId}
+                account={accountId}
+              />
             </th>
           </tr>
         </thead>
@@ -157,7 +161,7 @@ const AccountPage = () => {
           <tr className="flex">
             <td className="px-2 py-2 w-32 sm:w-40">Name</td>
             <td className="px-2 py-2 flex-1 flex items-center gap-2">
-              {data?.name || (tags.length === 0 ? "-" : null)}
+              {data?.name || (!tags[0]?.label ? "-" : null)}
               {tags.map((tag, i) => (
                 <TaggedLabel key={i} label={tag.label} />
               ))}
@@ -201,8 +205,9 @@ const AccountPage = () => {
             <td className="px-2 py-2 w-32 sm:w-40">Principal</td>
             <td className="px-2 py-2 flex-1 flex oneline">
               {data?.principalId ? (
-                <PrincipalLink
-                  principalId={data.principalId}
+                <IdentifierLink
+                  type="principal"
+                  id={data.principalId}
                   name={data.principal?.name}
                 />
               ) : (

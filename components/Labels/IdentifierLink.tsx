@@ -4,30 +4,33 @@ import React from "react";
 import { userTagAtom } from "../../state/tags";
 import { TaggedLabel } from "./TaggedLabel";
 
-const AccountLink = ({
-  accountId,
+const IdentifierLink = ({
+  id,
+  type,
   name,
   isLink = true,
 }: {
-  accountId: string;
+  id: string;
+  type: "account" | "principal";
   name?: string;
   isLink?: boolean;
 }) => {
   const [allTags] = useAtom(userTagAtom);
-  const tags = accountId
+  const field = type === "account" ? "accountId" : "principalId";
+  const tags = id
     ? allTags.private
-        .filter((t) => t.accountId === accountId)
-        .concat(allTags.public.filter((t) => t.accountId === accountId))
+        .filter((t) => t[field] === id)
+        .concat(allTags.public.filter((t) => t[field] === id))
     : [];
 
-  const label = tags[0] ? (
+  const label = tags[0]?.label ? (
     <TaggedLabel label={tags[0].label} />
   ) : (
-    name || accountId
+    name || id
   );
 
   return isLink ? (
-    <Link href={`/account/${accountId}`}>
+    <Link href={`/${type}/${id}`}>
       <a className="link-overflow">{label}</a>
     </Link>
   ) : (
@@ -35,4 +38,4 @@ const AccountLink = ({
   );
 };
 
-export default AccountLink;
+export default IdentifierLink;

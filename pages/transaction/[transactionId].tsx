@@ -2,8 +2,8 @@ import classnames from "classnames";
 import { DateTime } from "luxon";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
-import AccountLink from "../../components/Labels/AccountLink";
 import BalanceLabel from "../../components/Labels/BalanceLabel";
+import IdentifierLink from "../../components/Labels/IdentifierLink";
 import { TimestampLabel } from "../../components/Labels/TimestampLabel";
 import { TransactionTypeLabel } from "../../components/Labels/TransactionTypeLabel";
 import { MetaTags } from "../../components/MetaTags";
@@ -90,8 +90,9 @@ const TransactionPage = () => {
                 data.type === "MINT" ? (
                   "Mint"
                 ) : (
-                  <AccountLink
-                    accountId={data.senderId}
+                  <IdentifierLink
+                    type="account"
+                    id={data.senderId}
                     name={data.sender?.name}
                   />
                 )
@@ -110,8 +111,9 @@ const TransactionPage = () => {
                 data.type === "BURN" ? (
                   "Burn"
                 ) : (
-                  <AccountLink
-                    accountId={data.receiverId}
+                  <IdentifierLink
+                    type="account"
+                    id={data.receiverId}
                     name={data.receiver?.name}
                   />
                 )

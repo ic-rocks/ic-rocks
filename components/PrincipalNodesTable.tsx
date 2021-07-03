@@ -3,7 +3,7 @@ import React, { useMemo } from "react";
 import { countBy } from "../lib/arrays";
 import { capitalize } from "../lib/strings";
 import { APIPrincipal } from "../lib/types/API";
-import PrincipalLink from "./Labels/PrincipalLink";
+import IdentifierLink from "./Labels/IdentifierLink";
 import { Table } from "./Tables/Table";
 
 export const PrincipalNodesTable = ({ data }: { data: APIPrincipal }) => {
@@ -50,8 +50,9 @@ export const PrincipalNodesTable = ({ data }: { data: APIPrincipal }) => {
         id: "other",
         accessor: (d) => d[otherRole].id,
         Cell: ({ value, row }) => (
-          <PrincipalLink
-            principalId={value}
+          <IdentifierLink
+            type="principal"
+            id={value}
             name={row.original[otherRole].name}
           />
         ),

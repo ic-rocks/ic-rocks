@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useState } from "react";
 import fetchJSON from "../lib/fetch";
 import { formatNumber } from "../lib/numbers";
 import { PrincipalsResponse } from "../lib/types/API";
-import PrincipalLink from "./Labels/PrincipalLink";
+import IdentifierLink from "./Labels/IdentifierLink";
 import { Table } from "./Tables/Table";
 
 export const PrincipalsTable = () => {
@@ -19,7 +19,11 @@ export const PrincipalsTable = () => {
         accessor: "id",
         disableSortBy: true,
         Cell: ({ value, row }) => (
-          <PrincipalLink principalId={value} name={row.original.name} />
+          <IdentifierLink
+            type="principal"
+            id={value}
+            name={row.original.name}
+          />
         ),
         className: "pl-2 flex-1 flex oneline",
       },

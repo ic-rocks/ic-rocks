@@ -3,8 +3,8 @@ import Link from "next/link";
 import React, { useCallback, useMemo, useState } from "react";
 import fetchJSON from "../lib/fetch";
 import { TransactionsResponse } from "../lib/types/API";
-import AccountLink from "./Labels/AccountLink";
 import BalanceLabel from "./Labels/BalanceLabel";
+import IdentifierLink from "./Labels/IdentifierLink";
 import { TransactionTypeLabel } from "./Labels/TransactionTypeLabel";
 import { Table } from "./Tables/Table";
 
@@ -69,8 +69,9 @@ export const TransactionsTable = ({
           row.original.type === "MINT" ? (
             <TransactionTypeLabel type={row.original.type} />
           ) : (
-            <AccountLink
-              accountId={value}
+            <IdentifierLink
+              type="account"
+              id={value}
               name={row.original.sender.displayName}
               isLink={value !== accountId}
             />
@@ -86,8 +87,9 @@ export const TransactionsTable = ({
           row.original.type === "BURN" ? (
             <TransactionTypeLabel type={row.original.type} />
           ) : (
-            <AccountLink
-              accountId={value}
+            <IdentifierLink
+              type="account"
+              id={value}
               name={row.original.receiver.displayName}
               isLink={value !== accountId}
             />

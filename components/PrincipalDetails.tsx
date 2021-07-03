@@ -12,9 +12,8 @@ import { FiExternalLink } from "react-icons/fi";
 import { APIPrincipal, Canister } from "../lib/types/API";
 import { PrincipalType } from "../pages/principal/[principalId]";
 import { userTagAtom } from "../state/tags";
-import AccountLink from "./Labels/AccountLink";
 import BalanceLabel from "./Labels/BalanceLabel";
-import PrincipalLink from "./Labels/PrincipalLink";
+import IdentifierLink from "./Labels/IdentifierLink";
 import { TaggedLabel } from "./Labels/TaggedLabel";
 import { TimestampLabel } from "./Labels/TimestampLabel";
 import TagModal from "./Modals/TagModal";
@@ -99,8 +98,9 @@ export default function PrincipalDetails({
     head && (
       <>
         {head.id ? (
-          <PrincipalLink
-            principalId={head.id}
+          <IdentifierLink
+            type="principal"
+            id={head.id}
             name={head.name}
             isLink={head.id !== principalId}
           />
@@ -187,7 +187,7 @@ export default function PrincipalDetails({
           <tr className="flex">
             <td className="px-2 py-2 w-24 sm:w-44">Name</td>
             <td className="px-2 py-2 flex-1 flex items-center gap-2">
-              {principalData?.name || (tags.length === 0 ? "-" : null)}
+              {principalData?.name || (!tags[0]?.label ? "-" : null)}
               {tags.map((tag, i) => (
                 <TaggedLabel key={i} label={tag.label} />
               ))}
@@ -327,7 +327,12 @@ export default function PrincipalDetails({
                 {accounts.map(({ id, balance, displayName }) => {
                   return (
                     <div key={id} className="flex justify-between">
-                      <AccountLink key={id} accountId={id} name={displayName} />
+                      <IdentifierLink
+                        key={id}
+                        type="account"
+                        id={id}
+                        name={displayName}
+                      />
                       {balance && (
                         <span className="w-32 text-right text-gray-400 dark:text-gray-600">
                           <BalanceLabel value={balance} />

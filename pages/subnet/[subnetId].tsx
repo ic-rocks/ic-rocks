@@ -2,7 +2,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import NetworkGraph from "../../components/Charts/NetworkGraph";
-import PrincipalLink from "../../components/Labels/PrincipalLink";
+import IdentifierLink from "../../components/Labels/IdentifierLink";
 import { MetaTags } from "../../components/MetaTags";
 import { countBy } from "../../lib/arrays";
 import fetchJSON from "../../lib/fetch";
@@ -96,15 +96,17 @@ const Subnet = () => {
                   </Link>
                 </td>
                 <td className="px-2 py-0.5 flex-1 flex oneline">
-                  <PrincipalLink
+                  <IdentifierLink
+                    type="principal"
                     name={operator.name}
-                    principalId={operator.id}
+                    id={operator.id}
                   />
                 </td>
                 <td className="px-2 py-0.5 flex-1 flex oneline">
-                  <PrincipalLink
+                  <IdentifierLink
+                    type="principal"
                     name={provider.name}
-                    principalId={provider.id}
+                    id={provider.id}
                   />
                 </td>
               </tr>

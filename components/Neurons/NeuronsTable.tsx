@@ -5,8 +5,8 @@ import { entries } from "../../lib/enums";
 import fetchJSON from "../../lib/fetch";
 import { NeuronsResponse } from "../../lib/types/API";
 import { NeuronState } from "../../lib/types/governance";
-import AccountLink from "../Labels/AccountLink";
 import BalanceLabel from "../Labels/BalanceLabel";
+import IdentifierLink from "../Labels/IdentifierLink";
 import { SelectColumnFilter, Table } from "../Tables/Table";
 import { NeuronLabel } from "./NeuronLabel";
 
@@ -76,7 +76,7 @@ const NeuronsTable = ({
         accessor: "accountId",
         Cell: ({ value, row }) =>
           value ? (
-            <AccountLink accountId={value} />
+            <IdentifierLink type="account" id={value} />
           ) : (
             <span className="text-gray-500">Unknown</span>
           ),

@@ -161,6 +161,7 @@ export type Account = {
   tx_count: number;
   tx_received_count: number;
   tx_sent_count: number;
+  publicTags: LabelTag[];
 };
 
 export type CanistersResponse = PagedResponse<Canister>;
@@ -342,6 +343,7 @@ export type Tag = LabelTag & {
   accountId: string;
   principalId: string;
   note: string;
+  bookmarked: boolean;
 };
 
 export type UserTags = { private: Tag[]; public: Tag[] };

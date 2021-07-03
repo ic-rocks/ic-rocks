@@ -1,8 +1,8 @@
 import { DateTime } from "luxon";
 import { useRouter } from "next/router";
 import React, { useEffect, useMemo, useState } from "react";
-import AccountLink from "../../components/Labels/AccountLink";
 import BalanceLabel from "../../components/Labels/BalanceLabel";
+import IdentifierLink from "../../components/Labels/IdentifierLink";
 import { TimestampLabel } from "../../components/Labels/TimestampLabel";
 import { MetaTags } from "../../components/MetaTags";
 import { NeuronLabel } from "../../components/Neurons/NeuronLabel";
@@ -80,7 +80,7 @@ const NeuronIdPage = () => {
         { contents: "Account", className: "w-32" },
         {
           contents: data?.accountId ? (
-            <AccountLink accountId={data.accountId} />
+            <IdentifierLink type="account" id={data.accountId} />
           ) : (
             "-"
           ),

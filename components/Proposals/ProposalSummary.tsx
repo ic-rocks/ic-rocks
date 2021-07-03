@@ -5,9 +5,8 @@ import { decodeBlob } from "../../lib/candid/utils";
 import { addCrc32 } from "../../lib/identifiers";
 import { Proposal } from "../../lib/types/API";
 import { Action, NnsFunction } from "../../lib/types/governance";
-import AccountLink from "../Labels/AccountLink";
 import BalanceLabel from "../Labels/BalanceLabel";
-import PrincipalLink from "../Labels/PrincipalLink";
+import IdentifierLink from "../Labels/IdentifierLink";
 import { TimestampLabel } from "../Labels/TimestampLabel";
 
 export const ProposalSummary = ({ proposal }: { proposal: Proposal }) => {
@@ -45,7 +44,7 @@ export const ProposalSummary = ({ proposal }: { proposal: Proposal }) => {
       <div className="text-xs">
         <strong>Principal</strong>
         <div>
-          <PrincipalLink principalId={data} />
+          <IdentifierLink type="principal" id={data} />
         </div>
       </div>
     );
@@ -59,7 +58,7 @@ export const ProposalSummary = ({ proposal }: { proposal: Proposal }) => {
         <ul>
           {data.map((pid) => (
             <li key={pid}>
-              <PrincipalLink principalId={pid} />
+              <IdentifierLink type="principal" id={pid} />
             </li>
           ))}
         </ul>
@@ -76,7 +75,7 @@ export const ProposalSummary = ({ proposal }: { proposal: Proposal }) => {
           <ul>
             {data.who.map((pid) => (
               <li key={pid}>
-                <PrincipalLink principalId={pid} />
+                <IdentifierLink type="principal" id={pid} />
               </li>
             ))}
           </ul>
@@ -114,7 +113,7 @@ export const ProposalSummary = ({ proposal }: { proposal: Proposal }) => {
           <ul>
             {data.node_ids.map((pid) => (
               <li key={pid}>
-                <PrincipalLink principalId={pid} />
+                <IdentifierLink type="principal" id={pid} />
               </li>
             ))}
           </ul>
@@ -139,14 +138,16 @@ export const ProposalSummary = ({ proposal }: { proposal: Proposal }) => {
           <ul>
             {data.node_provider.map(({ id }) => (
               <li key={id}>
-                <PrincipalLink principalId={id} />
+                <IdentifierLink type="principal" id={id} />
               </li>
             ))}
           </ul>
         </div>
         <div>
           <strong>Account</strong>
-          <div>{!!account ? <AccountLink accountId={account} /> : "-"}</div>
+          <div>
+            {!!account ? <IdentifierLink type="account" id={account} /> : "-"}
+          </div>
         </div>
         <div>
           <strong>Amount</strong>
@@ -172,7 +173,7 @@ export const ProposalSummary = ({ proposal }: { proposal: Proposal }) => {
                 const pid = principal.toText();
                 return (
                   <li key={pid}>
-                    <PrincipalLink principalId={pid} />
+                    <IdentifierLink type="principal" id={pid} />
                   </li>
                 );
               })}

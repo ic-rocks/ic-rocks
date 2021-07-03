@@ -2,7 +2,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import NetworkGraph from "../../components/Charts/NetworkGraph";
-import PrincipalLink from "../../components/Labels/PrincipalLink";
+import IdentifierLink from "../../components/Labels/IdentifierLink";
 import { MetaTags } from "../../components/MetaTags";
 import fetchJSON from "../../lib/fetch";
 import { NodeResponse } from "../../lib/types/API";
@@ -44,9 +44,10 @@ const NodePage = () => {
             <td className="px-2 py-2 w-1/4">Node Operator</td>
             <td className="px-2 py-2 w-3/4 overflow-hidden">
               {data?.operator ? (
-                <PrincipalLink
+                <IdentifierLink
+                  type="principal"
                   name={data.operator.name}
-                  principalId={data.operator.id}
+                  id={data.operator.id}
                 />
               ) : (
                 "-"
@@ -57,9 +58,10 @@ const NodePage = () => {
             <td className="px-2 py-2 w-1/4">Node Provider</td>
             <td className="px-2 py-2 w-3/4 overflow-hidden">
               {data?.provider ? (
-                <PrincipalLink
+                <IdentifierLink
+                  type="principal"
                   name={data.provider.name}
-                  principalId={data.provider.id}
+                  id={data.provider.id}
                 />
               ) : (
                 "-"

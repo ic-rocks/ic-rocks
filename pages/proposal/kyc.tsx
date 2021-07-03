@@ -2,8 +2,7 @@ import { DateTime } from "luxon";
 import Link from "next/link";
 import React, { useCallback, useMemo, useState } from "react";
 import { BsInfoCircle } from "react-icons/bs";
-import AccountLink from "../../components/Labels/AccountLink";
-import PrincipalLink from "../../components/Labels/PrincipalLink";
+import IdentifierLink from "../../components/Labels/IdentifierLink";
 import { MetaTags } from "../../components/MetaTags";
 import ProposalNav from "../../components/Proposals/ProposalNav";
 import { Table } from "../../components/Tables/Table";
@@ -25,9 +24,10 @@ const KycPage = () => {
         accessor: (d) => d.principal.id,
         disableSortBy: true,
         Cell: ({ value, row }) => (
-          <PrincipalLink
+          <IdentifierLink
+            type="principal"
             name={row.original.principal.name}
-            principalId={value}
+            id={value}
           />
         ),
         className: "px-2 flex-1 flex oneline",
@@ -52,7 +52,7 @@ const KycPage = () => {
           <div className="flex flex-col">
             {row.original.principal.accounts.map(({ id, name }) => (
               <div key={id} className="flex oneline">
-                <AccountLink accountId={id} name={name} />
+                <IdentifierLink type="account" id={id} name={name} />
               </div>
             ))}
           </div>

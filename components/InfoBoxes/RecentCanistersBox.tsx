@@ -4,7 +4,7 @@ import React, { useCallback, useMemo, useState } from "react";
 import { BsArrowRight } from "react-icons/bs";
 import fetchJSON from "../../lib/fetch";
 import { CanistersResponse } from "../../lib/types/API";
-import PrincipalLink from "../Labels/PrincipalLink";
+import IdentifierLink from "../Labels/IdentifierLink";
 import { Table } from "../Tables/Table";
 import InfoBox from "./InfoBox";
 
@@ -33,8 +33,9 @@ export default function RecentCanistersBox({}: {}) {
         accessor: "id",
         Cell: ({ value, row }) => {
           return (
-            <PrincipalLink
-              principalId={value}
+            <IdentifierLink
+              type="principal"
+              id={value}
               name={row.original.principal?.name}
             />
           );
@@ -45,8 +46,9 @@ export default function RecentCanistersBox({}: {}) {
         Header: "Controller",
         accessor: "controllerId",
         Cell: ({ value, row }) => (
-          <PrincipalLink
-            principalId={value}
+          <IdentifierLink
+            type="principal"
+            id={value}
             name={row.original.controller?.name}
           />
         ),

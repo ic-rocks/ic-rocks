@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { FiExternalLink, FiFileText } from "react-icons/fi";
 import fetchJSON from "../lib/fetch";
 import { CanistersResponse, SubnetResponse } from "../lib/types/API";
-import PrincipalLink from "./Labels/PrincipalLink";
+import IdentifierLink from "./Labels/IdentifierLink";
 import { SelectColumnFilter, Table } from "./Tables/Table";
 
 export const CanistersTable = ({
@@ -59,8 +59,9 @@ export const CanistersTable = ({
           accessor: "id",
           disableSortBy: true,
           Cell: ({ value, row }) => (
-            <PrincipalLink
-              principalId={value}
+            <IdentifierLink
+              type="principal"
+              id={value}
               name={row.original.principal?.name}
             />
           ),
@@ -77,8 +78,9 @@ export const CanistersTable = ({
           accessor: "controllerId",
           disableSortBy: true,
           Cell: ({ value, row }) => (
-            <PrincipalLink
-              principalId={value}
+            <IdentifierLink
+              type="principal"
+              id={value}
               name={row.original.controller?.name}
             />
           ),
