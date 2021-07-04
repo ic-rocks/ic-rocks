@@ -199,9 +199,15 @@ const PrincipalPage = () => {
     }
 
     // Always fetch principal data
-    fetchJSON(`/api/principals/${principalId}`).then(
-      (data) => data && setPrincipalData(data)
-    );
+    fetchJSON(`/api/principals/${principalId}`).then((data) => {
+      if (data) {
+        if (data.node) {
+          router.replace(`/node/${principalId}`);
+        } else {
+          setPrincipalData(data);
+        }
+      }
+    });
   }, [principalId, candidOverride]);
 
   useEffect(() => {

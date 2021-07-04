@@ -15,6 +15,7 @@ import { MultiSelectColumnFilter, Table } from "../components/Tables/Table";
 import { entries } from "../lib/enums";
 import fetchJSON from "../lib/fetch";
 import { formatNumber } from "../lib/numbers";
+import { formatPercent } from "../lib/strings";
 import { ProposalsResponse } from "../lib/types/API";
 import { Action, NnsFunction, Status, Topic } from "../lib/types/governance";
 
@@ -81,8 +82,7 @@ const ProposalsPage = () => {
               <a className="link-overflow">{value}</a>
             </Link>
           ),
-          className:
-            "px-2 w-24 hidden md:block overflow-hidden overflow-ellipsis",
+          className: "px-2 w-24 hidden md:flex oneline",
           Filter: MultiSelectColumnFilter,
           filterOptions:
             proposers?.length > 0
@@ -92,6 +92,7 @@ const ProposalsPage = () => {
                 }))
               : [],
           filterLabel: "Proposer",
+          headerClassName: "w-24 hidden md:block items-start",
         },
         {
           Header: "Topic, Action & Summary",
@@ -168,6 +169,7 @@ const ProposalsPage = () => {
             );
             const tallyNo = Number(BigInt(row.original.tallyNo) / BigInt(1e8));
             const sum = tallyYes + tallyNo;
+            const total = Number(BigInt(row.original.tallyTotal) / BigInt(1e8));
             const open = row.original.status === Status.Open;
 
             return (
@@ -185,12 +187,12 @@ const ProposalsPage = () => {
                         row.original.status === Status.Failed,
                     })}
                   >
-                    {(tallyYes / sum).toFixed(2)}% Yes
+                    {formatPercent(tallyYes / total)} Yes
                   </span>
                 )}
                 {(open || tallyYes < tallyNo) && (
                   <span className="block text-red-500">
-                    {(tallyNo / sum).toFixed(2)}% No
+                    {formatPercent(tallyNo / total)} No
                   </span>
                 )}
               </div>

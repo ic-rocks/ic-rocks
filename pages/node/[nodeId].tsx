@@ -90,7 +90,7 @@ const NodePage = () => {
           </tr>
         </tbody>
       </table>
-      {data && <NetworkGraph activeId={nodeId} activeType="Node" />}
+      {data?.subnet && <NetworkGraph activeId={nodeId} activeType="Node" />}
     </div>
   );
 };
