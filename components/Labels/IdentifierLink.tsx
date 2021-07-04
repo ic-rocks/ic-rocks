@@ -1,3 +1,4 @@
+import classNames from "classnames";
 import { useAtom } from "jotai";
 import Link from "next/link";
 import React from "react";
@@ -9,11 +10,13 @@ const IdentifierLink = ({
   type,
   name,
   isLink = true,
+  className,
 }: {
   id: string;
   type: "account" | "principal";
   name?: string;
   isLink?: boolean;
+  className?: string;
 }) => {
   const [allTags] = useAtom(userTagAtom);
   const field = type === "account" ? "accountId" : "principalId";
@@ -31,7 +34,7 @@ const IdentifierLink = ({
 
   return isLink ? (
     <Link href={`/${type}/${id}`}>
-      <a className="link-overflow">{label}</a>
+      <a className={classNames(className, "link-overflow")}>{label}</a>
     </Link>
   ) : (
     <span className="overflow-hidden overflow-ellipsis">{label}</span>

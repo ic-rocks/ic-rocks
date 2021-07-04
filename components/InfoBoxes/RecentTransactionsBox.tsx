@@ -45,6 +45,7 @@ export default function RecentTransactionsBox() {
               <TransactionTypeLabel type={row.original.type} />
             ) : (
               <IdentifierLink
+                className="w-16 sm:w-20 md:w-28"
                 type="account"
                 id={row.original.senderId}
                 name={row.original.sender.name}
@@ -55,6 +56,7 @@ export default function RecentTransactionsBox() {
               <TransactionTypeLabel type={row.original.type} />
             ) : (
               <IdentifierLink
+                className="w-16 sm:w-20 md:w-28"
                 type="account"
                 id={row.original.receiverId}
                 name={row.original.receiver.name}
