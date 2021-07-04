@@ -31,14 +31,20 @@ export const PrincipalNodesTable = ({ data }: { data: APIPrincipal }) => {
         className: "px-2 flex-1 flex oneline",
       },
       {
-        Header: `Subnet (${countBy(rows, (d) => d.subnet.id)} unique)`,
+        Header: `Subnet (${countBy(
+          rows.filter((d) => !!d.subnet),
+          (d) => d.subnet.id
+        )} unique)`,
         id: "subnet",
-        accessor: (d) => d.subnet.displayName,
-        Cell: ({ value, row }) => (
-          <Link href={`/subnet/${row.original.subnet.id}`}>
-            <a className="link-overflow">{value}</a>
-          </Link>
-        ),
+        accessor: (d) => d.subnet?.displayName,
+        Cell: ({ value, row }) =>
+          row.original.subnet ? (
+            <Link href={`/subnet/${row.original.subnet.id}`}>
+              <a className="link-overflow">{value}</a>
+            </Link>
+          ) : (
+            "-"
+          ),
         className: "px-2 flex-1 flex oneline",
       },
       {
