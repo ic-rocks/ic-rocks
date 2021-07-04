@@ -113,7 +113,7 @@ export const TableWrapped = ({
   columns,
   data,
   count,
-  fetchData = () => {},
+  fetchData,
   loading,
   useSort = true,
   manualSortBy = true,
@@ -174,7 +174,9 @@ export const TableWrapped = ({
         [name]: { pageIndex, pageSize, sortBy, filters },
       }));
     }
-    fetchData({ pageIndex, pageSize, sortBy, filters });
+    if (fetchData) {
+      fetchData({ pageIndex, pageSize, sortBy, filters });
+    }
   }, [fetchData, pageIndex, pageSize, sortBy, filters]);
 
   return (

@@ -37,10 +37,10 @@ textarea {
   @apply rounded cursor-pointer transition-colors;
 }
 .btn-default {
-  @apply btn-base bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700;
+  @apply btn-base bg-gray-100 dark:bg-gray-800 disabled:bg-gray-100 dark:disabled:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 disabled:cursor-not-allowed;
 }
 .btn-default-2 {
-  @apply btn-base bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600;
+  @apply btn-base bg-gray-200 dark:bg-gray-700 disabled:bg-gray-200 dark:disabled:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 disabled:cursor-not-allowed;
 }
 
 .link-default {

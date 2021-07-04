@@ -3,9 +3,9 @@ import classNames from "classnames";
 import protobuf from "protobufjs";
 import React, { useEffect, useState } from "react";
 import { BiMinus, BiPlus } from "react-icons/bi";
-import { CgSpinner } from "react-icons/cg";
 import { maybeTimestamp } from "../../lib/numbers";
 import { Label } from "../Forms/Label";
+import SpinnerButton from "../Forms/SpinnerButton";
 import {
   CandidInput,
   CandidOutput,
@@ -88,22 +88,14 @@ export const QueryButton = ({
 }: {
   isLoading: boolean;
   isQuery: boolean;
-}) => {
-  return (
-    <button
-      className="mt-2 w-16 py-1 text-center btn-default"
-      disabled={isLoading}
-    >
-      {isLoading ? (
-        <CgSpinner className="inline-block animate-spin" />
-      ) : isQuery ? (
-        "Query"
-      ) : (
-        "Call"
-      )}
-    </button>
-  );
-};
+}) => (
+  <SpinnerButton
+    className="mt-2 w-16 py-1 text-center btn-default"
+    isLoading={isLoading}
+  >
+    {isQuery ? "Query" : "Call"}
+  </SpinnerButton>
+);
 
 export const Nested = ({ children }) => (
   <div className="flex flex-col pl-2 border-l border-gray-300 dark:border-gray-700 gap-1">

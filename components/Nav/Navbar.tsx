@@ -1,10 +1,15 @@
+import { useAtom } from "jotai";
 import Link from "next/link";
 import React from "react";
+import { FaBookmark } from "react-icons/fa";
+import { authAtom } from "../../state/auth";
 import ActiveLink from "../ActiveLink";
 import Dropdown from "./Dropdown";
 import SearchBar from "./Searchbar";
 
 export default function Nav() {
+  const [auth] = useAtom(authAtom);
+
   return (
     <nav className="pt-4 flex flex-col gap-4">
       <div className="flex flex-col xs:flex-row items-stretch xs:justify-between gap-2">
@@ -25,8 +30,19 @@ export default function Nav() {
           </Link>
         </div>
 
-        <div className="flex-1 flex flex-col xs:flex-row items-stretch xs:items-start max-w-sm gap-4">
+        <div className="flex-1 flex flex-col xs:flex-row items-stretch xs:items-start max-w-md gap-2">
           <SearchBar />
+          {!!auth && (
+            <Link href="/bookmarks">
+              <a
+                className="btn-default px-1.5 py-1 h-full inline-flex items-center"
+                title="Bookmarks"
+              >
+                <FaBookmark className="text-green-400 h-3" />
+                <span className="xs:hidden">Bookmarks</span>
+              </a>
+            </Link>
+          )}
           <Dropdown />
         </div>
       </div>

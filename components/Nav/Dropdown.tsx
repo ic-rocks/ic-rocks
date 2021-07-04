@@ -4,7 +4,7 @@ import { Menu, Transition } from "@headlessui/react";
 import { useAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import React, { Fragment, useEffect, useState } from "react";
-import { HiChevronDown } from "react-icons/hi";
+import { FiMenu } from "react-icons/fi";
 import { agentAtom, authAtom } from "../../state/auth";
 import DarkModeToggle from "./DarkModeToggle";
 
@@ -58,12 +58,16 @@ export default function Dropdown() {
   }, []);
 
   return (
-    <div className="flex-1 xs:flex-none flex">
+    <div className="flex-1 xs:flex-none flex h-full">
       <Menu as="div" className="relative flex-1">
-        <div className="w-full">
-          <Menu.Button className="w-full inline-flex justify-between items-center px-2 py-1 btn-default focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
-            {principal ? `User ${principal.toText().split("-")[0]}` : "User"}
-            <HiChevronDown className="w-5 h-5" aria-hidden="true" />
+        <div className="w-full h-full">
+          <Menu.Button className="w-full h-full inline-flex justify-between items-center px-2 py-1 btn-default focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
+            {!!principal && (
+              <span className="mr-2">
+                User {principal.toText().split("-")[0]}
+              </span>
+            )}
+            <FiMenu />
           </Menu.Button>
         </div>
         <Transition
