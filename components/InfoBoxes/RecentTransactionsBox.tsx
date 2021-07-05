@@ -1,7 +1,8 @@
 import { DateTime } from "luxon";
 import Link from "next/link";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { BsArrowRight } from "react-icons/bs";
+import { useQuery } from "react-query";
 import fetchJSON from "../../lib/fetch";
 import { Transaction } from "../../lib/types/API";
 import BalanceLabel from "../Labels/BalanceLabel";
@@ -11,17 +12,14 @@ import { Table } from "../Tables/Table";
 import InfoBox from "./InfoBox";
 
 export default function RecentTransactionsBox() {
-  const [isLoading, setIsLoading] = useState(true);
-  const [rows, setResponse] = useState<Transaction[]>([]);
-  useEffect(() => {
-    const interval = setInterval(fetchData, 5000);
-    return () => clearInterval(interval);
-  }, []);
-  const fetchData = useCallback(async () => {
-    const res = await fetchJSON("/api/transactions/recent");
-    if (res) setResponse(res);
-    setIsLoading(false);
-  }, []);
+  const { data, isFetching } = useQuery<Transaction[]>(
+    "recent-transactions",
+    () => fetchJSON("/api/transactions/recent"),
+    {
+      placeholderData: [],
+      refetchInterval: 5000,
+    }
+  );
   const columns = useMemo(
     () => [
       {
@@ -98,10 +96,9 @@ export default function RecentTransactionsBox() {
           className: "bg-heading py-0.5",
         }}
         columns={columns}
-        data={rows}
-        count={rows.length}
-        fetchData={fetchData}
-        loading={isLoading}
+        data={data}
+        count={data.length}
+        loading={!data.length && isFetching}
         useSort={false}
         usePage={false}
       />

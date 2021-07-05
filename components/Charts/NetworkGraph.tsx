@@ -3,8 +3,8 @@ import { SimulationNodeDatum } from "d3";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import useMeasure from "react-use-measure";
+import useNetwork from "../../lib/hooks/useNetwork";
 import { capitalize, shortPrincipal } from "../../lib/strings";
-import { useGlobalDispatch, useGlobalState } from "../StateContext";
 
 type NodeType = "Subnet" | "Node" | "Principal" | "Provider" | "Operator";
 type Node = {
@@ -46,13 +46,10 @@ const NetworkGraph = ({
   const router = useRouter();
   const svgRef = useRef(null);
   const [ref, { width: containerWidth }] = useMeasure();
-  const { network } = useGlobalState();
-  const dispatch = useGlobalDispatch();
+  const { data: network } = useNetwork();
 
   const width = containerWidth ? Math.max(500, containerWidth) : null;
   let height = 600;
-
-  useEffect(() => dispatch({ type: "fetchNetwork" }), []);
 
   const principalsMap = useMemo(
     () =>

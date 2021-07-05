@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { useQuery } from "react-query";
 import NetworkGraph from "../../components/Charts/NetworkGraph";
 import IdentifierLink from "../../components/Labels/IdentifierLink";
 import { MetaTags } from "../../components/MetaTags";
@@ -12,11 +13,11 @@ const NodePage = () => {
   const { nodeId } = router.query as {
     nodeId?: string;
   };
-  const [data, setData] = useState<NodeResponse>(null);
-  useEffect(() => {
-    if (!nodeId) return;
-    fetchJSON(`/api/nodes/${nodeId}`).then(setData);
-  }, [nodeId]);
+  const { data } = useQuery<NodeResponse>(
+    ["nodes", nodeId],
+    () => fetchJSON(`/api/nodes/${nodeId}`),
+    { enabled: !!nodeId, staleTime: Infinity }
+  );
 
   return (
     <div className="pb-16">

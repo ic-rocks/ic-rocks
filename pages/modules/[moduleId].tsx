@@ -1,5 +1,6 @@
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
+import { useQuery } from "react-query";
 import CanisterPage from "../../components/CanisterPage";
 import { CanistersTable } from "../../components/CanistersTable";
 import CodeBlock from "../../components/CodeBlock";
@@ -17,23 +18,21 @@ const ModuleCanistersPage = () => {
     moduleId: string;
   };
 
-  const [data, setData] = useState<Module>(null);
   const [bindings, setBindings] = useState(null);
-  useEffect(() => {
-    if (!moduleId) return;
+  const { data } = useQuery<Module>(
+    ["modules", moduleId],
+    async () => fetchJSON(`/api/modules/${moduleId}`),
+    { enabled: !!moduleId }
+  );
 
-    fetchJSON(`/api/modules/${moduleId}`).then((data) => {
-      if (data) {
-        setData(data);
-        if (data.candid) {
-          didc.then((mod) => {
-            const gen = mod.generate(data.candid);
-            setBindings(gen);
-          });
-        }
-      }
-    });
-  }, [moduleId]);
+  useEffect(() => {
+    if (data?.candid) {
+      didc.then((mod) => {
+        const gen = mod.generate(data.candid);
+        setBindings(gen);
+      });
+    }
+  }, [data]);
 
   const [showInterface, setShowInterface] = useState(false);
 
@@ -136,7 +135,7 @@ const ModuleCanistersPage = () => {
       {!!moduleId && (
         <section>
           <h2 className="text-2xl mb-4">Matching Canisters</h2>
-          <CanistersTable moduleId={moduleId} />
+          <CanistersTable name="matching-canisters" moduleId={moduleId} />
         </section>
       )}
     </CanisterPage>

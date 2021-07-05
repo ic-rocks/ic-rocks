@@ -11,8 +11,10 @@ const GenesisAccountPage = () => {
   return (
     <div className="pb-16">
       <MetaTags
-        title={`Genesis Account ${genesisAccount}`}
-        description={`Details for genesis account ${genesisAccount} on the Internet Computer.`}
+        title={`Genesis Account ${genesisAccount ?? ""}`}
+        description={`Details for genesis account ${
+          genesisAccount ?? ""
+        } on the Internet Computer.`}
       />
       <NeuronNav />
       <GenesisAccount genesisAccount={genesisAccount} />

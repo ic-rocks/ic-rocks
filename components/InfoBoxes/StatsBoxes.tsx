@@ -1,11 +1,15 @@
 import React from "react";
 import { CgSpinner } from "react-icons/cg";
+import useMarkets from "../../lib/hooks/useMarkets";
+import useStats from "../../lib/hooks/useStats";
+import useTotalCycles from "../../lib/hooks/useTotalCycles";
 import { formatNumber, formatNumberUSD } from "../../lib/numbers";
 import SparklineChart from "../Charts/SparklineChart";
-import { useGlobalState } from "../StateContext";
 
 export default function StatsBoxes() {
-  const { stats, tCycles, markets } = useGlobalState();
+  const { data: markets } = useMarkets();
+  const { data: stats } = useStats();
+  const { data: tCycles } = useTotalCycles();
 
   const mergedStats = stats ? { ...stats, tCycles } : null;
 

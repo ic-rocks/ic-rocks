@@ -4,7 +4,8 @@ import { useAtom } from "jotai";
 import { DateTime } from "luxon";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { useQuery } from "react-query";
 import BalanceLabel from "../../components/Labels/BalanceLabel";
 import IdentifierLink from "../../components/Labels/IdentifierLink";
 import { TaggedLabel } from "../../components/Labels/TaggedLabel";
@@ -12,10 +13,10 @@ import { MetaTags } from "../../components/MetaTags";
 import TagModal from "../../components/Modals/TagModal";
 import { NeuronLabel } from "../../components/Neurons/NeuronLabel";
 import Search404 from "../../components/Search404";
-import { useGlobalState } from "../../components/StateContext";
 import { TransactionsTable } from "../../components/TransactionsTable";
 import ledgerIdl from "../../lib/canisters/ledger.did";
 import fetchJSON from "../../lib/fetch";
+import useMarkets from "../../lib/hooks/useMarkets";
 import { formatNumber, formatNumberUSD } from "../../lib/numbers";
 import { Account } from "../../lib/types/API";
 import { NeuronState } from "../../lib/types/governance";
@@ -42,11 +43,32 @@ const hideLeadingZeros = (str: string) => {
 
 const AccountPage = () => {
   const router = useRouter();
-  const [data, setData] = useState<Partial<Account>>(null);
-  const [isValid, setIsValid] = useState(true);
+
   const { accountId: accountId_ } = router.query as { accountId: string };
-  const { markets } = useGlobalState();
+  const { data: markets } = useMarkets();
   const accountId = accountId_?.toLowerCase();
+
+  const isValid = useMemo(() => {
+    if (typeof accountId !== "string" || !accountId) return false;
+    try {
+      const blob = Buffer.from(accountId, "hex");
+      const crc32Buf = Buffer.alloc(4);
+      crc32Buf.writeUInt32BE(getCrc32(blob.slice(4)));
+      return blob.slice(0, 4).toString() === crc32Buf.toString();
+    } catch (error) {
+      console.warn(error);
+    }
+    return false;
+  }, [accountId]);
+
+  const { data } = useQuery<Partial<Account>>(
+    ["accounts", accountId],
+    () => fetchJSON(`/api/accounts/${accountId}`),
+    {
+      enabled: isValid,
+    }
+  );
+  const [ledgerBalance, setLedgerBalance] = useState(null);
   const [subaccount, setSubaccount] = useState(null);
   const [allTags] = useAtom(userTagAtom);
   const tags = allTags.private
@@ -54,52 +76,30 @@ const AccountPage = () => {
     .concat(allTags.public.filter((t) => t.accountId === accountId));
 
   useEffect(() => {
-    if (typeof accountId !== "string" || !accountId) return;
-
-    setData(null);
     setSubaccount(null);
+    setLedgerBalance(null);
+    async () => {
+      if (data?.subaccount) {
+        const buf = Buffer.from(data.subaccount, "hex");
+        const filled = Buffer.concat([Buffer.alloc(32 - buf.length), buf]);
+        setSubaccount(filled.toString("hex"));
+      }
 
-    let valid = false;
-    try {
-      const blob = Buffer.from(accountId, "hex");
-      const crc32Buf = Buffer.alloc(4);
-      crc32Buf.writeUInt32BE(getCrc32(blob.slice(4)));
-      valid = blob.slice(0, 4).toString() === crc32Buf.toString();
-    } catch (error) {
-      console.warn(error);
-    }
-    setIsValid(valid);
-
-    if (valid) {
-      (async () => {
-        const data: Account = await fetchJSON(`/api/accounts/${accountId}`);
-        if (data) {
-          if (data.subaccount) {
-            const buf = Buffer.from(data.subaccount, "hex");
-            const filled = Buffer.concat([Buffer.alloc(32 - buf.length), buf]);
-            setSubaccount(filled.toString("hex"));
-          }
-          setData(data);
+      const res = (await ledger.account_balance_dfx({
+        account: accountId,
+      })) as { es8: BigInt };
+      const ledgerBal = res["e8s"].toString();
+      if (data) {
+        if (ledgerBal !== data.balance) {
+          console.warn(`balance: ledger=${ledgerBal} api=${data.balance}`);
         }
+      } else {
+        setLedgerBalance(ledgerBal);
+      }
+    };
+  }, [data]);
 
-        const res = (await ledger.account_balance_dfx({
-          account: accountId,
-        })) as { es8: BigInt };
-        const ledgerBal = res["e8s"].toString();
-        if (data) {
-          if (ledgerBal !== data.balance) {
-            console.warn(`balance: ledger=${ledgerBal} api=${data.balance}`);
-          }
-        } else {
-          setData({
-            balance: ledgerBal,
-          });
-        }
-      })();
-    }
-  }, [accountId]);
-
-  if (!isValid) {
+  if (accountId && !isValid) {
     return <Search404 input={accountId} />;
   }
 
@@ -236,7 +236,11 @@ const AccountPage = () => {
           <tr className="flex">
             <td className="px-2 py-2 w-32 sm:w-40">Balance</td>
             <td className="px-2 py-2 flex-1">
-              {data ? <BalanceLabel value={data.balance} /> : "-"}
+              {data || ledgerBalance ? (
+                <BalanceLabel value={data.balance ?? ledgerBalance} />
+              ) : (
+                "-"
+              )}
             </td>
           </tr>
           <tr className="flex">

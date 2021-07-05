@@ -1,47 +1,35 @@
 import classnames from "classnames";
 import { DateTime } from "luxon";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { useQuery } from "react-query";
 import BalanceLabel from "../../components/Labels/BalanceLabel";
 import IdentifierLink from "../../components/Labels/IdentifierLink";
 import { TimestampLabel } from "../../components/Labels/TimestampLabel";
 import { TransactionTypeLabel } from "../../components/Labels/TransactionTypeLabel";
 import { MetaTags } from "../../components/MetaTags";
 import Search404 from "../../components/Search404";
-import { useGlobalState } from "../../components/StateContext";
 import fetchJSON from "../../lib/fetch";
+import useMarkets from "../../lib/hooks/useMarkets";
 import { formatNumberUSD } from "../../lib/numbers";
-import { Transaction, TransactionsResponse } from "../../lib/types/API";
+import { Transaction } from "../../lib/types/API";
 
 const TransactionPage = () => {
   const router = useRouter();
-  const [data, setData] = useState<Transaction>(null);
-  const [isValid, setIsValid] = useState(true);
-  const [isLoadingTxs, setIsLoadingTxs] = useState(false);
   const { transactionId } = router.query as { transactionId: string };
-  const { markets } = useGlobalState();
+  const { data: markets } = useMarkets();
 
-  useEffect(() => {
-    if (typeof transactionId !== "string" || !transactionId) return;
+  const { data, isError, isFetching } = useQuery<Transaction>(
+    ["transaction", transactionId],
+    () => fetchJSON(`/api/transactions/${transactionId}`),
+    { enabled: !!transactionId, staleTime: Infinity }
+  );
 
-    setData(null);
-    setIsLoadingTxs(true);
-    setIsValid(true);
+  if (isError) {
+    return <Search404 input={transactionId} />;
+  }
 
-    fetchJSON(`/api/transactions/${transactionId}`)
-      .then((data: TransactionsResponse) => {
-        const tx = data.rows[0];
-        if (!tx) throw "tx not found";
-        setData(tx);
-        setIsLoadingTxs(false);
-      })
-      .catch((err) => {
-        console.warn(err);
-        setIsValid(false);
-      });
-  }, [transactionId]);
-
-  return isValid ? (
+  return (
     <div className="pb-16">
       <MetaTags
         title={`Transaction${transactionId ? ` ${transactionId}` : ""}`}
@@ -173,8 +161,6 @@ const TransactionPage = () => {
         </tbody>
       </table>
     </div>
-  ) : (
-    <Search404 input={transactionId} />
   );
 };
 

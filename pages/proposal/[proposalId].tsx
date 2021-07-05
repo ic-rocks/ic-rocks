@@ -2,7 +2,8 @@ import classNames from "classnames";
 import { DateTime } from "luxon";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo } from "react";
+import { useQuery } from "react-query";
 import BalanceLabel from "../../components/Labels/BalanceLabel";
 import { TimestampLabel } from "../../components/Labels/TimestampLabel";
 import { MetaTags } from "../../components/MetaTags";
@@ -14,27 +15,18 @@ import { ProposalSummary } from "../../components/Proposals/ProposalSummary";
 import { ProposalUrl } from "../../components/Proposals/ProposalUrl";
 import SimpleTable from "../../components/Tables/SimpleTable";
 import fetchJSON from "../../lib/fetch";
-import { formatNumber } from "../../lib/numbers";
-import { formatPercent } from "../../lib/strings";
 import { Proposal } from "../../lib/types/API";
 import { Action, NnsFunction, Topic } from "../../lib/types/governance";
+import Votes from "./Votes";
 
 const ProposalIdPage = () => {
   const router = useRouter();
   const { proposalId } = router.query as { proposalId: string };
-  const [isLoading, setIsLoading] = useState(true);
-  const [data, setData] = useState<Proposal>(null);
-
-  useEffect(() => {
-    if (!proposalId) return;
-
-    fetchJSON(`/api/proposals/${proposalId}`).then((data) => {
-      if (data) {
-        setData(data);
-      }
-      setIsLoading(false);
-    });
-  }, [proposalId]);
+  const { data } = useQuery<Proposal>(
+    ["proposals", proposalId],
+    () => fetchJSON(`/api/proposals/${proposalId}`),
+    { enabled: !!proposalId }
+  );
 
   const headers = [{ contents: "Proposal Details" }];
 
@@ -165,66 +157,6 @@ const ProposalIdPage = () => {
       ],
     ];
   }, [data]);
-  let tally;
-  if (data) {
-    const tallyTotal = BigInt(data.tallyTotal);
-    const tallyTotalNumber = Number(BigInt(data.tallyTotal) / BigInt(1e8));
-    const tallyYes = BigInt(data.tallyYes);
-    const percentYes = Number(tallyYes / BigInt(1e8)) / tallyTotalNumber;
-    const tallyNo = BigInt(data.tallyNo);
-    const percentNo = Number(tallyNo / BigInt(1e8)) / tallyTotalNumber;
-    const tallyAbstain = tallyTotal - tallyYes - tallyNo;
-    const percentAbstain =
-      Number(tallyAbstain / BigInt(1e8)) / tallyTotalNumber;
-    tally = (
-      <div className="p-2 text-xs md:text-base">
-        <div className="flex py-0.5">
-          <div className="w-16">Yes</div>
-          <div className="w-20 md:w-28 pr-2 text-right">
-            {formatNumber(tallyYes / BigInt(1e8))}
-          </div>
-          <div className="flex-1">
-            <div
-              className="relative rounded bg-green-400 dark:bg-green-600 h-full"
-              style={{ width: `${percentYes * 100}%` }}
-            >
-              <div className="absolute pl-2">{formatPercent(percentYes)}</div>
-            </div>
-          </div>
-        </div>
-        <div className="flex py-0.5">
-          <div className="w-16">No</div>
-          <div className="w-20 md:w-28 pr-2 text-right">
-            {formatNumber(tallyNo / BigInt(1e8))}
-          </div>
-          <div className="flex-1">
-            <div
-              className="relative rounded bg-red-400 dark:bg-red-600 h-full"
-              style={{ width: `${percentNo * 100}%` }}
-            >
-              <div className="absolute pl-2">{formatPercent(percentNo)}</div>
-            </div>
-          </div>
-        </div>
-        <div className="flex py-0.5">
-          <div className="w-16 text-gray-500">No Vote</div>
-          <div className="w-20 md:w-28 pr-2 text-right">
-            {formatNumber(tallyAbstain / BigInt(1e8))}
-          </div>
-          <div className="flex-1">
-            <div
-              className="relative rounded bg-gray-500 h-full"
-              style={{ width: `${percentAbstain * 100}%` }}
-            >
-              <div className="absolute pl-2">
-                {formatPercent(percentAbstain)}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="pb-16">
@@ -240,7 +172,7 @@ const ProposalIdPage = () => {
       <section className="flex flex-col gap-4">
         <div>
           <div className="p-2 bg-heading font-bold">Votes</div>
-          {tally}
+          {!!data && <Votes data={data} />}
         </div>
         <SimpleTable headers={headers} rows={summaryRows} />
       </section>

@@ -1,35 +1,28 @@
 import classNames from "classnames";
 import { DateTime } from "luxon";
 import Link from "next/link";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useMemo } from "react";
+import { useQuery } from "react-query";
 import BalanceLabel from "../components/Labels/BalanceLabel";
 import { MetaTags } from "../components/MetaTags";
 import NeuronNav from "../components/Neurons/NeuronNav";
-import { useGlobalState } from "../components/StateContext";
+import { DataTable } from "../components/Tables/DataTable";
 import SimpleTable from "../components/Tables/SimpleTable";
-import { SelectColumnFilter, Table } from "../components/Tables/Table";
+import { SelectColumnFilter } from "../components/Tables/Table";
 import { entries } from "../lib/enums";
 import fetchJSON from "../lib/fetch";
+import useStats from "../lib/hooks/useStats";
 import { formatNumber } from "../lib/numbers";
 import { formatPercent } from "../lib/strings";
-import {
-  GenesisAccountStatus,
-  InvestorType,
-  NeuronsResponse,
-} from "../lib/types/API";
+import { GenesisAccountStatus, InvestorType } from "../lib/types/API";
 
-const GenesisAccountsPage = () => {
-  const { stats } = useGlobalState();
-  const [isLoading, setIsLoading] = useState(false);
-  const [genesisStats, setStats] = useState(null);
-
-  useEffect(() => {
-    fetchJSON("/api/genesis/stats").then((data) => {
-      if (data) {
-        setStats(data);
-      }
-    });
-  }, []);
+const GenesisAccountsStats = () => {
+  const { data: stats } = useStats();
+  const { data: genesisStats } = useQuery(
+    "genesis/stats",
+    () => fetchJSON("/api/genesis/stats"),
+    { staleTime: Infinity }
+  );
 
   const statsByStatusHeaders = [
     { contents: "Account Status", className: "w-36" },
@@ -123,11 +116,22 @@ const GenesisAccountsPage = () => {
     });
   }, [genesisStats]);
 
-  const [{ rows, count }, setResponse] = useState<NeuronsResponse>({
-    count: 0,
-    rows: [],
-  });
+  return (
+    <section className="mb-8 md:flex-row flex-col flex gap-8">
+      <div className="flex-1" style={{ minWidth: 320 }}>
+        <SimpleTable headers={statsByStatusHeaders} rows={statsByStatusRows} />
+      </div>
+      <div className="flex-1" style={{ minWidth: 320 }}>
+        <SimpleTable
+          headers={statsByNeuronStateHeaders}
+          rows={statsByNeuronStateRows}
+        />
+      </div>
+    </section>
+  );
+};
 
+const GenesisAccountsPage = () => {
   const columns = useMemo(
     () => [
       {
@@ -221,37 +225,29 @@ const GenesisAccountsPage = () => {
 
   const initialSort = useMemo(() => [{ id: "icpts", desc: true }], []);
 
-  const fetchData = useCallback(
-    async ({ pageSize, pageIndex, sortBy, filters }) => {
-      const statusFilter = filters.find(({ id }) => id === "status");
-      const investorTypeFilter = filters.find(
-        ({ id }) => id === "investorType"
-      );
-      const isKycFilter = filters.find(({ id }) => id === "isKyc");
-      setIsLoading(true);
-      const res = await fetchJSON(
-        "/api/genesis?" +
-          new URLSearchParams({
-            ...(sortBy.length > 0
-              ? {
-                  orderBy: sortBy[0].id,
-                  order: sortBy[0].desc ? "desc" : "asc",
-                }
-              : {}),
-            pageSize,
-            page: pageIndex,
-            ...(statusFilter ? { status: statusFilter.value } : {}),
-            ...(investorTypeFilter
-              ? { investorType: investorTypeFilter.value }
-              : {}),
-            ...(isKycFilter ? { isKyc: isKycFilter.value } : {}),
-          })
-      );
-      if (res) setResponse(res);
-      setIsLoading(false);
-    },
-    []
-  );
+  const fetchData = ({ pageSize, pageIndex, sortBy, filters }) => {
+    const statusFilter = filters.find(({ id }) => id === "status");
+    const investorTypeFilter = filters.find(({ id }) => id === "investorType");
+    const isKycFilter = filters.find(({ id }) => id === "isKyc");
+    return fetchJSON(
+      "/api/genesis?" +
+        new URLSearchParams({
+          ...(sortBy.length > 0
+            ? {
+                orderBy: sortBy[0].id,
+                order: sortBy[0].desc ? "desc" : "asc",
+              }
+            : {}),
+          pageSize,
+          page: pageIndex,
+          ...(statusFilter ? { status: statusFilter.value } : {}),
+          ...(investorTypeFilter
+            ? { investorType: investorTypeFilter.value }
+            : {}),
+          ...(isKycFilter ? { isKyc: isKycFilter.value } : {}),
+        })
+    );
+  };
 
   return (
     <div className="pb-16">
@@ -263,30 +259,15 @@ const GenesisAccountsPage = () => {
       <h1 className="text-3xl my-8 overflow-hidden overflow-ellipsis">
         Genesis Accounts
       </h1>
-      <section className="mb-8 md:flex-row flex-col flex gap-8">
-        <div className="flex-1" style={{ minWidth: 320 }}>
-          <SimpleTable
-            headers={statsByStatusHeaders}
-            rows={statsByStatusRows}
-          />
-        </div>
-        <div className="flex-1" style={{ minWidth: 320 }}>
-          <SimpleTable
-            headers={statsByNeuronStateHeaders}
-            rows={statsByNeuronStateRows}
-          />
-        </div>
-      </section>
+      <GenesisAccountsStats />
       <section>
-        <Table
+        <DataTable
           name="genesis-accounts"
+          persistState={true}
           style={{ minWidth: 400 }}
           className="text-xs sm:text-base"
           columns={columns}
-          data={rows}
-          count={count}
           fetchData={fetchData}
-          loading={isLoading}
           initialSortBy={initialSort}
           useFilter={true}
         />

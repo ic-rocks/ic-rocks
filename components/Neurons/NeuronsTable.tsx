@@ -1,30 +1,22 @@
 import { DateTime } from "luxon";
 import Link from "next/link";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { entries } from "../../lib/enums";
 import fetchJSON from "../../lib/fetch";
-import { NeuronsResponse } from "../../lib/types/API";
 import { NeuronState } from "../../lib/types/governance";
 import BalanceLabel from "../Labels/BalanceLabel";
 import IdentifierLink from "../Labels/IdentifierLink";
-import { SelectColumnFilter, Table } from "../Tables/Table";
+import { DataTable } from "../Tables/DataTable";
+import { SelectColumnFilter } from "../Tables/Table";
 import { NeuronLabel } from "./NeuronLabel";
 
 const NeuronsTable = ({
   name,
   genesisAccount,
-  onFetch,
 }: {
-  name?: string;
+  name: string;
   genesisAccount?: string;
-  onFetch?: (res?) => void;
 }) => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [{ rows, count }, setResponse] = useState<NeuronsResponse>({
-    count: 0,
-    rows: [],
-  });
-
   const columns = useMemo(
     () => [
       {
@@ -125,46 +117,38 @@ const NeuronsTable = ({
     []
   );
 
-  const fetchData = useCallback(
-    async ({ pageSize, pageIndex, sortBy, filters }) => {
-      const stateFilter = filters.find(({ id }) => id === "state");
-      const proposalFilter = filters.find(({ id }) => id === "proposalCount");
-      const genesisFilter = filters.find(({ id }) => id === "id");
-      setIsLoading(true);
-      const res = await fetchJSON(
-        "/api/neurons?" +
-          new URLSearchParams({
-            ...(genesisAccount ? { genesisAccount } : {}),
-            ...(sortBy.length > 0
-              ? {
-                  orderBy: sortBy[0].id,
-                  order: sortBy[0].desc ? "desc" : "asc",
-                }
-              : {}),
-            pageSize,
-            page: pageIndex,
-            ...(stateFilter ? { state: stateFilter.value } : {}),
-            ...(proposalFilter ? { hasProposals: proposalFilter.value } : {}),
-            ...(genesisFilter ? { isGenesis: genesisFilter.value } : {}),
-          })
-      );
-      if (onFetch) onFetch(res);
-      if (res) setResponse(res);
-      setIsLoading(false);
-    },
-    []
-  );
+  const fetchData = ({ pageSize, pageIndex, sortBy, filters }) => {
+    const stateFilter = filters.find(({ id }) => id === "state");
+    const proposalFilter = filters.find(({ id }) => id === "proposalCount");
+    const genesisFilter = filters.find(({ id }) => id === "id");
+    return fetchJSON(
+      "/api/neurons?" +
+        new URLSearchParams({
+          ...(genesisAccount ? { genesisAccount } : {}),
+          ...(sortBy.length > 0
+            ? {
+                orderBy: sortBy[0].id,
+                order: sortBy[0].desc ? "desc" : "asc",
+              }
+            : {}),
+          pageSize,
+          page: pageIndex,
+          ...(stateFilter ? { state: stateFilter.value } : {}),
+          ...(proposalFilter ? { hasProposals: proposalFilter.value } : {}),
+          ...(genesisFilter ? { isGenesis: genesisFilter.value } : {}),
+        })
+    );
+  };
 
   return (
-    <Table
+    <DataTable
       name={`${name}.neurons`}
+      extraQueryParams={genesisAccount}
+      persistState={!genesisAccount}
       style={{ minWidth: 480 }}
       className="text-xs sm:text-base"
       columns={columns}
-      data={rows}
-      count={count}
       fetchData={fetchData}
-      loading={isLoading}
       initialSortBy={initialSort}
       useExpand={true}
       initialPageSize={genesisAccount ? 50 : undefined}

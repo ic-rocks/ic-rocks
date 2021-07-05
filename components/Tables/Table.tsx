@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import { useAtom } from "jotai";
-import React, { CSSProperties, useEffect, useMemo } from "react";
+import React, { CSSProperties, useEffect } from "react";
 import { CgSpinner } from "react-icons/cg";
 import { FaSortAmountDown, FaSortAmountUp } from "react-icons/fa";
 import MultiSelect from "react-multi-select-component";
@@ -19,6 +19,7 @@ import ClientOnly from "../ClientOnly";
 import { Pagination } from "./Pagination";
 
 const STORAGE_KEY = "tables";
+export const tablesAtom = atomWithLocalStorage(STORAGE_KEY, {});
 
 export const PAGE_SIZE = 25;
 
@@ -61,16 +62,31 @@ export function MultiSelectColumnFilter({
   );
 }
 
-type TableProps = {
+export type CommonTableProps = {
   name?: string;
   className?: string;
   style?: CSSProperties;
   tableBodyProps?: any;
   tableHeaderGroupProps?: any;
   columns: Column<any>[];
+  useSort?: boolean;
+  manualSortBy?: boolean;
+  initialSortBy?: SortingRule<any>[];
+  usePage?: boolean;
+  manualPagination?: boolean;
+  initialPageSize?: number;
+  useExpand?: boolean;
+  useFilter?: boolean;
+  manualFilters?: boolean;
+  persistState?: boolean;
+};
+
+type TableProps = CommonTableProps & {
   data: any[];
   count?: number;
-  fetchData?: ({
+
+  /** Notify parent on page, sort, or filter change */
+  onStateChange?: ({
     pageSize,
     pageIndex,
     sortBy,
@@ -82,27 +98,18 @@ type TableProps = {
     filters: Filters<any>;
   }) => void;
   loading?: boolean;
-  useSort?: boolean;
-  manualSortBy?: boolean;
-  initialSortBy?: SortingRule<any>[];
-  usePage?: boolean;
-  manualPagination?: boolean;
-  initialPageSize?: number;
-  useExpand?: boolean;
-  useFilter?: boolean;
-  manualFilters?: boolean;
 };
 
 /** Table should only be rendered client-side so localStorage is available */
 export const Table = (props: TableProps) => {
   return (
     <ClientOnly>
-      <TableWrapped {...props} />
+      <TableInner {...props} />
     </ClientOnly>
   );
 };
 
-export const TableWrapped = ({
+export const TableInner = ({
   name,
   className,
   style,
@@ -113,7 +120,7 @@ export const TableWrapped = ({
   columns,
   data,
   count,
-  fetchData,
+  onStateChange,
   loading,
   useSort = true,
   manualSortBy = true,
@@ -124,9 +131,9 @@ export const TableWrapped = ({
   useExpand = false,
   useFilter = false,
   manualFilters = true,
+  persistState = false,
 }: TableProps) => {
   // Create the atom here so localStorage is defined
-  const tablesAtom = useMemo(() => atomWithLocalStorage(STORAGE_KEY, {}), []);
   const [tableState, setTableState] = useAtom(tablesAtom);
   const savedTableState = tableState[name];
 
@@ -168,16 +175,21 @@ export const TableWrapped = ({
   );
 
   useEffect(() => {
-    if (name) {
+    if (persistState) {
+      if (!name) {
+        console.warn(`persistState=${persistState} but no name specified`);
+        return;
+      }
+
       setTableState((s) => ({
         ...s,
         [name]: { pageIndex, pageSize, sortBy, filters },
       }));
     }
-    if (fetchData) {
-      fetchData({ pageIndex, pageSize, sortBy, filters });
+    if (onStateChange) {
+      onStateChange({ pageIndex, pageSize, sortBy, filters });
     }
-  }, [fetchData, pageIndex, pageSize, sortBy, filters]);
+  }, [pageIndex, pageSize, sortBy, filters]);
 
   return (
     <div className="max-w-full overflow-x-auto">

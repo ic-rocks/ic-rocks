@@ -1,20 +1,15 @@
 import Link from "next/link";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { FiCheck, FiFileText } from "react-icons/fi";
+import { Query, useQueryClient } from "react-query";
 import CanisterPage from "../components/CanisterPage";
 import { MetaTags } from "../components/MetaTags";
-import { Table } from "../components/Tables/Table";
+import { DataTable } from "../components/Tables/DataTable";
 import fetchJSON from "../lib/fetch";
 import { formatNumber } from "../lib/numbers";
 import { ModulesResponse } from "../lib/types/API";
 
 const ModulesTable = () => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [{ rows, count }, setResponse] = useState<ModulesResponse>({
-    count: 0,
-    rows: [],
-  });
-
   const columns = useMemo(
     () => [
       {
@@ -77,32 +72,33 @@ const ModulesTable = () => {
 
   const initialSort = useMemo(() => [{ id: "canisters", desc: true }], []);
 
-  const fetchData = useCallback(async ({ pageSize, pageIndex, sortBy }) => {
-    setIsLoading(true);
-    const res = await fetchJSON(
+  const fetchData = ({ pageSize, pageIndex, sortBy }) =>
+    fetchJSON(
       "/api/modules?" +
         new URLSearchParams({
           pageSize,
           page: pageIndex,
         })
     );
-    if (res) setResponse(res);
-    setIsLoading(false);
-  }, []);
+
+  /** Use the cached query */
+  const queryClient = useQueryClient();
+  const queryCache = queryClient.getQueryCache();
+  const query = queryCache
+    .findAll("modules")
+    .find((q) => !q.queryKey[1] && !!q.queryKey[2]) as Query<ModulesResponse>;
 
   return (
     <>
       <p className="mb-8">
-        {isLoading
+        {!query || query.state.isFetching
           ? "Searching for matching modules..."
-          : `There are ${count} modules that match multiple canisters.`}
+          : `There are ${query.state.data.count} modules that match multiple canisters.`}
       </p>
-      <Table
+      <DataTable
+        name="modules"
         columns={columns}
-        data={rows}
-        count={count}
         fetchData={fetchData}
-        loading={isLoading}
         initialSortBy={initialSort}
       />
     </>

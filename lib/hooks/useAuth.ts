@@ -11,13 +11,9 @@ export default function useAuth() {
   const resetTags = useResetAtom(userTagAtom);
 
   useEffect(() => {
-    console.log({ auth });
-
     if (auth) {
       (async () => {
         const tags = await fetchAuthed("/api/user/tags", auth);
-        console.log({ tags });
-
         setTags(tags);
       })();
     } else {

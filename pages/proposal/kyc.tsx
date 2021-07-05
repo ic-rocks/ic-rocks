@@ -1,22 +1,15 @@
 import { DateTime } from "luxon";
 import Link from "next/link";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { BsInfoCircle } from "react-icons/bs";
 import IdentifierLink from "../../components/Labels/IdentifierLink";
 import { MetaTags } from "../../components/MetaTags";
 import ProposalNav from "../../components/Proposals/ProposalNav";
-import { Table } from "../../components/Tables/Table";
+import { DataTable } from "../../components/Tables/DataTable";
 import fetchJSON from "../../lib/fetch";
 import { formatNumber } from "../../lib/numbers";
-import { KycsResponse } from "../../lib/types/API";
 
 const KycPage = () => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [{ rows, count }, setResponse] = useState<KycsResponse>({
-    count: 0,
-    rows: [],
-  });
-
   const columns = useMemo(
     () => [
       {
@@ -111,9 +104,8 @@ const KycPage = () => {
 
   const initialSort = useMemo(() => [{ id: "proposalId", desc: true }], []);
 
-  const fetchData = useCallback(async ({ pageSize, pageIndex, sortBy }) => {
-    setIsLoading(true);
-    const res = await fetchJSON(
+  const fetchData = ({ pageSize, pageIndex, sortBy }) =>
+    fetchJSON(
       "/api/principals/kyc?" +
         new URLSearchParams({
           ...(sortBy.length > 0
@@ -126,9 +118,6 @@ const KycPage = () => {
           page: pageIndex,
         })
     );
-    if (res) setResponse(res);
-    setIsLoading(false);
-  }, []);
 
   return (
     <div className="pb-16">
@@ -144,13 +133,10 @@ const KycPage = () => {
         <p>The following principals have passed KYC.</p>
       </section>
       <section>
-        <Table
+        <DataTable
           name="kyc"
           columns={columns}
-          data={rows}
-          count={count}
           fetchData={fetchData}
-          loading={isLoading}
           initialSortBy={initialSort}
         />
       </section>

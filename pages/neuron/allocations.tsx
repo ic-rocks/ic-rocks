@@ -1,13 +1,14 @@
 import classNames from "classnames";
 import { DateTime } from "luxon";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo } from "react";
+import { useQuery } from "react-query";
 import BalanceLabel from "../../components/Labels/BalanceLabel";
 import { MetaTags } from "../../components/MetaTags";
 import NeuronNav from "../../components/Neurons/NeuronNav";
-import { useGlobalState } from "../../components/StateContext";
 import { Table } from "../../components/Tables/Table";
 import { formatDuration } from "../../lib/datetime";
 import fetchJSON from "../../lib/fetch";
+import useStats from "../../lib/hooks/useStats";
 import { formatPercent } from "../../lib/strings";
 import { NeuronAllocation } from "../../lib/types/API";
 
@@ -23,18 +24,13 @@ const NEURON_ID_LABELS = {
 };
 
 const NeuronAllocationsPage = () => {
-  const { stats } = useGlobalState();
-  const [isLoading, setIsLoading] = useState(true);
-  const [rows, setResponse] = useState<NeuronAllocation[]>([]);
+  const { data: stats } = useStats();
 
-  useEffect(() => {
-    fetchJSON("/api/neurons/groups").then((data) => {
-      if (data) {
-        setResponse(data);
-      }
-      setIsLoading(false);
-    });
-  }, []);
+  const { data, isFetching } = useQuery<NeuronAllocation[]>(
+    "neurons/groups",
+    () => fetchJSON("/api/neurons/groups"),
+    { placeholderData: [], staleTime: Infinity }
+  );
 
   const columns = useMemo(
     () => [
@@ -148,9 +144,9 @@ const NeuronAllocationsPage = () => {
       <Table
         className="text-xs md:text-sm lg:text-base"
         columns={columns}
-        data={rows}
-        count={rows.length}
-        loading={isLoading}
+        data={data}
+        count={data.length}
+        loading={isFetching}
         useExpand={true}
         useSort={false}
         usePage={false}

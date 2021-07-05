@@ -1,12 +1,10 @@
 const fetchJSON = (url, opts?) =>
-  fetch(url, opts)
-    .then((res) => {
-      if (!res.ok) {
-        throw res.statusText;
-      }
-      return res.json();
-    })
-    .catch((e) => {});
+  fetch(url, opts).then((res) => {
+    if (!res.ok) {
+      throw res.statusText;
+    }
+    return res.json();
+  });
 
 export default fetchJSON;
 

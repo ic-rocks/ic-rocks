@@ -91,6 +91,7 @@ export type APIPrincipal = {
   entity?: { id: number; name: string };
   kyc?: { proposalId: number }[];
   publicTags: LabelTag[];
+  node?: { id: string };
 };
 
 export type KycsResponse = PagedResponse<Kyc>;

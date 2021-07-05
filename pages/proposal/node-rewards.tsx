@@ -1,24 +1,61 @@
 import { DateTime } from "luxon";
 import Link from "next/link";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { BsInfoCircle } from "react-icons/bs";
+import { useQuery } from "react-query";
 import BalanceLabel from "../../components/Labels/BalanceLabel";
 import IdentifierLink from "../../components/Labels/IdentifierLink";
 import { MetaTags } from "../../components/MetaTags";
 import ProposalNav from "../../components/Proposals/ProposalNav";
+import { DataTable } from "../../components/Tables/DataTable";
 import SimpleTable from "../../components/Tables/SimpleTable";
-import { Table } from "../../components/Tables/Table";
 import fetchJSON from "../../lib/fetch";
 import { formatNumber } from "../../lib/numbers";
-import { NodeProviderRewardsResponse } from "../../lib/types/API";
+
+const NodeRewardsStats = () => {
+  const { data: stats } = useQuery("node-rewards/stats", () =>
+    fetchJSON("/api/node-rewards/stats")
+  );
+
+  const summaryHeaders = [
+    {
+      contents: (
+        <>
+          Details
+          <span
+            aria-label="Node Providers are minted ICP as reward for participating in the
+      network"
+            data-balloon-pos="right"
+            data-balloon-length="medium"
+          >
+            <BsInfoCircle className="ml-1 inline text-xs align-middle" />
+          </span>
+        </>
+      ),
+    },
+  ];
+
+  const summaryRows = useMemo(() => {
+    return [
+      [
+        { contents: "Total Rewards Minted", className: "w-48" },
+        {
+          contents: stats ? <BalanceLabel value={stats.total_amount} /> : "-",
+        },
+      ],
+      [
+        { contents: "Principals", className: "w-48" },
+        {
+          contents: stats ? formatNumber(stats.principals) : "-",
+        },
+      ],
+    ];
+  }, [stats]);
+
+  return <SimpleTable headers={summaryHeaders} rows={summaryRows} />;
+};
 
 export default function NodeRewardsPage() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [{ rows, count }, setResponse] = useState<NodeProviderRewardsResponse>({
-    count: 0,
-    rows: [],
-  });
-
   const columns = useMemo(
     () => [
       {
@@ -90,9 +127,8 @@ export default function NodeRewardsPage() {
 
   const initialSort = useMemo(() => [{ id: "proposalId", desc: true }], []);
 
-  const fetchData = useCallback(async ({ pageSize, pageIndex, sortBy }) => {
-    setIsLoading(true);
-    const res = await fetchJSON(
+  const fetchData = ({ pageSize, pageIndex, sortBy }) =>
+    fetchJSON(
       "/api/node-rewards?" +
         new URLSearchParams({
           ...(sortBy.length > 0
@@ -105,53 +141,6 @@ export default function NodeRewardsPage() {
           page: pageIndex,
         })
     );
-    if (res) setResponse(res);
-    setIsLoading(false);
-  }, []);
-
-  const [stats, setStats] = useState(null);
-  useEffect(() => {
-    fetchJSON("/api/node-rewards/stats").then((data) => {
-      if (data) {
-        setStats(data);
-      }
-    });
-  }, []);
-
-  const summaryHeaders = [
-    {
-      contents: (
-        <>
-          Details
-          <span
-            aria-label="Node Providers are minted ICP as reward for participating in the
-      network"
-            data-balloon-pos="right"
-            data-balloon-length="medium"
-          >
-            <BsInfoCircle className="ml-1 inline text-xs align-middle" />
-          </span>
-        </>
-      ),
-    },
-  ];
-
-  const summaryRows = useMemo(() => {
-    return [
-      [
-        { contents: "Total Rewards Minted", className: "w-48" },
-        {
-          contents: stats ? <BalanceLabel value={stats.total_amount} /> : "-",
-        },
-      ],
-      [
-        { contents: "Principals", className: "w-48" },
-        {
-          contents: stats ? formatNumber(stats.principals) : "-",
-        },
-      ],
-    ];
-  }, [stats]);
 
   return (
     <div className="pb-16">
@@ -164,17 +153,14 @@ export default function NodeRewardsPage() {
         Node Provider Rewards
       </h1>
       <section className="mb-8">
-        <SimpleTable headers={summaryHeaders} rows={summaryRows} />
+        <NodeRewardsStats />
       </section>
       <section>
-        <Table
+        <DataTable
           name="node-rewards"
           className="text-xs sm:text-base"
           columns={columns}
-          data={rows}
-          count={count}
           fetchData={fetchData}
-          loading={isLoading}
           initialSortBy={initialSort}
         />
       </section>

@@ -1,24 +1,14 @@
 import Link from "next/link";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import NetworkGraph from "../components/Charts/NetworkGraph";
 import { MetaTags } from "../components/MetaTags";
 import { Table } from "../components/Tables/Table";
-import fetchJSON from "../lib/fetch";
+import useSubnets from "../lib/hooks/useSubnets";
 import { getSubnetType } from "../lib/network";
 import { formatNumber } from "../lib/numbers";
 
 const Network = () => {
-  const [loading, setLoading] = useState(false);
-  const [subnetsData, setSubnetsData] = useState([]);
-  useEffect(() => {
-    setLoading(true);
-    fetchJSON("/api/subnets").then((data) => {
-      if (data) {
-        setSubnetsData(data);
-      }
-      setLoading(false);
-    });
-  }, []);
+  const { data, isFetching } = useSubnets();
 
   const title = "Network";
 
@@ -72,13 +62,13 @@ const Network = () => {
       <NetworkGraph />
       <section className="pt-8">
         <h2 className="text-2xl mb-4">
-          {loading ? "⁠—" : subnetsData.length} Subnets
+          {isFetching ? "⁠—" : data.length} Subnets
         </h2>
         <Table
-          data={subnetsData}
+          data={data}
           columns={columns}
-          count={subnetsData.length}
-          loading={loading}
+          count={data.length}
+          loading={isFetching}
           initialSortBy={initialSort}
           manualPagination={false}
           manualSortBy={false}

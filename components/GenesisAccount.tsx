@@ -1,7 +1,8 @@
 import classNames from "classnames";
 import { DateTime } from "luxon";
 import Link from "next/link";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo } from "react";
+import { Query, useQuery, useQueryClient } from "react-query";
 import BalanceLabel from "../components/Labels/BalanceLabel";
 import NeuronsTable from "../components/Neurons/NeuronsTable";
 import SimpleTable from "../components/Tables/SimpleTable";
@@ -17,23 +18,26 @@ import {
 import IdentifierLink from "./Labels/IdentifierLink";
 
 const GenesisAccount = ({ genesisAccount }: { genesisAccount: string }) => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [data, setData] = useState(null);
-  const [neuronData, setNeuronData] = useState<NeuronsResponse>(null);
+  const { data, isFetching } = useQuery(
+    ["genesis", genesisAccount],
+    () => fetchJSON(`/api/genesis/${genesisAccount}`),
+    {
+      enabled: !!genesisAccount,
+      staleTime: Infinity,
+    }
+  );
 
-  useEffect(() => {
-    if (!genesisAccount) return;
-
-    fetchJSON(`/api/genesis/${genesisAccount}`).then(
-      (data) => data && setData(data)
-    );
-    setIsLoading(false);
-  }, [genesisAccount]);
+  const queryClient = useQueryClient();
+  const queryCache = queryClient.getQueryCache();
+  const query = queryCache.findAll([
+    "genesis.neurons",
+    genesisAccount,
+  ])[0] as Query<NeuronsResponse>;
 
   const summaryRows = useMemo(() => {
     let stats;
-    if (neuronData) {
-      const groups = groupBy(neuronData.rows, "state");
+    if (query?.state.data) {
+      const groups = groupBy(query.state.data.rows, "state");
       stats = ["1", "2", "3"].map((k) => {
         const [amount, sumTime] = (groups[k] || []).reduce(
           ([amt, ts]: [bigint, number], curr) => [
@@ -208,7 +212,7 @@ const GenesisAccount = ({ genesisAccount }: { genesisAccount: string }) => {
         },
       ],
     ];
-  }, [data, neuronData]);
+  }, [data, query]);
 
   return (
     <>
@@ -222,11 +226,7 @@ const GenesisAccount = ({ genesisAccount }: { genesisAccount: string }) => {
         />
       </section>
       {genesisAccount && (
-        <NeuronsTable
-          genesisAccount={genesisAccount}
-          onFetch={setNeuronData}
-          name="genesis"
-        />
+        <NeuronsTable genesisAccount={genesisAccount} name="genesis" />
       )}
     </>
   );

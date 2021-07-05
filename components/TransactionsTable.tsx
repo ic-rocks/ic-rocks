@@ -1,27 +1,15 @@
 import { DateTime } from "luxon";
 import Link from "next/link";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import fetchJSON from "../lib/fetch";
-import { TransactionsResponse } from "../lib/types/API";
 import BalanceLabel from "./Labels/BalanceLabel";
 import IdentifierLink from "./Labels/IdentifierLink";
 import { TransactionTypeLabel } from "./Labels/TransactionTypeLabel";
-import { Table } from "./Tables/Table";
+import { DataTable } from "./Tables/DataTable";
 
-export const TransactionsTable = ({
-  accountId = "",
-}: {
-  accountId?: string;
-}) => {
-  const [{ rows, count }, setResponse] = useState<TransactionsResponse>({
-    count: 0,
-    rows: [],
-  });
-  const [isLoading, setIsLoading] = useState(false);
-
-  const fetchData = useCallback(async ({ pageSize, pageIndex, sortBy }) => {
-    setIsLoading(true);
-    const res = await fetchJSON(
+export const TransactionsTable = ({ accountId }: { accountId?: string }) => {
+  const fetchData = ({ pageSize, pageIndex, sortBy }) =>
+    fetchJSON(
       `/api/transactions?` +
         new URLSearchParams({
           ...(sortBy.length > 0
@@ -32,12 +20,9 @@ export const TransactionsTable = ({
             : {}),
           pageSize,
           page: pageIndex,
-          accountId,
+          ...(accountId ? { accountId } : {}),
         })
     );
-    if (res) setResponse(res);
-    setIsLoading(false);
-  }, []);
 
   const columns = useMemo(
     () => [
@@ -119,14 +104,14 @@ export const TransactionsTable = ({
   const initialSort = useMemo(() => [{ id: "blockHeight", desc: true }], []);
 
   return (
-    <Table
+    <DataTable
+      name="transactions"
+      extraQueryParams={accountId}
+      persistState={!accountId}
       className="text-xs xs:text-sm sm:text-base"
       style={{ minWidth: "400px" }}
-      data={rows}
       columns={columns}
-      count={count}
       fetchData={fetchData}
-      loading={isLoading}
       initialSortBy={initialSort}
     />
   );

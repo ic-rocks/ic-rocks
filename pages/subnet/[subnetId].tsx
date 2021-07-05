@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { useQuery } from "react-query";
 import NetworkGraph from "../../components/Charts/NetworkGraph";
 import IdentifierLink from "../../components/Labels/IdentifierLink";
 import { MetaTags } from "../../components/MetaTags";
@@ -14,11 +15,11 @@ const Subnet = () => {
   const { subnetId } = router.query as {
     subnetId?: string;
   };
-  const [data, setData] = useState<SubnetResponse>(null);
-  useEffect(() => {
-    if (!subnetId) return;
-    fetchJSON(`/api/subnets/${subnetId}`).then(setData);
-  }, [subnetId]);
+  const { data } = useQuery<SubnetResponse>(
+    ["subnets", subnetId],
+    () => fetchJSON(`/api/subnets/${subnetId}`),
+    { enabled: !!subnetId, staleTime: Infinity }
+  );
 
   return (
     <div className="pb-16">

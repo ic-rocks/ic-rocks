@@ -2,6 +2,10 @@ import { atom } from "jotai";
 
 export const atomWithLocalStorage = (key, initialValue) => {
   const getInitialValue = () => {
+    if (typeof window === "undefined") {
+      return initialValue;
+    }
+
     const item = localStorage.getItem(key);
     if (item !== null) {
       try {

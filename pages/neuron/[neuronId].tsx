@@ -1,6 +1,7 @@
 import { DateTime } from "luxon";
 import { useRouter } from "next/router";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo } from "react";
+import { useQuery } from "react-query";
 import BalanceLabel from "../../components/Labels/BalanceLabel";
 import IdentifierLink from "../../components/Labels/IdentifierLink";
 import { TimestampLabel } from "../../components/Labels/TimestampLabel";
@@ -8,6 +9,7 @@ import { MetaTags } from "../../components/MetaTags";
 import { NeuronLabel } from "../../components/Neurons/NeuronLabel";
 import Search404 from "../../components/Search404";
 import SimpleTable from "../../components/Tables/SimpleTable";
+import fetchJSON from "../../lib/fetch";
 import { formatNumber } from "../../lib/numbers";
 import { formatPercent } from "../../lib/strings";
 import { Neuron } from "../../lib/types/API";
@@ -19,27 +21,12 @@ const MAX_NEURON_AGE_FOR_AGE_BONUS = 126_230_400;
 const NeuronIdPage = () => {
   const router = useRouter();
   const { neuronId } = router.query as { neuronId: string };
-  const [isLoading, setIsLoading] = useState(true);
-  const [isValid, setIsValid] = useState(true);
-  const [data, setData] = useState<Neuron>(null);
 
-  useEffect(() => {
-    if (!neuronId) return;
-    (async () => {
-      const res = await fetch(`/api/neurons/${neuronId}`);
-      if (res.status === 404) {
-        setIsValid(false);
-        return;
-      }
-      try {
-        const data = await res.json();
-        if (data) {
-          setData(data);
-        }
-      } catch (error) {}
-      setIsLoading(false);
-    })();
-  }, [neuronId]);
+  const { data, isError } = useQuery<Neuron>(
+    ["neurons", neuronId],
+    () => fetchJSON(`/api/neurons/${neuronId}`),
+    { enabled: !!neuronId }
+  );
 
   const summaryRows = useMemo(() => {
     let createdDate,
@@ -49,9 +36,11 @@ const NeuronIdPage = () => {
       agingSinceDate,
       ageBonus;
     if (data) {
-      createdDate = DateTime.fromISO(data.createdDate);
-      if (createdDate.toMillis() === 0) {
-        createdDate = null;
+      if (data.createdDate) {
+        createdDate = DateTime.fromISO(data.createdDate);
+        if (createdDate.toMillis() === 0) {
+          createdDate = null;
+        }
       }
       dissolveDate = DateTime.fromISO(data.dissolveDate);
       dissolveDateRelative = dissolveDate.diffNow().toMillis();
@@ -166,7 +155,7 @@ const NeuronIdPage = () => {
     ];
   }, [data]);
 
-  if (!isValid) {
+  if (isError) {
     return <Search404 input={neuronId} />;
   }
 

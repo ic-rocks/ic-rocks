@@ -1,17 +1,10 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import fetchJSON from "../lib/fetch";
 import { formatNumber } from "../lib/numbers";
-import { PrincipalsResponse } from "../lib/types/API";
 import IdentifierLink from "./Labels/IdentifierLink";
-import { Table } from "./Tables/Table";
+import { DataTable } from "./Tables/DataTable";
 
 export const PrincipalsTable = () => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [{ rows, count }, setResponse] = useState<PrincipalsResponse>({
-    count: 0,
-    rows: [],
-  });
-
   const columns = useMemo(
     () => [
       {
@@ -54,9 +47,8 @@ export const PrincipalsTable = () => {
 
   const initialSort = useMemo(() => [{ id: "canisterCount", desc: true }], []);
 
-  const fetchData = useCallback(async ({ pageSize, pageIndex, sortBy }) => {
-    setIsLoading(true);
-    const res = await fetchJSON(
+  const fetchData = ({ pageSize, pageIndex, sortBy }) =>
+    fetchJSON(
       "/api/principals?" +
         new URLSearchParams({
           ...(sortBy.length > 0
@@ -69,19 +61,15 @@ export const PrincipalsTable = () => {
           page: pageIndex,
         })
     );
-    if (res) setResponse(res);
-    setIsLoading(false);
-  }, []);
 
   return (
-    <Table
+    <DataTable
       name="principals"
+      persistState={true}
       columns={columns}
-      data={rows}
-      count={count}
       fetchData={fetchData}
-      loading={isLoading}
       initialSortBy={initialSort}
+      staleTime={Infinity}
     />
   );
 };

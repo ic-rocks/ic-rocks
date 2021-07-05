@@ -1,30 +1,32 @@
 import { DateTime } from "luxon";
 import Link from "next/link";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { BsArrowRight } from "react-icons/bs";
+import { useQuery } from "react-query";
 import fetchJSON from "../../lib/fetch";
-import { CanistersResponse } from "../../lib/types/API";
 import IdentifierLink from "../Labels/IdentifierLink";
 import { Table } from "../Tables/Table";
 import InfoBox from "./InfoBox";
 
-export default function RecentCanistersBox({}: {}) {
-  const [isLoading, setIsLoading] = useState(false);
-  const [{ rows, count }, setResponse] = useState<CanistersResponse>({
-    count: 0,
-    rows: [],
-  });
-  const fetchData = useCallback(async () => {
-    setIsLoading(true);
-    const res = await fetchJSON(
-      "/api/canisters?" +
-        new URLSearchParams({
-          pageSize: "5",
-        })
-    );
-    if (res) setResponse(res);
-    setIsLoading(false);
-  }, []);
+export default function RecentCanistersBox() {
+  const {
+    data: { rows, count },
+    isFetching,
+  } = useQuery(
+    "recent-canisters",
+    () =>
+      fetchJSON(
+        "/api/canisters?" +
+          new URLSearchParams({
+            pageSize: "5",
+          })
+      ),
+    {
+      placeholderData: { rows: [], count: 0 },
+      refetchInterval: 60 * 1000,
+    }
+  );
+
   const columns = useMemo(
     () => [
       {
@@ -40,7 +42,7 @@ export default function RecentCanistersBox({}: {}) {
             />
           );
         },
-        className: "pr-2 flex-1 flex oneline",
+        className: "px-2 flex-1 flex oneline",
       },
       {
         Header: "Controller",
@@ -81,8 +83,7 @@ export default function RecentCanistersBox({}: {}) {
         columns={columns}
         data={rows}
         count={count}
-        fetchData={fetchData}
-        loading={isLoading}
+        loading={!count && isFetching}
         useSort={false}
         usePage={false}
       />

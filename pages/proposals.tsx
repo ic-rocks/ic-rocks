@@ -1,8 +1,9 @@
 import classNames from "classnames";
 import { DateTime } from "luxon";
 import Link from "next/link";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { BsChevronDown, BsChevronRight } from "react-icons/bs";
+import { useQuery } from "react-query";
 import { MetaTags } from "../components/MetaTags";
 import ProposalNav from "../components/Proposals/ProposalNav";
 import {
@@ -11,27 +12,20 @@ import {
 } from "../components/Proposals/ProposalStatusLabel";
 import { ProposalSummary } from "../components/Proposals/ProposalSummary";
 import { ProposalUrl } from "../components/Proposals/ProposalUrl";
-import { MultiSelectColumnFilter, Table } from "../components/Tables/Table";
+import { DataTable } from "../components/Tables/DataTable";
+import { MultiSelectColumnFilter } from "../components/Tables/Table";
 import { entries } from "../lib/enums";
 import fetchJSON from "../lib/fetch";
 import { formatNumber } from "../lib/numbers";
 import { formatPercent } from "../lib/strings";
-import { ProposalsResponse } from "../lib/types/API";
 import { Action, NnsFunction, Status, Topic } from "../lib/types/governance";
 
 const ProposalsPage = () => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [{ rows, count }, setResponse] = useState<ProposalsResponse>({
-    count: 0,
-    rows: [],
-  });
-  const [proposers, setProposers] = useState(null);
-
-  useEffect(() => {
-    fetchJSON("/api/neurons/proposers").then(
-      (data) => data && setProposers(data)
-    );
-  }, []);
+  const { data: proposers } = useQuery(
+    "neurons/proposers",
+    () => fetchJSON("/api/neurons/proposers"),
+    { placeholderData: [] }
+  );
 
   const columns = useMemo(
     () =>
@@ -213,80 +207,70 @@ const ProposalsPage = () => {
 
   const initialSort = useMemo(() => [{ id: "id", desc: true }], []);
 
-  const fetchData = useCallback(
-    async ({ pageSize, pageIndex, sortBy, filters }) => {
-      const topicFilter = filters.find(({ id }) => id === "topic");
-      const statusFilter = filters.find(({ id }) => id === "status");
-      const rewardStatusFilter = filters.find(
-        ({ id }) => id === "rewardStatus"
-      );
-      const proposerIdFilter = filters.find(({ id }) => id === "proposerId");
-      const actionFilter = filters.find(({ id }) => id === "action");
-      const nnsFunctionFilter = filters.find(({ id }) => id === "nnsFunction");
-      setIsLoading(true);
-      const params = new URLSearchParams({
-        pageSize,
-        page: pageIndex,
-      });
+  const fetchData = ({ pageSize, pageIndex, sortBy, filters }) => {
+    const topicFilter = filters.find(({ id }) => id === "topic");
+    const statusFilter = filters.find(({ id }) => id === "status");
+    const rewardStatusFilter = filters.find(({ id }) => id === "rewardStatus");
+    const proposerIdFilter = filters.find(({ id }) => id === "proposerId");
+    const actionFilter = filters.find(({ id }) => id === "action");
+    const nnsFunctionFilter = filters.find(({ id }) => id === "nnsFunction");
+    const params = new URLSearchParams({
+      pageSize,
+      page: pageIndex,
+    });
 
-      if (sortBy.length > 0) {
-        params.append("orderBy", sortBy[0].id);
-        params.append("order", sortBy[0].desc ? "desc" : "asc");
+    if (sortBy.length > 0) {
+      params.append("orderBy", sortBy[0].id);
+      params.append("order", sortBy[0].desc ? "desc" : "asc");
+    }
+    if (topicFilter) {
+      if (!Array.isArray(topicFilter.value)) {
+        topicFilter.value = [{ value: topicFilter.value }];
       }
-      if (topicFilter) {
-        if (!Array.isArray(topicFilter.value)) {
-          topicFilter.value = [{ value: topicFilter.value }];
-        }
-        topicFilter.value.forEach(({ value }) =>
-          params.append("topic[]", value)
-        );
+      topicFilter.value.forEach(({ value }) => params.append("topic[]", value));
+    }
+    if (statusFilter) {
+      if (!Array.isArray(statusFilter.value)) {
+        statusFilter.value = [{ value: statusFilter.value }];
       }
-      if (statusFilter) {
-        if (!Array.isArray(statusFilter.value)) {
-          statusFilter.value = [{ value: statusFilter.value }];
-        }
-        statusFilter.value.forEach(({ value }) =>
-          params.append("status[]", value)
-        );
+      statusFilter.value.forEach(({ value }) =>
+        params.append("status[]", value)
+      );
+    }
+    if (rewardStatusFilter) {
+      if (!Array.isArray(rewardStatusFilter.value)) {
+        rewardStatusFilter.value = [{ value: rewardStatusFilter.value }];
       }
-      if (rewardStatusFilter) {
-        if (!Array.isArray(rewardStatusFilter.value)) {
-          rewardStatusFilter.value = [{ value: rewardStatusFilter.value }];
-        }
-        rewardStatusFilter.value.forEach(({ value }) =>
-          params.append("rewardStatus[]", value)
-        );
+      rewardStatusFilter.value.forEach(({ value }) =>
+        params.append("rewardStatus[]", value)
+      );
+    }
+    if (proposerIdFilter) {
+      if (!Array.isArray(proposerIdFilter.value)) {
+        proposerIdFilter.value = [{ value: proposerIdFilter.value }];
       }
-      if (proposerIdFilter) {
-        if (!Array.isArray(proposerIdFilter.value)) {
-          proposerIdFilter.value = [{ value: proposerIdFilter.value }];
-        }
-        proposerIdFilter.value.forEach(({ value }) =>
-          params.append("proposerId[]", value)
-        );
+      proposerIdFilter.value.forEach(({ value }) =>
+        params.append("proposerId[]", value)
+      );
+    }
+    if (actionFilter) {
+      if (!Array.isArray(actionFilter.value)) {
+        actionFilter.value = [{ value: actionFilter.value }];
       }
-      if (actionFilter) {
-        if (!Array.isArray(actionFilter.value)) {
-          actionFilter.value = [{ value: actionFilter.value }];
-        }
-        actionFilter.value.forEach(({ value }) =>
-          params.append("action[]", value)
-        );
+      actionFilter.value.forEach(({ value }) =>
+        params.append("action[]", value)
+      );
+    }
+    if (nnsFunctionFilter) {
+      if (!Array.isArray(nnsFunctionFilter.value)) {
+        nnsFunctionFilter.value = [{ value: nnsFunctionFilter.value }];
       }
-      if (nnsFunctionFilter) {
-        if (!Array.isArray(nnsFunctionFilter.value)) {
-          nnsFunctionFilter.value = [{ value: nnsFunctionFilter.value }];
-        }
-        nnsFunctionFilter.value.forEach(({ value }) =>
-          params.append("nnsFunction[]", value)
-        );
-      }
-      const res = await fetchJSON("/api/proposals?" + params);
-      if (res) setResponse(res);
-      setIsLoading(false);
-    },
-    []
-  );
+      nnsFunctionFilter.value.forEach(({ value }) =>
+        params.append("nnsFunction[]", value)
+      );
+    }
+    return fetchJSON("/api/proposals?" + params);
+  };
 
   return (
     <div className="pb-16">
@@ -305,14 +289,12 @@ const ProposalsPage = () => {
         </p>
       </section>
       <section>
-        <Table
+        <DataTable
           name="proposals"
+          persistState={true}
           style={{ minWidth: 480 }}
           columns={columns}
-          data={rows}
-          count={count}
           fetchData={fetchData}
-          loading={isLoading}
           initialSortBy={initialSort}
           useExpand={true}
           useFilter={true}
