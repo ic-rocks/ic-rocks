@@ -5,9 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
-    "export": "next export",
-    "sync": "node scripts/syncSystemData"
+    "start": "next start"
   },
   "dependencies": {
     "@dfinity/agent": "^0.9.0",
