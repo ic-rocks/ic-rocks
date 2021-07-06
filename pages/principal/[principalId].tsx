@@ -2,7 +2,7 @@ import { Actor, Certificate, HttpAgent } from "@dfinity/agent";
 import { blobFromText, blobFromUint8Array } from "@dfinity/candid";
 import { Principal } from "@dfinity/principal";
 import { useRouter } from "next/router";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import CandidUI from "../../components/CandidUI";
 import { CanistersTable } from "../../components/CanistersTable";
@@ -15,47 +15,32 @@ import { PrincipalNodesTable } from "../../components/PrincipalNodesTable";
 import Search404 from "../../components/Search404";
 import CandidService from "../../lib/canisters/get-candid.did";
 import fetchJSON from "../../lib/fetch";
+import { getPrincipalType } from "../../lib/identifiers";
 import { APIPrincipal, Canister } from "../../lib/types/API";
+import { PrincipalType } from "../../lib/types/PrincipalType";
 
 const didc = import("didc");
 
-const getPrincipalType = (principalId): PrincipalType | null => {
-  if (!principalId) return null;
-
-  let principalRaw;
-  try {
-    principalRaw = Principal.fromText(principalId).toUint8Array();
-  } catch (error) {
-    console.warn(error);
-    return;
-  }
-
-  switch (principalRaw.slice(-1)[0]) {
-    case 1:
-      return "Canister";
-    case 2:
-      return "User";
-    case 3:
-      return "Derived";
-    case 4:
-      return "Anonymous";
-  }
-  return "Unknown";
-};
-
-export type PrincipalType =
-  | "Canister"
-  | "User"
-  | "Anonymous"
-  | "Derived"
-  | "Unknown";
-
 const agent = new HttpAgent({ host: "https://ic0.app" });
 
-const PrincipalPage = () => {
+export async function getServerSideProps({ params }) {
+  const { principalId } = params;
+  return { props: { type: getPrincipalType(principalId), principalId } };
+}
+
+const PrincipalPage = ({
+  principalId,
+  type,
+}: {
+  principalId: string;
+  type: PrincipalType | null;
+}) => {
+  if (!type) {
+    return <Search404 input={principalId} />;
+  }
+
   const router = useRouter();
-  const { principalId, candid: candidOverride } = router.query as {
-    principalId: string;
+  const { candid: candidOverride } = router.query as {
     candid?: string;
   };
   const [candid, setCandid] = useState("");
@@ -77,11 +62,7 @@ const PrincipalPage = () => {
     }
   };
 
-  const type = useMemo(() => getPrincipalType(principalId), [principalId]);
-
   useEffect(() => {
-    if (typeof principalId !== "string" || !principalId) return;
-
     let newCandid = "";
     if (candidOverride) {
       try {
@@ -96,16 +77,13 @@ const PrincipalPage = () => {
 
   const { data: principalData } = useQuery<APIPrincipal>(
     ["principals", principalId],
-    () => fetchJSON(`/api/principals/${principalId}`),
-    {
-      enabled: !!principalId,
-    }
+    () => fetchJSON(`/api/principals/${principalId}`)
   );
   const { data: canisterData } = useQuery<Canister>(
     ["canisters", principalId],
     () => fetchJSON(`/api/canisters/${principalId}`),
     {
-      enabled: !!principalId && type === "Canister",
+      enabled: type === "Canister",
     }
   );
 
@@ -233,10 +211,6 @@ const PrincipalPage = () => {
     }
   }, [canisterData]);
 
-  if (principalId && !type) {
-    return <Search404 input={principalId} />;
-  }
-
   const showNodes =
     principalData?.operatorOf.length > 0 ||
     principalData?.providerOf.length > 0;
@@ -244,10 +218,8 @@ const PrincipalPage = () => {
   return (
     <div className="pb-16">
       <MetaTags
-        title={`Principal${principalId ? ` ${principalId}` : ""}`}
-        description={`Details for principal${
-          principalId ? ` ${principalId}` : ""
-        } on the Internet Computer.`}
+        title={`Principal ${principalId}`}
+        description={`Details for principal ${principalId} on the Internet Computer.`}
       />
       <h1 className="text-3xl my-8 overflow-hidden overflow-ellipsis">
         Principal <small className="text-xl">{principalId}</small>

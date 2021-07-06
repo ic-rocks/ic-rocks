@@ -1,22 +1,34 @@
 import Link from "next/link";
-import { useRouter } from "next/router";
 import React from "react";
 import { useQuery } from "react-query";
 import NetworkGraph from "../../components/Charts/NetworkGraph";
 import IdentifierLink from "../../components/Labels/IdentifierLink";
 import { MetaTags } from "../../components/MetaTags";
+import Search404 from "../../components/Search404";
 import fetchJSON from "../../lib/fetch";
+import { getPrincipalType } from "../../lib/identifiers";
 import { NodeResponse } from "../../lib/types/API";
 
-const NodePage = () => {
-  const router = useRouter();
-  const { nodeId } = router.query as {
-    nodeId?: string;
-  };
+export async function getServerSideProps({ params }) {
+  const { nodeId } = params;
+  return { props: { isValid: !!getPrincipalType(nodeId), nodeId } };
+}
+
+const NodePage = ({
+  nodeId,
+  isValid,
+}: {
+  nodeId: string;
+  isValid: boolean;
+}) => {
+  if (!isValid) {
+    return <Search404 input={nodeId} />;
+  }
+
   const { data } = useQuery<NodeResponse>(
     ["nodes", nodeId],
     () => fetchJSON(`/api/nodes/${nodeId}`),
-    { enabled: !!nodeId, staleTime: Infinity }
+    { staleTime: Infinity }
   );
 
   return (

@@ -1,28 +1,37 @@
-import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import CanisterPage from "../../components/CanisterPage";
 import { CanistersTable } from "../../components/CanistersTable";
 import CodeBlock from "../../components/CodeBlock";
 import { MetaTags } from "../../components/MetaTags";
+import Search404 from "../../components/Search404";
 import SimpleTable from "../../components/Tables/SimpleTable";
 import fetchJSON from "../../lib/fetch";
-import { pluralize } from "../../lib/strings";
+import { isAccountOrTransaction, pluralize } from "../../lib/strings";
 import { Module } from "../../lib/types/API";
 
 const didc = import("didc");
 
-const ModuleCanistersPage = () => {
-  const router = useRouter();
-  const { moduleId } = router.query as {
-    moduleId: string;
-  };
+export async function getServerSideProps({ params }) {
+  const { moduleId } = params;
+  const isValid = !!moduleId && isAccountOrTransaction(moduleId);
+  return { props: { isValid, moduleId } };
+}
+
+const ModuleCanistersPage = ({
+  isValid,
+  moduleId,
+}: {
+  isValid: boolean;
+  moduleId: string;
+}) => {
+  if (!isValid) {
+    return <Search404 input={moduleId} />;
+  }
 
   const [bindings, setBindings] = useState(null);
-  const { data } = useQuery<Module>(
-    ["modules", moduleId],
-    async () => fetchJSON(`/api/modules/${moduleId}`),
-    { enabled: !!moduleId }
+  const { data } = useQuery<Module>(["modules", moduleId], async () =>
+    fetchJSON(`/api/modules/${moduleId}`)
   );
 
   useEffect(() => {
@@ -119,9 +128,7 @@ const ModuleCanistersPage = () => {
     <CanisterPage>
       <MetaTags
         title={`Module ${moduleId}`}
-        description={`Details for module${
-          moduleId ? ` ${moduleId}` : ""
-        } on the Internet Computer.`}
+        description={`Details for module ${moduleId} on the Internet Computer.`}
       />
       <h1 className="text-3xl my-8 overflow-hidden overflow-ellipsis">
         Module <small className="text-xl break-all">{moduleId}</small>
@@ -132,12 +139,10 @@ const ModuleCanistersPage = () => {
       {showInterface && (
         <CodeBlock className="mb-8" candid={data.candid} bindings={bindings} />
       )}
-      {!!moduleId && (
-        <section>
-          <h2 className="text-2xl mb-4">Matching Canisters</h2>
-          <CanistersTable name="matching-canisters" moduleId={moduleId} />
-        </section>
-      )}
+      <section>
+        <h2 className="text-2xl mb-4">Matching Canisters</h2>
+        <CanistersTable name="matching-canisters" moduleId={moduleId} />
+      </section>
     </CanisterPage>
   );
 };

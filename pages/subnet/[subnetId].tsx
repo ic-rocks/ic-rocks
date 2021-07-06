@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { useRouter } from "next/router";
 import React from "react";
 import { useQuery } from "react-query";
 import NetworkGraph from "../../components/Charts/NetworkGraph";
@@ -7,18 +6,26 @@ import IdentifierLink from "../../components/Labels/IdentifierLink";
 import { MetaTags } from "../../components/MetaTags";
 import { countBy } from "../../lib/arrays";
 import fetchJSON from "../../lib/fetch";
+import { getPrincipalType } from "../../lib/identifiers";
 import { formatNumber } from "../../lib/numbers";
 import { SubnetResponse } from "../../lib/types/API";
 
-const Subnet = () => {
-  const router = useRouter();
-  const { subnetId } = router.query as {
-    subnetId?: string;
-  };
+export async function getServerSideProps({ params }) {
+  const { subnetId } = params;
+  return { props: { isValid: !!getPrincipalType(subnetId), subnetId } };
+}
+
+const Subnet = ({
+  subnetId,
+  isValid,
+}: {
+  subnetId: string;
+  isValid: boolean;
+}) => {
   const { data } = useQuery<SubnetResponse>(
     ["subnets", subnetId],
     () => fetchJSON(`/api/subnets/${subnetId}`),
-    { enabled: !!subnetId, staleTime: Infinity }
+    { enabled: isValid, staleTime: Infinity }
   );
 
   return (

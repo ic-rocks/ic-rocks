@@ -1,7 +1,6 @@
 import classNames from "classnames";
 import { DateTime } from "luxon";
 import Link from "next/link";
-import { useRouter } from "next/router";
 import React, { useMemo } from "react";
 import { useQuery } from "react-query";
 import BalanceLabel from "../../components/Labels/BalanceLabel";
@@ -14,18 +13,32 @@ import {
 import { ProposalSummary } from "../../components/Proposals/ProposalSummary";
 import { ProposalUrl } from "../../components/Proposals/ProposalUrl";
 import Votes from "../../components/Proposals/Votes";
+import Search404 from "../../components/Search404";
 import SimpleTable from "../../components/Tables/SimpleTable";
 import fetchJSON from "../../lib/fetch";
+import { isNumber } from "../../lib/strings";
 import { Proposal } from "../../lib/types/API";
 import { Action, NnsFunction, Topic } from "../../lib/types/governance";
 
-const ProposalIdPage = () => {
-  const router = useRouter();
-  const { proposalId } = router.query as { proposalId: string };
-  const { data } = useQuery<Proposal>(
-    ["proposals", proposalId],
-    () => fetchJSON(`/api/proposals/${proposalId}`),
-    { enabled: !!proposalId }
+export async function getServerSideProps({ params }) {
+  const { proposalId } = params;
+  const isValid = !!proposalId && isNumber(proposalId);
+  return { props: { isValid, proposalId } };
+}
+
+const ProposalIdPage = ({
+  isValid,
+  proposalId,
+}: {
+  isValid: boolean;
+  proposalId: string;
+}) => {
+  if (!isValid) {
+    return <Search404 input={proposalId} />;
+  }
+
+  const { data, isError } = useQuery<Proposal>(["proposals", proposalId], () =>
+    fetchJSON(`/api/proposals/${proposalId}`)
   );
 
   const headers = [{ contents: "Proposal Details" }];
@@ -161,10 +174,8 @@ const ProposalIdPage = () => {
   return (
     <div className="pb-16">
       <MetaTags
-        title={`Proposal${proposalId ? ` ${proposalId}` : ""}`}
-        description={`Details for Proposal${
-          proposalId ? ` ${proposalId}` : ""
-        } on the Internet Computer ledger.`}
+        title={`Proposal ${proposalId}`}
+        description={`Details for Proposal ${proposalId} on the Internet Computer ledger.`}
       />
       <h1 className="text-3xl my-8 overflow-hidden overflow-ellipsis">
         Proposal <small className="text-xl break-all">{proposalId}</small>

@@ -1,6 +1,5 @@
 import classnames from "classnames";
 import { DateTime } from "luxon";
-import { useRouter } from "next/router";
 import React from "react";
 import { useQuery } from "react-query";
 import BalanceLabel from "../../components/Labels/BalanceLabel";
@@ -12,30 +11,39 @@ import Search404 from "../../components/Search404";
 import fetchJSON from "../../lib/fetch";
 import useMarkets from "../../lib/hooks/useMarkets";
 import { formatNumberUSD } from "../../lib/numbers";
+import { isAccountOrTransaction } from "../../lib/strings";
 import { Transaction } from "../../lib/types/API";
 
-const TransactionPage = () => {
-  const router = useRouter();
-  const { transactionId } = router.query as { transactionId: string };
-  const { data: markets } = useMarkets();
+export async function getServerSideProps({ params }) {
+  const { transactionId } = params;
+  const isValid = !!transactionId && isAccountOrTransaction(transactionId);
+  return { props: { isValid, transactionId } };
+}
 
-  const { data, isError, isFetching } = useQuery<Transaction>(
-    ["transaction", transactionId],
-    () => fetchJSON(`/api/transactions/${transactionId}`),
-    { enabled: !!transactionId, staleTime: Infinity }
-  );
-
-  if (isError) {
+const TransactionPage = ({
+  isValid,
+  transactionId,
+}: {
+  isValid: boolean;
+  transactionId: string;
+}) => {
+  if (!isValid) {
     return <Search404 input={transactionId} />;
   }
+
+  const { data } = useQuery<Transaction>(
+    ["transaction", transactionId],
+    () => fetchJSON(`/api/transactions/${transactionId}`),
+    { staleTime: Infinity }
+  );
+
+  const { data: markets } = useMarkets();
 
   return (
     <div className="pb-16">
       <MetaTags
-        title={`Transaction${transactionId ? ` ${transactionId}` : ""}`}
-        description={`Details for transaction${
-          transactionId ? ` ${transactionId}` : ""
-        } on the Internet Computer ledger.`}
+        title={`Transaction ${transactionId}`}
+        description={`Details for transaction ${transactionId} on the Internet Computer ledger.`}
       />
       <h1 className="text-3xl my-8">Transaction Details</h1>
       <table className="table-fixed w-full">

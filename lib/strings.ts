@@ -13,12 +13,31 @@ export function isUrl(string: string) {
   }
 }
 
+const NUMBER_REGEX = /^\d+$/;
+export const isNumber = (string: string) => NUMBER_REGEX.test(string);
+
 const BASE64_REGEX =
   /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/;
 export const isBase64 = (string: string) => BASE64_REGEX.test(string);
 
 const HEX_REGEX = /^(?:0x)?([0-9a-fA-F]*)$/;
 export const isHex = (string: string) => HEX_REGEX.test(string);
+
+const ACCOUNT_AND_TRANSACTION_REGEX = /^[0-9a-fA-F]{64}$/;
+/** Returns `true` if input is a 32-byte hex string */
+export const isAccountOrTransaction = (string: string) =>
+  ACCOUNT_AND_TRANSACTION_REGEX.test(string);
+
+export const isAccount = (string: string) => {
+  try {
+    const blob = Buffer.from(string, "hex");
+    const crc32Buf = Buffer.alloc(4);
+    crc32Buf.writeUInt32BE(getCrc32(blob.slice(4)));
+    return blob.slice(0, 4).toString() === crc32Buf.toString();
+  } catch (error) {
+    return false;
+  }
+};
 
 export enum IdentityKind {
   None,
@@ -44,17 +63,13 @@ export const getIdentityKind = (
       input = input.slice(2);
     }
 
-    if (input.length === 64) {
-      try {
-        const blob = Buffer.from(input, "hex");
-        const crc32Buf = Buffer.alloc(4);
-        crc32Buf.writeUInt32BE(getCrc32(blob.slice(4)));
-        if (blob.slice(0, 4).toString() === crc32Buf.toString()) {
-          return [IdentityKind.AccountIdentifier, input];
-        } else {
-          return [IdentityKind.Transaction, input];
-        }
-      } catch (error) {}
+    if (isAccountOrTransaction(input)) {
+      return [
+        isAccount(input)
+          ? IdentityKind.AccountIdentifier
+          : IdentityKind.Transaction,
+        input,
+      ];
     } else if (input.match(/^[0-9a-fA-F]+$/)) {
       if (input.match(/^4449444C/i)) {
         return [IdentityKind.Candid, input];

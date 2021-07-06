@@ -1,7 +1,7 @@
 import { Principal } from "@dfinity/principal";
-import { getCrc32 } from "@dfinity/principal/lib/cjs/utils/getCrc";
 import { useRouter } from "next/router";
 import { useState } from "react";
+import { isAccount, isAccountOrTransaction, isHex } from "../../lib/strings";
 
 export default function SearchBar() {
   const router = useRouter();
@@ -14,23 +14,15 @@ export default function SearchBar() {
 
     if (input.includes("-")) {
       router.push(`/principal/${input}`);
-    } else if (input.length === 64) {
-      try {
-        const blob = Buffer.from(input, "hex");
-        const crc32Buf = Buffer.alloc(4);
-        crc32Buf.writeUInt32BE(getCrc32(blob.slice(4)));
-        const isAccount = blob.slice(0, 4).toString() === crc32Buf.toString();
-        if (isAccount) {
-          router.push(`/account/${input}`);
-        } else {
-          router.push(`/transaction/${input}`);
-        }
-      } catch (error) {
+    } else if (isAccountOrTransaction(input)) {
+      if (isAccount(input)) {
         router.push(`/account/${input}`);
+      } else {
+        router.push(`/transaction/${input}`);
       }
     } else if (input.match(/^\d+$/)) {
       router.push(`/neuron/${input}`);
-    } else if (input.match(/^[0-9a-fA-F]+$/)) {
+    } else if (isHex(input)) {
       const principal = Principal.fromHex(input).toText();
       router.push(`/principal/${principal}`);
     }

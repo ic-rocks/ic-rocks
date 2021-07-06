@@ -1,5 +1,4 @@
 import { DateTime } from "luxon";
-import { useRouter } from "next/router";
 import React, { useMemo } from "react";
 import { useQuery } from "react-query";
 import BalanceLabel from "../../components/Labels/BalanceLabel";
@@ -11,21 +10,32 @@ import Search404 from "../../components/Search404";
 import SimpleTable from "../../components/Tables/SimpleTable";
 import fetchJSON from "../../lib/fetch";
 import { formatNumber } from "../../lib/numbers";
-import { formatPercent } from "../../lib/strings";
+import { formatPercent, isNumber } from "../../lib/strings";
 import { Neuron } from "../../lib/types/API";
 import { NeuronState } from "../../lib/types/governance";
 
 const MAX_DISSOLVE_DELAY_SECONDS = 252_460_800;
 const MAX_NEURON_AGE_FOR_AGE_BONUS = 126_230_400;
 
-const NeuronIdPage = () => {
-  const router = useRouter();
-  const { neuronId } = router.query as { neuronId: string };
+export async function getServerSideProps({ params }) {
+  const { neuronId } = params;
+  const isValid = !!neuronId && isNumber(neuronId);
+  return { props: { isValid, neuronId } };
+}
 
-  const { data, isError } = useQuery<Neuron>(
-    ["neurons", neuronId],
-    () => fetchJSON(`/api/neurons/${neuronId}`),
-    { enabled: !!neuronId }
+const NeuronIdPage = ({
+  isValid,
+  neuronId,
+}: {
+  isValid: boolean;
+  neuronId: string;
+}) => {
+  if (!isValid) {
+    return <Search404 input={neuronId} />;
+  }
+
+  const { data } = useQuery<Neuron>(["neurons", neuronId], () =>
+    fetchJSON(`/api/neurons/${neuronId}`)
   );
 
   const summaryRows = useMemo(() => {
@@ -155,19 +165,13 @@ const NeuronIdPage = () => {
     ];
   }, [data]);
 
-  if (isError) {
-    return <Search404 input={neuronId} />;
-  }
-
   const headers = [{ contents: "Neuron Details" }];
 
   return (
     <div className="pb-16">
       <MetaTags
-        title={`Neuron${neuronId ? ` ${neuronId}` : ""}`}
-        description={`Details for Neuron${
-          neuronId ? ` ${neuronId}` : ""
-        } on the Internet Computer ledger.`}
+        title={`Neuron ${neuronId}`}
+        description={`Details for Neuron ${neuronId} on the Internet Computer ledger.`}
       />
       <h1 className="text-3xl my-8 overflow-hidden overflow-ellipsis">
         Neuron <small className="text-xl break-all">{neuronId}</small>

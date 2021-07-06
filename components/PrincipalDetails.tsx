@@ -1,7 +1,5 @@
 import { Principal } from "@dfinity/principal";
-import { getCrc32 } from "@dfinity/principal/lib/cjs/utils/getCrc.js";
 import { sha224 } from "@dfinity/principal/lib/cjs/utils/sha224.js";
-import { Buffer } from "buffer/";
 import classNames from "classnames";
 import { DateTime } from "luxon";
 import Link from "next/link";
@@ -9,8 +7,9 @@ import React, { useEffect, useMemo, useState } from "react";
 import { BsArrowReturnRight } from "react-icons/bs";
 import { FiExternalLink } from "react-icons/fi";
 import useTags from "../lib/hooks/useTags";
+import { addCrc32 } from "../lib/identifiers";
 import { APIPrincipal, Canister } from "../lib/types/API";
-import { PrincipalType } from "../pages/principal/[principalId]";
+import { PrincipalType } from "../lib/types/PrincipalType";
 import BalanceLabel from "./Labels/BalanceLabel";
 import IdentifierLink from "./Labels/IdentifierLink";
 import { TaggedLabel } from "./Labels/TaggedLabel";
@@ -59,9 +58,7 @@ export default function PrincipalDetails({
             ])
           )
         );
-        const crc32Buf = Buffer.alloc(4);
-        crc32Buf.writeUInt32BE(getCrc32(aId), 0);
-        return { id: Buffer.concat([crc32Buf, aId]).toString("hex") };
+        return { id: addCrc32(aId).toString("hex") };
       })
     );
   }, [principalId]);
