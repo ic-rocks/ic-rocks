@@ -13,11 +13,11 @@ import {
 } from "../../components/Proposals/ProposalStatusLabel";
 import { ProposalSummary } from "../../components/Proposals/ProposalSummary";
 import { ProposalUrl } from "../../components/Proposals/ProposalUrl";
+import Votes from "../../components/Proposals/Votes";
 import SimpleTable from "../../components/Tables/SimpleTable";
 import fetchJSON from "../../lib/fetch";
 import { Proposal } from "../../lib/types/API";
 import { Action, NnsFunction, Topic } from "../../lib/types/governance";
-import Votes from "./Votes";
 
 const ProposalIdPage = () => {
   const router = useRouter();
