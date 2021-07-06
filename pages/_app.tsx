@@ -20,24 +20,28 @@ const queryClient = new QueryClient({
   },
 });
 
-function App({ Component, pageProps }) {
+function Inner({ Component, pageProps }) {
   useAuth();
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <div className="flex flex-col items-center">
-        <div className="flex flex-col justify-between min-h-screen w-full sm:max-w-screen-lg px-4">
-          <main>
-            <Nav />
-            <Component {...pageProps} />
-          </main>
-          <Footer />
-        </div>
+    <div className="flex flex-col items-center">
+      <div className="flex flex-col justify-between min-h-screen w-full sm:max-w-screen-lg px-4">
+        <main>
+          <Nav />
+          <Component {...pageProps} />
+        </main>
+        <Footer />
       </div>
+    </div>
+  );
+}
+
+export default function App(props) {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <Inner {...props} />
 
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );
 }
-
-export default App;

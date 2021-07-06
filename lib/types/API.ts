@@ -340,11 +340,12 @@ export type LabelTag = {
   count: number;
 };
 
-export type Tag = LabelTag & {
+export type Tag = {
   accountId: string;
   principalId: string;
-  note: string;
-  bookmarked: boolean;
+  label: string;
+  note?: string;
+  bookmarked?: boolean;
 };
 
 export type UserTags = { private: Tag[]; public: Tag[] };

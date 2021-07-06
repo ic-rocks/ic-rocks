@@ -1,6 +1,5 @@
 import { Actor, HttpAgent } from "@dfinity/agent";
 import { getCrc32 } from "@dfinity/principal/lib/cjs/utils/getCrc";
-import { useAtom } from "jotai";
 import { DateTime } from "luxon";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -17,10 +16,10 @@ import { TransactionsTable } from "../../components/TransactionsTable";
 import ledgerIdl from "../../lib/canisters/ledger.did";
 import fetchJSON from "../../lib/fetch";
 import useMarkets from "../../lib/hooks/useMarkets";
+import useTags from "../../lib/hooks/useTags";
 import { formatNumber, formatNumberUSD } from "../../lib/numbers";
 import { Account } from "../../lib/types/API";
 import { NeuronState } from "../../lib/types/governance";
-import { userTagAtom } from "../../state/tags";
 
 const agent = new HttpAgent({ host: "https://ic0.app" });
 const ledger = Actor.createActor(ledgerIdl, {
@@ -70,7 +69,7 @@ const AccountPage = () => {
   );
   const [ledgerBalance, setLedgerBalance] = useState(null);
   const [subaccount, setSubaccount] = useState(null);
-  const [allTags] = useAtom(userTagAtom);
+  const { data: allTags } = useTags();
   const tags = allTags.private
     .filter((t) => t.accountId === accountId)
     .concat(allTags.public.filter((t) => t.accountId === accountId));

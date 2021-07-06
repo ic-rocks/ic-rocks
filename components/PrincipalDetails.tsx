@@ -3,15 +3,14 @@ import { getCrc32 } from "@dfinity/principal/lib/cjs/utils/getCrc.js";
 import { sha224 } from "@dfinity/principal/lib/cjs/utils/sha224.js";
 import { Buffer } from "buffer/";
 import classNames from "classnames";
-import { useAtom } from "jotai";
 import { DateTime } from "luxon";
 import Link from "next/link";
 import React, { useEffect, useMemo, useState } from "react";
 import { BsArrowReturnRight } from "react-icons/bs";
 import { FiExternalLink } from "react-icons/fi";
+import useTags from "../lib/hooks/useTags";
 import { APIPrincipal, Canister } from "../lib/types/API";
 import { PrincipalType } from "../pages/principal/[principalId]";
-import { userTagAtom } from "../state/tags";
 import BalanceLabel from "./Labels/BalanceLabel";
 import IdentifierLink from "./Labels/IdentifierLink";
 import { TaggedLabel } from "./Labels/TaggedLabel";
@@ -32,7 +31,7 @@ export default function PrincipalDetails({
   principalData?: APIPrincipal;
   canisterData?: Canister;
 }) {
-  const [allTags] = useAtom(userTagAtom);
+  const { data: allTags } = useTags();
   const tags = allTags.private
     .filter((t) => t.principalId === principalId)
     .concat(allTags.public.filter((t) => t.principalId === principalId));

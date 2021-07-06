@@ -4,12 +4,12 @@ import React, { useMemo } from "react";
 import { FaBookmark, FaRegBookmark } from "react-icons/fa";
 import { MetaTags } from "../components/MetaTags";
 import { Table } from "../components/Tables/Table";
+import useTags from "../lib/hooks/useTags";
 import { authAtom } from "../state/auth";
-import { userTagAtom } from "../state/tags";
 
 const Bookmarks = () => {
   const auth = useAtomValue(authAtom);
-  const tags = useAtomValue(userTagAtom);
+  const { data: tags } = useTags();
 
   const publicColumns = useMemo(
     () => [

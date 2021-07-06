@@ -1,8 +1,7 @@
 import classNames from "classnames";
-import { useAtom } from "jotai";
 import Link from "next/link";
 import React from "react";
-import { userTagAtom } from "../../state/tags";
+import useTags from "../../lib/hooks/useTags";
 import { TaggedLabel } from "./TaggedLabel";
 
 const IdentifierLink = ({
@@ -18,7 +17,7 @@ const IdentifierLink = ({
   isLink?: boolean;
   className?: string;
 }) => {
-  const [allTags] = useAtom(userTagAtom);
+  const { data: allTags } = useTags();
   const field = type === "account" ? "accountId" : "principalId";
   const tags = id
     ? allTags.private
