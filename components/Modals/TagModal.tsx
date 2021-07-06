@@ -89,26 +89,26 @@ export default function TagModal({
         )}
       </div>
       <Modal isOpen={isOpen} openModal={openModal} closeModal={closeModal}>
-        {auth ? (
-          <div className="divide-y divide-default">
-            <PublicForm
-              account={account}
-              principal={principal}
-              myTag={myPublicTag}
-              name={name}
-              publicTags={publicTags}
-            />
+        <div className="divide-y divide-default">
+          <PublicForm
+            account={account}
+            principal={principal}
+            myTag={myPublicTag}
+            name={name}
+            publicTags={publicTags}
+          />
+          {auth ? (
             <PrivateForm
               account={account}
               principal={principal}
               myTag={myPrivateTag}
             />
-          </div>
-        ) : (
-          <p className="mt-1 text-xs text-gray-500">
-            Please log in to use bookmarks, labels, and notes.
-          </p>
-        )}
+          ) : (
+            <p className="py-4 text-xs text-gray-500">
+              Please log in to use bookmarks, labels, and notes.
+            </p>
+          )}
+        </div>
       </Modal>
     </>
   );
@@ -127,6 +127,7 @@ function PublicForm({
   name: string;
   publicTags: LabelTag[];
 }) {
+  const [auth] = useAtom(authAtom);
   const [label, setLabel] = useState("");
   const { mutate, isLoading } = useMutateTagsPublic({ account, principal });
   const [isChecked, setIsChecked] = useAutoToggle();
@@ -163,14 +164,16 @@ function PublicForm({
       <div className="flex flex-col gap-4 py-4">
         <div>
           <Label>Public Label</Label>
-          <input
-            type="text"
-            placeholder="Submit Public Label..."
-            className="w-full px-2 py-1 bg-gray-200 dark:bg-gray-700 text-sm"
-            value={label}
-            onChange={(e) => setLabel(e.target.value)}
-            maxLength={40}
-          />
+          {!!auth && (
+            <input
+              type="text"
+              placeholder="Submit Public Label..."
+              className="w-full px-2 py-1 bg-gray-200 dark:bg-gray-700 text-sm"
+              value={label}
+              onChange={(e) => setLabel(e.target.value)}
+              maxLength={40}
+            />
+          )}
         </div>
         <ul className="text-sm">
           {!!name && (
@@ -190,24 +193,26 @@ function PublicForm({
             );
           })}
         </ul>
-        <div className="flex gap-2">
-          <CheckButton
-            isLoading={isLoading && action.current === "update"}
-            isChecked={isChecked}
-            className="btn-default-2 px-2 py-1 text-center w-16"
-          >
-            Save
-          </CheckButton>
-          {!!myTag && (
-            <SpinnerButton
-              isLoading={isLoading && action.current === "delete"}
-              className="btn-default-2 w-16 text-center py-1 text-red-500"
-              onClick={handleDelete}
+        {!!auth && (
+          <div className="flex gap-2">
+            <CheckButton
+              isLoading={isLoading && action.current === "update"}
+              isChecked={isChecked}
+              className="btn-default-2 px-2 py-1 text-center w-16"
             >
-              Delete
-            </SpinnerButton>
-          )}
-        </div>
+              Save
+            </CheckButton>
+            {!!myTag && (
+              <SpinnerButton
+                isLoading={isLoading && action.current === "delete"}
+                className="btn-default-2 w-16 text-center py-1 text-red-500"
+                onClick={handleDelete}
+              >
+                Delete
+              </SpinnerButton>
+            )}
+          </div>
+        )}
       </div>
     </form>
   );
