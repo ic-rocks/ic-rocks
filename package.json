@@ -28,6 +28,7 @@
     "object-path-immutable": "^4.1.1",
     "protobufjs": "^6.11.2",
     "react": "17.0.2",
+    "react-content-loader": "^6.0.3",
     "react-dom": "17.0.2",
     "react-icons": "^4.2.0",
     "react-multi-select-component": "^4.0.2",

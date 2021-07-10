@@ -1,12 +1,19 @@
-import useDarkMode from "use-dark-mode";
-import ClientOnly from "../ClientOnly";
+import useDarkModeDefault, { DarkMode } from "use-dark-mode";
 
-function DarkModeToggle({ className }: { className: string }) {
-  const darkMode = useDarkMode(undefined, {
+export const useDarkMode = () => {
+  if (typeof document === "undefined") {
+    return { value: null } as DarkMode;
+  }
+
+  return useDarkModeDefault(undefined, {
     classNameDark: "dark",
     classNameLight: "light",
     element: document.documentElement,
   });
+};
+
+export default function DarkModeToggle({ className }: { className: string }) {
+  const darkMode = useDarkMode();
 
   const onClick = (e) => {
     darkMode.toggle();
@@ -20,17 +27,5 @@ function DarkModeToggle({ className }: { className: string }) {
       </span>
       {darkMode.value ? "Light Mode" : "Dark Mode"}
     </button>
-  );
-}
-
-export default function DarkModeToggleWrapped({
-  className,
-}: {
-  className: string;
-}) {
-  return (
-    <ClientOnly>
-      <DarkModeToggle className={className} />
-    </ClientOnly>
   );
 }

@@ -2,6 +2,7 @@ import { Menu } from "@headlessui/react";
 import classNames from "classnames";
 import * as d3 from "d3";
 import React, { useEffect, useRef } from "react";
+import ContentLoader from "react-content-loader";
 import { FiChevronDown } from "react-icons/fi";
 import useMeasure from "react-use-measure";
 import useMetrics, { Period } from "../../lib/hooks/useMetrics";
@@ -140,44 +141,62 @@ const MetricsDataChart = ({
         ref={ref}
         style={{ minHeight: 220 }}
       >
-        <div className="flex justify-between">
-          <strong>{data?.description.name}</strong>
-          {data?.principal && (
-            <IdentifierLink
-              type="principal"
-              id={data.principal.toText()}
-              name={shortPrincipal(data.principal)}
-            />
-          )}
-        </div>
-        <p className="dark:text-gray-400 text-xs pb-2">
-          {data?.description.description[0]}
-        </p>
-        <Menu
-          as="div"
-          className={classNames(
-            "dark:text-gray-400 flex justify-end relative text-xs",
-            { invisible: !data }
-          )}
-        >
-          <Menu.Button className="w-18 inline-flex justify-between items-center px-2 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
-            {PERIODS.find((p) => p.value === period)?.label || "Period"}
-            <FiChevronDown />
-          </Menu.Button>
-          <Menu.Items className="absolute right-2 w-18 mt-6 origin-top-right bg-gray-100 dark:bg-gray-800">
-            {PERIODS.map(({ label, value }) => (
-              <Menu.Item>
-                <button
-                  className="flex items-center w-full px-2 py-1 btn-default"
-                  onClick={() => setPeriod(value as Period)}
-                >
-                  {label}
-                </button>
-              </Menu.Item>
-            ))}
-          </Menu.Items>
-        </Menu>
-        <svg width={width} height={height} ref={svgRef} />
+        {data ? (
+          <>
+            <div className="flex justify-between">
+              <strong>{data?.description.name}</strong>
+              {data?.principal && (
+                <IdentifierLink
+                  type="principal"
+                  id={data.principal.toText()}
+                  name={shortPrincipal(data.principal)}
+                />
+              )}
+            </div>
+            <p className="dark:text-gray-400 text-xs pb-2">
+              {data?.description.description[0]}
+            </p>
+            <Menu
+              as="div"
+              className={classNames(
+                "dark:text-gray-400 flex justify-end relative text-xs",
+                { invisible: !data }
+              )}
+            >
+              <Menu.Button className="w-18 inline-flex justify-between items-center px-2 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
+                {PERIODS.find((p) => p.value === period)?.label || "Period"}
+                <FiChevronDown />
+              </Menu.Button>
+              <Menu.Items className="absolute right-2 w-18 mt-6 origin-top-right bg-gray-100 dark:bg-gray-800">
+                {PERIODS.map(({ label, value }) => (
+                  <Menu.Item>
+                    <button
+                      className="flex items-center w-full px-2 py-1 btn-default"
+                      onClick={() => setPeriod(value as Period)}
+                    >
+                      {label}
+                    </button>
+                  </Menu.Item>
+                ))}
+              </Menu.Items>
+            </Menu>
+            <svg width={width} height={height} ref={svgRef} />
+          </>
+        ) : (
+          <ContentLoader
+            uniqueKey={`metrics.${attributeId}`}
+            className="w-full"
+            width={100}
+            height={220}
+            viewBox="0 0 100 220"
+            preserveAspectRatio="none"
+          >
+            <rect x="0" y="4" rx="2" ry="2" width="50%" height="16" />
+            <rect x="75%" y="4" rx="2" ry="2" width="25%" height="16" />
+            <rect x="0" y="26" rx="2" ry="2" width="80%" height="12" />
+            <rect x="0" y="70" rx="2" ry="2" width="100%" height="150" />
+          </ContentLoader>
+        )}
       </div>
     </div>
   );

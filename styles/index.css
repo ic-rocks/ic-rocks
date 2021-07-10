@@ -76,3 +76,12 @@ textarea {
   --rmsc-border: theme("colors.gray.700");
   --rmsc-selected: theme("colors.gray.700");
 }
+
+/* ContentLoader animations, should probably be more specific */
+.dark svg > defs > linearGradient > stop:nth-of-type(2n) {
+  stop-color: theme("colors.gray.800");
+}
+
+.dark svg > defs > linearGradient > stop:nth-of-type(2n + 1) {
+  stop-color: theme("colors.gray.700");
+}
