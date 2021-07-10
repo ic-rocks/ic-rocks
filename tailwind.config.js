@@ -12,12 +12,16 @@ module.exports = {
     extend: {
       colors: {
         gray: {
+          850: "hsl(217deg 32% 14%)",
           950: "hsl(222deg 42% 10%)",
         },
       },
       fontFamily: {
         sans: ["Aestetico", ...defaultTheme.fontFamily.sans],
         mono: ["Space Mono", ...defaultTheme.fontFamily.mono],
+      },
+      fontSize: {
+        xxs: "0.625rem",
       },
       flex: {
         2: "2 2 0%",

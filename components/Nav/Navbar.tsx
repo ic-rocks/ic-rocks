@@ -70,6 +70,9 @@ export default function Nav() {
           <ActiveLink href="/transactions">Transactions</ActiveLink>
         </li>
         <li>
+          <ActiveLink href="/metrics">Metrics</ActiveLink>
+        </li>
+        <li>
           <ActiveLink href="/tools/blob">Tools</ActiveLink>
         </li>
       </ul>
