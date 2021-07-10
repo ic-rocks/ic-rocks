@@ -1,9 +1,7 @@
 import { Actor, HttpAgent } from "@dfinity/agent";
-import { useEffect, useState } from "react";
-import Metrics, {
-  AttributeRecord,
-  GetPeriod,
-} from "../canisters/Metrics/Metrics";
+import { useState } from "react";
+import { useQuery } from "react-query";
+import Metrics, { GetPeriod } from "../canisters/Metrics/Metrics";
 import MetricsIDL from "../canisters/Metrics/Metrics.did";
 import { KeysOfUnion } from "../types/utils";
 
@@ -17,14 +15,14 @@ export default function useMetrics({
   canisterId?: string;
   attributeId: number | string;
 }) {
-  const [data, setData] = useState<AttributeRecord>();
   const [period, setPeriod] = useState<Period>(null);
-  useEffect(() => {
-    const metrics = Actor.createActor<Metrics>(MetricsIDL, {
-      agent,
-      canisterId,
-    });
-    (async () => {
+  const { data, isFetching } = useQuery(
+    ["metrics", { canisterId, attributeId, period }],
+    async () => {
+      const metrics = Actor.createActor<Metrics>(MetricsIDL, {
+        agent,
+        canisterId,
+      });
       const record = await metrics.recordById({
         attributeId: BigInt(attributeId),
         before: [],
@@ -32,9 +30,14 @@ export default function useMetrics({
         period: period ? [{ [period]: null } as GetPeriod] : [],
       });
       if ("ok" in record) {
-        setData(record.ok);
+        return record.ok;
       }
-    })();
-  }, [canisterId, attributeId, period]);
-  return { data, period, setPeriod };
+      throw record.err;
+    },
+    {
+      keepPreviousData: true,
+      staleTime: period === "Minute" || !period ? 60 * 1000 : Infinity,
+    }
+  );
+  return { data, isFetching, period, setPeriod };
 }

@@ -1,11 +1,13 @@
 import { Menu } from "@headlessui/react";
-import classNames from "classnames";
 import * as d3 from "d3";
+import { DateTime } from "luxon";
 import React, { useEffect, useRef } from "react";
 import ContentLoader from "react-content-loader";
+import { CgSpinner } from "react-icons/cg";
 import { FiChevronDown } from "react-icons/fi";
 import useMeasure from "react-use-measure";
 import useMetrics, { Period } from "../../lib/hooks/useMetrics";
+import { formatNumber, formatNumberShortScale } from "../../lib/numbers";
 import { shortPrincipal } from "../../lib/strings";
 import IdentifierLink from "../Labels/IdentifierLink";
 
@@ -17,13 +19,7 @@ const PERIODS = [
   { label: "By Week", value: "Week" },
 ];
 
-const formatNumber = (n: number) => {
-  if (n >= 1e12) return `${(n / 1e12).toFixed(2)}T`;
-  if (n >= 1e9) return `${(n / 1e9).toFixed(2)}B`;
-  if (n >= 1e6) return `${(n / 1e6).toFixed(2)}M`;
-  if (n >= 1e3) return `${(n / 1e3).toFixed(2)}K`;
-  return n.toString();
-};
+const bisect = d3.bisector((d: { x: Date }) => d.x).center;
 
 const MetricsDataChart = ({
   attributeId,
@@ -31,10 +27,11 @@ const MetricsDataChart = ({
   attributeId: number | string;
 }) => {
   const svgRef = useRef(null);
+  const tooltipRef = useRef(null);
   const [ref, { width }] = useMeasure();
-  const { data, period, setPeriod } = useMetrics({ attributeId });
+  const { data, isFetching, period, setPeriod } = useMetrics({ attributeId });
 
-  let height = 150;
+  const height = 150;
 
   useEffect(() => {
     if (!width || !data) return;
@@ -78,10 +75,21 @@ const MetricsDataChart = ({
       .append("g")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    const series = data.series.map((x, i) => ({
-      x: new Date(Number(x.timestamp / BigInt(1e6))),
-      y: Number(x.value),
-    }));
+    const tooltip = d3.select(tooltipRef.current);
+
+    let series = d3.sort(
+      data.series.map((x, i) => ({
+        x: new Date(Number(x.timestamp / BigInt(1e6))),
+        y: Number(x.value),
+      })),
+      ({ x }) => x
+    );
+    if (series.length === 1) {
+      series = series.concat({
+        x: new Date(),
+        y: series[0].y,
+      });
+    }
 
     const xScale = d3
       .scaleUtc()
@@ -97,7 +105,6 @@ const MetricsDataChart = ({
       .line()
       .x((d: any) => xScale(d.x))
       .y((d: any) => yScale(d.y));
-    // .curve(d3.curveCatmullRom.alpha(0.5));
 
     svg
       .append("g")
@@ -112,7 +119,7 @@ const MetricsDataChart = ({
         d3
           .axisLeft(yScale)
           .ticks(height / 50)
-          .tickFormat(formatNumber)
+          .tickFormat(formatNumberShortScale)
       );
 
     const area = d3
@@ -132,20 +139,76 @@ const MetricsDataChart = ({
       .datum(series)
       .style("fill", "url(#gradient)")
       .attr("d", area as any);
+
+    const mouseG = svg
+      .append("g")
+      .attr("class", "mouse-over-effects")
+      .style("opacity", 0);
+
+    mouseG
+      .append("line")
+      .attr(
+        "class",
+        "mouse-line stroke-current stroke-1 text-black dark:text-white"
+      )
+      .attr("y1", 0)
+      .attr("y2", innerHeight);
+
+    mouseG
+      .append("circle")
+      .attr("r", 4)
+      .attr("class", "fill-current stroke-none text-blue-400");
+
+    mouseG
+      .append("rect")
+      .attr("width", innerWidth)
+      .attr("height", innerHeight)
+      .attr("fill", "none")
+      .attr("pointer-events", "all")
+      .on("mouseout", () => {
+        mouseG.style("opacity", 0);
+        tooltip.style("opacity", 0);
+      })
+      .on("mouseover", () => {
+        mouseG.style("opacity", 1);
+        tooltip.style("opacity", 0.5);
+      })
+      .on("mousemove", (e) => {
+        const mouse = d3.pointer(e);
+        const xDate = xScale.invert(mouse[0]);
+        const i = bisect(series, xDate);
+        const d = series[i];
+
+        tooltip.select(".label-y").text(formatNumber(d.y));
+        tooltip
+          .select(".label-x")
+          .text(
+            DateTime.fromJSDate(xDate).toLocaleString(DateTime.DATETIME_SHORT)
+          );
+        tooltip.attr(
+          "style",
+          `transform: translate(${mouse[0]}px,${yScale(d.y)}px)`
+        );
+
+        mouseG
+          .select(".mouse-line")
+          .attr("transform", `translate(${mouse[0]},0)`)
+          .attr("y1", yScale(d.y));
+
+        mouseG
+          .select("circle")
+          .attr("transform", `translate(${mouse[0]},${yScale(d.y)})`);
+      });
   }, [data, width]);
 
   return (
-    <div className="flex bg-gray-50 dark:bg-gray-850 p-4 shadow-md rounded-md">
-      <div
-        className="flex-1 flex flex-col "
-        ref={ref}
-        style={{ minHeight: 220 }}
-      >
+    <div className="bg-gray-100 dark:bg-gray-850 p-4 shadow-md rounded-md">
+      <div className="flex flex-col" ref={ref} style={{ minHeight: 220 }}>
         {data ? (
           <>
             <div className="flex justify-between">
-              <strong>{data?.description.name}</strong>
-              {data?.principal && (
+              <strong>{data.description.name}</strong>
+              {data.principal && (
                 <IdentifierLink
                   type="principal"
                   id={data.principal.toText()}
@@ -154,22 +217,24 @@ const MetricsDataChart = ({
               )}
             </div>
             <p className="dark:text-gray-400 text-xs pb-2">
-              {data?.description.description[0]}
+              {data.description.description[0]}
             </p>
             <Menu
               as="div"
-              className={classNames(
-                "dark:text-gray-400 flex justify-end relative text-xs",
-                { invisible: !data }
-              )}
+              className="dark:text-gray-400 flex justify-end relative text-xs"
             >
-              <Menu.Button className="w-18 inline-flex justify-between items-center px-2 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
-                {PERIODS.find((p) => p.value === period)?.label || "Period"}
-                <FiChevronDown />
-              </Menu.Button>
-              <Menu.Items className="absolute right-2 w-18 mt-6 origin-top-right bg-gray-100 dark:bg-gray-800">
+              <div className="inline-flex items-center">
+                {isFetching && (
+                  <CgSpinner className="inline-block animate-spin" />
+                )}
+                <Menu.Button className="w-18 inline-flex justify-between items-center px-2 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
+                  {PERIODS.find((p) => p.value === period)?.label || "Period"}
+                  <FiChevronDown className="ml-1" />
+                </Menu.Button>
+              </div>
+              <Menu.Items className="absolute z-10 right-2 w-18 mt-5 origin-top-right shadow-lg">
                 {PERIODS.map(({ label, value }) => (
-                  <Menu.Item>
+                  <Menu.Item key={value}>
                     <button
                       className="flex items-center w-full px-2 py-1 btn-default"
                       onClick={() => setPeriod(value as Period)}
@@ -180,7 +245,25 @@ const MetricsDataChart = ({
                 ))}
               </Menu.Items>
             </Menu>
-            <svg width={width} height={height} ref={svgRef} />
+            {data.series.length > 0 ? (
+              <div className="relative">
+                <div
+                  className="p-1 bg-black absolute rounded-md pointer-events-none origin-bottom"
+                  style={{ opacity: 0 }}
+                  ref={tooltipRef}
+                >
+                  <div className="flex flex-col">
+                    <label className="label-y text-xs text-white"></label>
+                    <span className="label-x text-xxs text-gray-500"></span>
+                  </div>
+                </div>
+                <svg width={width} height={height} ref={svgRef} />
+              </div>
+            ) : (
+              <div className="flex-1 flex items-center justify-center text-xs text-gray-500">
+                No data
+              </div>
+            )}
           </>
         ) : (
           <ContentLoader
