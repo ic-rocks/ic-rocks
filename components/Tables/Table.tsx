@@ -192,7 +192,7 @@ export const TableInner = ({
   }, [pageIndex, pageSize, sortBy, filters]);
 
   return (
-    <div className="max-w-full overflow-x-auto">
+    <div className="max-w-full overflow-x-auto xs:overflow-x-visible">
       {useFilter && (
         <div className="py-2 flex flex-wrap gap-1">
           {allColumns.map((column) =>
