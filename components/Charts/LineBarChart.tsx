@@ -1,4 +1,5 @@
 import * as d3 from "d3";
+import { curveStep, curveStepAfter, curveStepBefore } from "d3";
 import { DateTime } from "luxon";
 import React, { useEffect, useRef } from "react";
 import useMeasure from "react-use-measure";
@@ -22,6 +23,7 @@ const LineBarChart = ({
   y1TooltipFormat = ({ y1 }) => formatNumber(y1),
   y2TooltipFormat = ({ y2 }) => formatNumber(y2),
   curve = d3.curveLinear,
+  color = d3.schemeCategory10[0],
 }: {
   data: Data[];
   height?: number;
@@ -30,6 +32,7 @@ const LineBarChart = ({
   y1TooltipFormat?: (d: Data) => string;
   y2TooltipFormat?: (d: Data) => string;
   curve?: d3.CurveFactory | d3.CurveFactoryLineOnly;
+  color?: string;
 }) => {
   const svgRef = useRef(null);
   const tooltipRef = useRef(null);
@@ -57,8 +60,8 @@ const LineBarChart = ({
     let series = d3.sort(data, ({ x }) => x);
 
     const paddedExtent = [
-      d3.min(series.map((d) => d3.utcDay.offset(d.x, -1))),
-      d3.max(series.map((d) => d3.utcDay.offset(d.x, 1))),
+      d3.min(series.map((d) => d3.utcDay.round(d3.utcDay.offset(d.x, -1)))),
+      d3.max(series.map((d) => d3.utcDay.round(d3.utcDay.offset(d.x, 1)))),
     ];
 
     const xTimeScale = d3
@@ -73,12 +76,7 @@ const LineBarChart = ({
       .paddingInner(0.1);
 
     const xBandStep = xBand.step();
-    console.log(
-      xBandStep,
-      xBand.paddingInner(),
-      xBand.paddingOuter(),
-      xBand.domain().length
-    );
+    const paddingOuter = xBand(xBand.domain()[0]);
 
     const y1Scale = d3
       .scaleLinear()
@@ -96,12 +94,13 @@ const LineBarChart = ({
       .y((d: any) => y2Scale(d.y2))
       .curve(curve);
 
-    svg
+    const path = svg
       .append("path")
       .datum(series)
       .style("fill", "none")
-      .attr("class", "line stroke-current stroke-2 text-blue-400")
-      .attr("d", line as any);
+      .attr("class", "line stroke-2")
+      .attr("d", line as any)
+      .style("stroke", color);
 
     const bar = svg.append("g");
 
@@ -110,8 +109,9 @@ const LineBarChart = ({
       .data(series)
       .enter()
       .append("rect")
-      .attr("class", (d, i) => `bar-${i} fill-current text-blue-400`)
-      .attr("x", (d) => xTimeScale(d.x) - xBand.bandwidth() / 2)
+      .attr("class", (d, i) => `bar-${i}`)
+      .style("fill", color)
+      .attr("x", (d) => xBand(d.x as unknown as string) - xBand.bandwidth() / 2)
       .attr("y", (d) => y1Scale(d.y1))
       .attr("width", xBand.bandwidth())
       .attr("height", (d) => innerHeight - y1Scale(d.y1))
@@ -145,6 +145,16 @@ const LineBarChart = ({
       );
 
     if (useTooltip) {
+      const pathNode = path.node();
+      const pathPos = (x: number) => {
+        const array = d3.range(pathNode.getTotalLength());
+        const bisect = d3.bisector(
+          (d: number) => pathNode.getPointAtLength(d).x
+        );
+        const len = bisect.right(array, x);
+        return pathNode.getPointAtLength(len).y;
+      };
+
       const mouseG = svg
         .append("g")
         .attr("class", "mouse-over-effects")
@@ -162,7 +172,8 @@ const LineBarChart = ({
       mouseG
         .append("circle")
         .attr("r", 4)
-        .attr("class", "fill-current stroke-none text-blue-400");
+        .attr("class", "stroke-none")
+        .style("fill", color);
 
       mouseG
         .append("rect")
@@ -179,22 +190,26 @@ const LineBarChart = ({
           tooltip.style("opacity", 0.5);
         })
         .on("mousemove", (e) => {
-          const [x, y] = d3.pointer(e);
+          bar.selectAll("rect").style("opacity", 0.5);
+
+          const [x] = d3.pointer(e);
           const xDate = xTimeScale.invert(x);
           let i = bisect(series, xDate);
+          if (i === 0 || i >= series.length) {
+            return;
+          }
           i = i > 0 ? i - 1 : i;
           const d = series[i];
 
-          const xBarDate = xBand.domain()[
-            Math.floor(x / xBandStep)
-          ] as unknown as Date;
+          const bandIdx = Math.floor(
+            (x - paddingOuter + xBand.bandwidth() / 2) / xBandStep
+          );
+          const xBarDate = xBand.domain()[bandIdx] as unknown as Date;
           const xBarDT = DateTime.fromJSDate(xBarDate);
 
           const barIdx = series.findIndex(({ x }) =>
             xBarDT.equals(DateTime.fromJSDate(x))
           );
-
-          bar.selectAll("rect").style("opacity", 0.5);
 
           let y1Label: string;
           if (barIdx > -1) {
@@ -207,19 +222,25 @@ const LineBarChart = ({
           tooltip.select(".label-y1").text(y1Label);
           tooltip.select(".label-y2").text(y2TooltipFormat(d));
           tooltip.select(".label-x").text(xTooltipFormat(xBarDate));
+
+          const yPos =
+            curve === curveStepAfter ||
+            curve === curveStepBefore ||
+            curve === curveStep
+              ? y2Scale(d.y2)
+              : pathPos(x);
+
           tooltip.attr(
             "style",
-            `transform: translate(${x + margin.left + 5}px,${y2Scale(d.y2)}px)`
+            `transform: translate(${x + margin.left + 5}px,${yPos}px)`
           );
 
           mouseG
             .select(".mouse-line")
             .attr("transform", `translate(${x},0)`)
-            .attr("y1", y2Scale(d.y2));
+            .attr("y1", yPos);
 
-          mouseG
-            .select("circle")
-            .attr("transform", `translate(${x},${y2Scale(d.y2)})`);
+          mouseG.select("circle").attr("transform", `translate(${x},${yPos})`);
         });
     }
   }, [data, width]);

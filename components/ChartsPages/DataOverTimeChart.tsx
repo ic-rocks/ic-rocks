@@ -15,13 +15,14 @@ const DataOverTimeChart = ({
   chartId: ChartId;
   isFull?: boolean;
 }) => {
-  if (chartId === "transactions") {
-    return <TransactionsOverTimeChart isFull={isFull} />;
-  }
-
   const { hook, dataKey, heading, curve } = ChartTypes.find(
     ({ id }) => id === chartId
   );
+
+  if (chartId === "transactions") {
+    return <TransactionsOverTimeChart heading={heading} isFull={isFull} />;
+  }
+
   const { data } = hook();
 
   const series = useMemo(() => {

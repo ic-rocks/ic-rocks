@@ -58,7 +58,7 @@ export const ChartTypes: ChartType[] = [
     description: (
       <div>
         <p>New canisters created by day.</p>
-        <p className="text-gray-500 text-sm">
+        <p className="text-gray-500 text-xs">
           Note: Canisters created before June 6, 2021 are missing exact creation
           dates.
         </p>
@@ -67,5 +67,6 @@ export const ChartTypes: ChartType[] = [
   },
   {
     id: "transactions",
+    heading: "ICP Transactions over Time",
   },
 ];

@@ -76,7 +76,7 @@ const ProposalsPage = () => {
               <a className="link-overflow">{value}</a>
             </Link>
           ),
-          className: "px-2 w-24 hidden md:flex oneline",
+          className: "px-2 w-20 hidden md:flex oneline",
           Filter: MultiSelectColumnFilter,
           filterOptions:
             proposers?.length > 0
@@ -86,7 +86,7 @@ const ProposalsPage = () => {
                 }))
               : [],
           filterLabel: "Proposer",
-          headerClassName: "w-24 hidden md:block items-start",
+          headerClassName: "px-2 w-20 hidden md:block items-start",
         },
         {
           Header: "Topic, Action & Summary",
@@ -192,14 +192,14 @@ const ProposalsPage = () => {
               </div>
             );
           },
-          className: "px-2 w-28 hidden md:block",
+          className: "w-24 hidden md:block",
         },
         {
           Header: "Proposal Date",
           accessor: "proposalDate",
           disableSortBy: true,
           Cell: ({ value }) => DateTime.fromISO(value).toRelative(),
-          className: "px-2 w-32 text-right hidden sm:block",
+          className: "pr-2 w-32 text-right hidden sm:block",
         },
       ].filter(Boolean),
     [proposers]

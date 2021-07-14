@@ -10,11 +10,12 @@ import MultiLineChart from "../Charts/MultiLineChart";
 
 const TransactionsOverTimeChart = ({
   isFull = false,
+  heading,
 }: {
   isFull?: boolean;
+  heading: string;
 }) => {
   const { data } = useTransactionCounts();
-  const heading = "ICP Transactions over Time";
 
   const series = useMemo(() => {
     if (!data) return null;

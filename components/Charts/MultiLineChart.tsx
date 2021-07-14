@@ -43,7 +43,7 @@ const MultiLineChart = ({
 
     parent.selectAll("*").remove();
 
-    const margin = { top: 10, right: 40, bottom: 20, left: 40 };
+    const margin = { top: 10, right: 50, bottom: 20, left: 40 };
     const innerWidth = width - margin.left - margin.right;
     const innerHeight = height - margin.top - margin.bottom;
 
@@ -78,7 +78,7 @@ const MultiLineChart = ({
         .curve(curve)
     );
 
-    series.forEach((ds, i) =>
+    const paths = series.map((ds, i) =>
       svg
         .append("path")
         .datum(ds)
@@ -116,6 +116,16 @@ const MultiLineChart = ({
       );
 
     if (useTooltip) {
+      const pathPos = paths.map((path) => (x: number) => {
+        const pathNode = path.node();
+        const array = d3.range(pathNode.getTotalLength());
+        const bisect = d3.bisector(
+          (d: number) => pathNode.getPointAtLength(d).x
+        );
+        const len = bisect.right(array, x);
+        return pathNode.getPointAtLength(len).y;
+      });
+
       const mouseG = svg
         .append("g")
         .attr("class", "mouse-over-effects")
@@ -161,9 +171,15 @@ const MultiLineChart = ({
 
             tooltip.select(`.label-y${i}`).text(yTooltipFormat(i, d));
 
+            const yPos =
+              curve === d3.curveStepAfter ||
+              curve === d3.curveStepBefore ||
+              curve === d3.curveStep
+                ? yScales[i](d.y)
+                : pathPos[i](x);
             mouseG
               .select(`.circle-${i}`)
-              .attr("transform", `translate(${x},${yScales[i](d.y)})`);
+              .attr("transform", `translate(${x},${yPos})`);
           });
           tooltip.select(".label-x").text(xTooltipFormat(xDate));
           tooltip.attr(
