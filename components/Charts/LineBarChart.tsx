@@ -2,10 +2,10 @@ import * as d3 from "d3";
 import { DateTime } from "luxon";
 import React, { useEffect, useRef } from "react";
 import useMeasure from "react-use-measure";
-import { useDarkMode } from "../../lib/hooks/useDarkMode";
 import { formatNumber, formatNumberShortScale } from "../../lib/numbers";
+import WaterMark from "./WaterMark";
 
-const bisect = d3.bisector((d: { x: Date }) => d.x).center;
+const bisect = d3.bisector((d: { x: Date }) => d.x).left;
 
 type Data = {
   x: Date;
@@ -31,7 +31,6 @@ const LineBarChart = ({
   y2TooltipFormat?: (d: Data) => string;
   curve?: d3.CurveFactory | d3.CurveFactoryLineOnly;
 }) => {
-  const { value: isDark } = useDarkMode();
   const svgRef = useRef(null);
   const tooltipRef = useRef(null);
   const [ref, { width }] = useMeasure();
@@ -71,9 +70,15 @@ const LineBarChart = ({
       .scaleBand()
       .domain(d3.utcDay.range(...(xTimeScale.domain() as [Date, Date])) as any)
       .range([0, innerWidth])
-      .padding(0.1);
+      .paddingInner(0.1);
 
     const xBandStep = xBand.step();
+    console.log(
+      xBandStep,
+      xBand.paddingInner(),
+      xBand.paddingOuter(),
+      xBand.domain().length
+    );
 
     const y1Scale = d3
       .scaleLinear()
@@ -105,11 +110,12 @@ const LineBarChart = ({
       .data(series)
       .enter()
       .append("rect")
-      .attr("class", "fill-current text-blue-400 opacity-50")
+      .attr("class", (d, i) => `bar-${i} fill-current text-blue-400`)
       .attr("x", (d) => xTimeScale(d.x) - xBand.bandwidth() / 2)
       .attr("y", (d) => y1Scale(d.y1))
       .attr("width", xBand.bandwidth())
-      .attr("height", (d) => innerHeight - y1Scale(d.y1));
+      .attr("height", (d) => innerHeight - y1Scale(d.y1))
+      .style("opacity", 0.5);
 
     svg
       .append("g")
@@ -173,17 +179,27 @@ const LineBarChart = ({
           tooltip.style("opacity", 0.5);
         })
         .on("mousemove", (e) => {
-          const mouse = d3.pointer(e);
-          const xDate = xTimeScale.invert(mouse[0]);
-          const d = series[bisect(series, xDate)];
-          const i = Math.floor(mouse[0] / xBandStep);
-          const xBarDate = xBand.domain()[i] as unknown as Date;
-          const isBar = DateTime.fromJSDate(xBarDate).equals(
-            DateTime.fromJSDate(d.x)
+          const [x, y] = d3.pointer(e);
+          const xDate = xTimeScale.invert(x);
+          let i = bisect(series, xDate);
+          i = i > 0 ? i - 1 : i;
+          const d = series[i];
+
+          const xBarDate = xBand.domain()[
+            Math.floor(x / xBandStep)
+          ] as unknown as Date;
+          const xBarDT = DateTime.fromJSDate(xBarDate);
+
+          const barIdx = series.findIndex(({ x }) =>
+            xBarDT.equals(DateTime.fromJSDate(x))
           );
+
+          bar.selectAll("rect").style("opacity", 0.5);
+
           let y1Label: string;
-          if (isBar) {
-            y1Label = y1TooltipFormat(d);
+          if (barIdx > -1) {
+            y1Label = y1TooltipFormat(series[barIdx]);
+            bar.select(`.bar-${barIdx}`).style("opacity", 0.8);
           } else {
             y1Label = y1TooltipFormat({ y1: 0, x: xBarDate, y2: d.y2 });
           }
@@ -193,17 +209,17 @@ const LineBarChart = ({
           tooltip.select(".label-x").text(xTooltipFormat(xBarDate));
           tooltip.attr(
             "style",
-            `transform: translate(${mouse[0]}px,${y2Scale(d.y2)}px)`
+            `transform: translate(${x + margin.left + 5}px,${y2Scale(d.y2)}px)`
           );
 
           mouseG
             .select(".mouse-line")
-            .attr("transform", `translate(${mouse[0]},0)`)
+            .attr("transform", `translate(${x},0)`)
             .attr("y1", y2Scale(d.y2));
 
           mouseG
             .select("circle")
-            .attr("transform", `translate(${mouse[0]},${y2Scale(d.y2)})`);
+            .attr("transform", `translate(${x},${y2Scale(d.y2)})`);
         });
     }
   }, [data, width]);
@@ -223,14 +239,7 @@ const LineBarChart = ({
           </div>
         </div>
       )}
-      <div
-        style={{
-          background: `no-repeat center/30% url(/img/icrocks-${
-            isDark ? "dark" : "light"
-          }.svg)`,
-        }}
-        className="absolute w-full h-full opacity-10 pointer-events-none"
-      />
+      <WaterMark />
       <svg width={width} height={height} ref={svgRef} />
     </div>
   ) : (

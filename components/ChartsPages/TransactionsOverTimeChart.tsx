@@ -1,45 +1,39 @@
+import { curveMonotoneX } from "d3";
 import { DateTime } from "luxon";
 import Link from "next/link";
 import React, { useMemo } from "react";
 import ContentLoader from "react-content-loader";
 import { FiChevronRight } from "react-icons/fi";
+import useTransactionCounts from "../../lib/hooks/useTransactionCounts";
 import { formatNumber } from "../../lib/numbers";
-import LineBarChart from "../Charts/LineBarChart";
-import { ChartId, ChartTypes } from "./ChartIds";
-import TransactionsOverTimeChart from "./TransactionsOverTimeChart";
+import MultiLineChart from "../Charts/MultiLineChart";
 
-const DataOverTimeChart = ({
-  chartId,
+const TransactionsOverTimeChart = ({
   isFull = false,
 }: {
-  chartId: ChartId;
   isFull?: boolean;
 }) => {
-  if (chartId === "transactions") {
-    return <TransactionsOverTimeChart isFull={isFull} />;
-  }
-
-  const { hook, dataKey, heading, curve } = ChartTypes.find(
-    ({ id }) => id === chartId
-  );
-  const { data } = hook();
+  const { data } = useTransactionCounts();
+  const heading = "ICP Transactions over Time";
 
   const series = useMemo(() => {
-    let sum = 0;
-    return data
-      ?.map((d) => {
-        sum += d[dataKey];
-        return {
-          x: DateTime.fromISO(d.day).toJSDate(),
-          y1: d[dataKey],
-          y2: sum,
-        };
-      })
-      .concat({
-        x: new Date(),
-        y1: 0,
-        y2: sum,
-      });
+    if (!data) return null;
+    return data.reduce(
+      ([counts, sums], d) => {
+        const x = DateTime.fromISO(d.day).toJSDate();
+        return [
+          counts.concat({
+            x,
+            y: d.count,
+          }),
+          sums.concat({
+            x,
+            y: Number(d.sum),
+          }),
+        ];
+      },
+      [[], []]
+    );
   }, [data]);
 
   const height = isFull ? 400 : 250;
@@ -50,26 +44,27 @@ const DataOverTimeChart = ({
         {data ? (
           <>
             {!isFull && (
-              <Link href={`/charts/${chartId}`}>
+              <Link href={`/charts/transactions`}>
                 <a className="font-bold link-overflow inline-flex items-center">
                   {heading} <FiChevronRight />
                 </a>
               </Link>
             )}
-            <LineBarChart
+            <MultiLineChart
               data={series}
               xTooltipFormat={(x) =>
                 DateTime.fromJSDate(x).toLocaleString(DateTime.DATE_FULL)
               }
-              y1TooltipFormat={({ y1 }) => `New: ${formatNumber(y1)}`}
-              y2TooltipFormat={({ y2 }) => `Total: ${formatNumber(y2)}`}
+              yTooltipFormat={(i, { y }) =>
+                `${i === 0 ? "Count" : "Sum"}: ${formatNumber(y, 2)}`
+              }
               height={height}
-              curve={curve}
+              curve={curveMonotoneX}
             />
           </>
         ) : (
           <ContentLoader
-            uniqueKey={`charts.network-counts.${dataKey}`}
+            uniqueKey={`charts.network-counts.transactions`}
             className="w-full"
             width={100}
             height={height}
@@ -91,4 +86,4 @@ const DataOverTimeChart = ({
   );
 };
 
-export default DataOverTimeChart;
+export default TransactionsOverTimeChart;
