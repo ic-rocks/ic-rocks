@@ -200,7 +200,10 @@ const AccountDetails = ({ accountId }: { accountId: string }) => {
             <td className="px-2 py-2 w-32 sm:w-40">Balance</td>
             <td className="px-2 py-2 flex-1">
               {data || ledgerBalance ? (
-                <BalanceLabel value={data.balance ?? ledgerBalance} />
+                <BalanceLabel
+                  value={data.balance ?? ledgerBalance}
+                  digits={8}
+                />
               ) : (
                 "-"
               )}
