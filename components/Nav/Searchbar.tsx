@@ -12,18 +12,20 @@ export default function SearchBar() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (input.includes("-")) {
-      router.push(`/principal/${input}`);
-    } else if (isAccountOrTransaction(input)) {
-      if (isAccount(input)) {
-        router.push(`/account/${input}`);
+    const trimmed = input.trim().replaceAll("_", "");
+
+    if (trimmed.includes("-")) {
+      router.push(`/principal/${trimmed}`);
+    } else if (isAccountOrTransaction(trimmed)) {
+      if (isAccount(trimmed)) {
+        router.push(`/account/${trimmed}`);
       } else {
-        router.push(`/transaction/${input}`);
+        router.push(`/transaction/${trimmed}`);
       }
-    } else if (input.match(/^\d+$/)) {
-      router.push(`/neuron/${input}`);
-    } else if (isHex(input)) {
-      const principal = Principal.fromHex(input).toText();
+    } else if (trimmed.match(/^\d+$/)) {
+      router.push(`/neuron/${trimmed}`);
+    } else if (isHex(trimmed)) {
+      const principal = Principal.fromHex(trimmed).toText();
       router.push(`/principal/${principal}`);
     }
     setInput("");
