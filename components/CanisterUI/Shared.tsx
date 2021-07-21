@@ -281,7 +281,7 @@ export const Output = ({
   display,
 }: {
   format: Format;
-  value: any;
+  value: { res?: any; err?: any };
   type?: IDL.Type | protobuf.Type;
   display?: CandidOutputDisplay | ProtobufOutputDisplay;
 }) => {

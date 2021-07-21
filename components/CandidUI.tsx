@@ -5,7 +5,7 @@ import classNames from "classnames";
 import { Bindings } from "didc";
 import { useAtom } from "jotai";
 import Link from "next/link";
-import { del, set } from "object-path-immutable";
+import { del, get, set } from "object-path-immutable";
 import protobuf, { Method } from "protobufjs/light";
 import React, { useCallback, useEffect, useReducer, useState } from "react";
 import { BsArrowReturnRight } from "react-icons/bs";
@@ -304,11 +304,20 @@ export default function CandidUI({
         </div>
       </div>
       {sortedMethods.map(([funcName, method]) => {
-        let isPb, isQuery, inputs, responseTypes;
+        // TODO: refactor to separate component
+        let isPb,
+          isQuery,
+          format,
+          inputs,
+          responseTypes,
+          OUTPUT_DISPLAYS,
+          output;
+
         if (isProtobufMethod(method)) {
           isPb = true;
           funcName = method.name;
           isQuery = method.getOption("annotation") === "query";
+          format = "protobuf";
           inputs = (
             <PbMessage
               objectName={method.requestType}
@@ -328,9 +337,11 @@ export default function CandidUI({
             />
           );
           responseTypes = method.responseType;
+          OUTPUT_DISPLAYS = PROTOBUF_OUTPUT_DISPLAYS;
         } else {
           isPb = false;
           isQuery = method.annotations[0] === "query";
+          format = "candid";
           if (method.argTypes.length > 0) {
             inputs = method.argTypes.map((arg, i) => {
               return (
@@ -352,17 +363,52 @@ export default function CandidUI({
               );
             });
           }
-          responseTypes = method.retTypes.length
-            ? getShortname(method.retTypes[0])
-            : "()";
-        }
+          OUTPUT_DISPLAYS = CANDID_OUTPUT_DISPLAYS;
 
-        const OUTPUT_DISPLAYS = isPb
-          ? PROTOBUF_OUTPUT_DISPLAYS
-          : CANDID_OUTPUT_DISPLAYS;
+          responseTypes =
+            method.retTypes.length > 0
+              ? method.retTypes.length > 1
+                ? `(${method.retTypes.map(getShortname).join(", ")})`
+                : getShortname(method.retTypes[0])
+              : "()";
+        }
         const outputDisplay =
           state.outputDisplays[funcName] || OUTPUT_DISPLAYS[0];
-        const format = isPb ? "protobuf" : "candid";
+
+        if (isProtobufMethod(method)) {
+          output = (
+            <Output
+              format={format}
+              display={outputDisplay}
+              type={method.resolvedResponseType}
+              value={state.outputs[funcName]}
+            />
+          );
+        } else {
+          if (method.retTypes.length > 1) {
+            output = method.retTypes.map((type, i) => (
+              <Output
+                key={i}
+                format={format}
+                display={outputDisplay}
+                type={type}
+                value={{
+                  res: get(state.outputs[funcName], ["res", i]),
+                  err: get(state.outputs[funcName], "err"),
+                }}
+              />
+            ));
+          } else {
+            output = (
+              <Output
+                format={format}
+                display={outputDisplay}
+                type={method.retTypes[0]}
+                value={state.outputs[funcName]}
+              />
+            );
+          }
+        }
 
         return (
           <form
@@ -409,20 +455,9 @@ export default function CandidUI({
                   />
                 )}
               </div>
-              {state.outputs[funcName] ? (
-                <div className="mt-1">
-                  <Output
-                    format={format}
-                    display={outputDisplay}
-                    type={
-                      isPb
-                        ? (method as Method).resolvedResponseType
-                        : (method as IDL.FuncClass).retTypes[0]
-                    }
-                    value={state.outputs[funcName]}
-                  />
-                </div>
-              ) : null}
+              {!!state.outputs[funcName] && (
+                <div className="mt-1">{output}</div>
+              )}
             </div>
           </form>
         );
