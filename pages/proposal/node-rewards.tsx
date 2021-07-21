@@ -118,7 +118,10 @@ export default function NodeRewardsPage() {
         Header: "Date",
         accessor: (d) => d.proposal.decidedDate,
         disableSortBy: true,
-        Cell: ({ value }) => DateTime.fromISO(value).toLocaleString(),
+        Cell: ({ value, row }) =>
+          DateTime.fromISO(
+            value || row.original.proposal.proposalDate
+          ).toLocaleString(),
         className: "pr-2 w-24 text-right hidden sm:block",
       },
     ],
