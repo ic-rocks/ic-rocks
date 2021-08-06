@@ -5,6 +5,8 @@ type TransactionCount = {
   day: string;
   count: number;
   sum: string;
+  burned: string;
+  minted: string;
 };
 
 export default function useTransactionCounts() {

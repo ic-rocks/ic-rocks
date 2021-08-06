@@ -29,10 +29,10 @@ const DataOverTimeChart = ({
     let sum = 0;
     return data
       ?.map((d) => {
-        sum += d[dataKey];
+        sum += Number(d[dataKey]);
         return {
           x: DateTime.fromISO(d.day).toJSDate(),
-          y1: d[dataKey],
+          y1: Number(d[dataKey]),
           y2: sum,
         };
       })
@@ -42,6 +42,7 @@ const DataOverTimeChart = ({
         y2: sum,
       });
   }, [data]);
+  console.log(series);
 
   const height = isFull ? 400 : 250;
 

@@ -2,6 +2,7 @@ import { CurveFactory, curveMonotoneX, curveStepAfter } from "d3";
 import { UseQueryResult } from "react-query";
 import useCanisterCounts from "../../lib/hooks/useCanisterCounts";
 import useNetworkCounts from "../../lib/hooks/useNetworkCounts";
+import useTransactionCounts from "../../lib/hooks/useTransactionCounts";
 
 export type ChartId =
   | "subnets"
@@ -9,7 +10,9 @@ export type ChartId =
   | "operators"
   | "providers"
   | "canisters"
-  | "transactions";
+  | "transactions"
+  | "burned"
+  | "minted";
 
 export type ChartType = {
   id: ChartId;
@@ -68,5 +71,19 @@ export const ChartTypes: ChartType[] = [
   {
     id: "transactions",
     heading: "ICP Transactions over Time",
+  },
+  {
+    id: "burned",
+    hook: useTransactionCounts,
+    heading: "ICP Burned over Time",
+    dataKey: "burned",
+    curve: curveMonotoneX,
+  },
+  {
+    id: "minted",
+    hook: useTransactionCounts,
+    heading: "ICP Minted over Time",
+    dataKey: "minted",
+    curve: curveMonotoneX,
   },
 ];
