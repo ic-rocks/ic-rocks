@@ -1,6 +1,6 @@
 export enum NeuronState {
   Donated = 0,
-  Locked = 1,
+  "Non-Dissolving" = 1,
   Dissolving = 2,
   Dissolved = 3,
 }

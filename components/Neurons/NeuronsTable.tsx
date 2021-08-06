@@ -45,7 +45,7 @@ const NeuronsTable = ({
         Header: "State",
         accessor: "state",
         Cell: ({ value, row }) => <NeuronLabel state={value} />,
-        className: "px-2 w-24",
+        className: "px-2 w-32",
         Filter: SelectColumnFilter,
         filterOptions: [["State...", "" as any]].concat(
           entries(NeuronState).filter(([_, n]) => n > 0)
@@ -55,7 +55,7 @@ const NeuronsTable = ({
         Header: "Proposals",
         accessor: "proposalCount",
         sortDescFirst: true,
-        className: "px-2 hidden sm:block w-28 text-right",
+        className: "px-2 hidden md:block w-28 text-right",
         Filter: SelectColumnFilter,
         filterOptions: [
           ["Proposals...", ""],

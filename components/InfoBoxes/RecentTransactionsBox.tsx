@@ -40,7 +40,9 @@ export default function RecentTransactionsBox() {
         Cell: ({ value, row }) => {
           const sender =
             row.original.type === "MINT" ? (
-              <TransactionTypeLabel type={row.original.type} />
+              <span className="w-16 sm:w-20 md:w-28">
+                <TransactionTypeLabel type={row.original.type} />
+              </span>
             ) : (
               <IdentifierLink
                 className="w-16 sm:w-20 md:w-28"
@@ -51,7 +53,9 @@ export default function RecentTransactionsBox() {
             );
           const receiver =
             row.original.type === "BURN" ? (
-              <TransactionTypeLabel type={row.original.type} />
+              <span className="w-16 sm:w-20 md:w-28">
+                <TransactionTypeLabel type={row.original.type} />
+              </span>
             ) : (
               <IdentifierLink
                 className="w-16 sm:w-20 md:w-28"

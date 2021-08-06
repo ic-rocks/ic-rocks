@@ -79,8 +79,12 @@ const GenesisAccountsStats = () => {
   ];
 
   const statsByNeuronStateRows = useMemo(() => {
-    const order = ["Locked", "Dissolving", "Dissolved"];
-    return order.map((label, i) => {
+    const order = [
+      ["lockedCount", "lockedAmount", "Non-Dissolving"],
+      ["dissolvingCount", "dissolvingAmount", "Dissolving"],
+      ["dissolvedCount", "dissolvedAmount", "Dissolved"],
+    ];
+    return order.map(([countKey, amountKey, label], i) => {
       if (!genesisStats) {
         return [
           {
@@ -88,8 +92,8 @@ const GenesisAccountsStats = () => {
           },
         ];
       }
-      const count = genesisStats.byNeuronState[`${label.toLowerCase()}Count`];
-      const amount = genesisStats.byNeuronState[`${label.toLowerCase()}Amount`];
+      const count = genesisStats.byNeuronState[countKey];
+      const amount = genesisStats.byNeuronState[amountKey];
       return [
         {
           contents: label,

@@ -129,7 +129,7 @@ const GenesisAccount = ({ genesisAccount }: { genesisAccount: string }) => {
       ],
       [
         {
-          contents: "Locked ICP",
+          contents: "Non-Dissolving ICP",
           className: "w-36",
         },
         {

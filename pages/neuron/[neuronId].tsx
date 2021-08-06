@@ -1,5 +1,6 @@
 import { DateTime } from "luxon";
 import React, { useMemo } from "react";
+import { BsInfoCircle } from "react-icons/bs";
 import { useQuery } from "react-query";
 import BalanceLabel from "../../components/Labels/BalanceLabel";
 import IdentifierLink from "../../components/Labels/IdentifierLink";
@@ -78,8 +79,21 @@ const NeuronIdPage = ({
       [
         { contents: "Account", className: "w-32" },
         {
-          contents: data?.accountId ? (
-            <IdentifierLink type="account" id={data.accountId} />
+          contents: data ? (
+            data.accountId ? (
+              <IdentifierLink type="account" id={data.accountId} />
+            ) : (
+              <span className="text-gray-500">
+                Unknown{" "}
+                <span
+                  aria-label="Neuron accounts are not public, and can not always be linked."
+                  data-balloon-pos="down"
+                  data-balloon-length="medium"
+                >
+                  <BsInfoCircle className="ml-1 inline text-xs align-middle" />
+                </span>
+              </span>
+            )
           ) : (
             "-"
           ),
