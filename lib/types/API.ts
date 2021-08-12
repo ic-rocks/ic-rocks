@@ -189,12 +189,13 @@ export type Canister = {
   createdDate: string;
   latestVersionDate: string;
   status: "Running" | "Stopping" | "Stopped";
-  controller: {
-    name: string;
-  } | null;
-  controllerId: string | null;
-  ancestors?: {
+  controllers: {
     id: string;
+    name: string;
+  }[];
+  ancestors?: {
+    child: string;
+    parent: string;
     name: string;
   }[];
   subnet: {

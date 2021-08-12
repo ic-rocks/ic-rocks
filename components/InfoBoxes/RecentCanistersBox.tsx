@@ -4,6 +4,7 @@ import React, { useMemo } from "react";
 import { BsArrowRight } from "react-icons/bs";
 import { useQuery } from "react-query";
 import fetchJSON from "../../lib/fetch";
+import { CanistersResponse } from "../../lib/types/API";
 import IdentifierLink from "../Labels/IdentifierLink";
 import { Table } from "../Tables/Table";
 import InfoBox from "./InfoBox";
@@ -12,7 +13,7 @@ export default function RecentCanistersBox() {
   const {
     data: { rows, count },
     isFetching,
-  } = useQuery(
+  } = useQuery<CanistersResponse>(
     "recent-canisters",
     () =>
       fetchJSON(
@@ -46,12 +47,12 @@ export default function RecentCanistersBox() {
       },
       {
         Header: "Controller",
-        accessor: "controllerId",
+        accessor: "controllers",
         Cell: ({ value, row }) => (
           <IdentifierLink
             type="principal"
             id={value}
-            name={row.original.controller?.name}
+            name={row.original.controllers[0]?.name}
           />
         ),
         className: "px-2 sm:flex flex-1 hidden oneline",

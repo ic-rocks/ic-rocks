@@ -60,22 +60,26 @@ export const CanistersTable = ({
         ],
       },
       !controllerId && {
-        Header: "Controller",
-        accessor: "controllerId",
+        Header: "Controllers",
+        accessor: "controllers",
         disableSortBy: true,
-        Cell: ({ value, row }) => (
-          <IdentifierLink
-            type="principal"
-            id={value}
-            name={row.original.controller?.name}
-          />
-        ),
-        className: "px-2 sm:flex flex-1 hidden oneline",
+        Cell: ({ value, row }) =>
+          value.length <= 2
+            ? value.map(({ id, name }) => (
+                <IdentifierLink
+                  className="flex-1"
+                  type="principal"
+                  id={id}
+                  name={name}
+                />
+              ))
+            : `${value.length} controllers`,
+        className: "px-2 sm:flex gap-1 flex-1 hidden oneline",
         Filter: SelectColumnFilter,
         filterOptions: [
-          ["Controller...", ""],
-          ["Has Controller", "1"],
-          ["No Controller", "0"],
+          ["Controllers...", ""],
+          ["Has Controllers", "1"],
+          ["No Controllers", "0"],
         ],
       },
       !moduleId && {

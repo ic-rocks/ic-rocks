@@ -23,6 +23,14 @@ const didc = import("didc");
 
 const agent = new HttpAgent({ host: "https://ic0.app" });
 
+const cbor = require("borc");
+
+const decoder = new cbor.Decoder({
+  tags: {
+    55799: (val: any) => val,
+  },
+} as any);
+
 export async function getServerSideProps({ params }) {
   const { principalId } = params;
   return { props: { type: getPrincipalType(principalId), principalId } };
@@ -123,12 +131,12 @@ const PrincipalPage = ({
       );
       const pathCommon = [blobFromText("canister"), principal];
       const pathModuleHash = pathCommon.concat(blobFromText("module_hash"));
-      const pathController = pathCommon.concat(blobFromText("controller"));
+      const pathControllers = pathCommon.concat(blobFromText("controllers"));
       const agent = new HttpAgent({ host: "https://ic0.app" });
       let res;
       try {
         res = await agent.readState(principalId, {
-          paths: [pathModuleHash, pathController],
+          paths: [pathModuleHash, pathControllers],
         });
       } catch (error) {
         if (res) {
@@ -151,16 +159,26 @@ const PrincipalPage = ({
         } else {
           console.warn("state: no subnet");
         }
-        const certController = cert.lookup(pathController);
-        if (certController) {
-          const controller = Principal.fromUint8Array(certController).toText();
-          if (canisterData && canisterData.controllerId !== controller) {
+        const certControllers = cert.lookup(pathControllers);
+        if (certControllers) {
+          const certControllerIds = decoder
+            .decodeFirst(certControllers)
+            .map((buf: Buffer) => Principal.fromUint8Array(buf).toText());
+          const certControllersSet = new Set(certControllerIds);
+          const apiControllerIds = canisterData.controllers.map(({ id }) => id);
+
+          if (
+            !(
+              certControllersSet.size === apiControllerIds.length &&
+              apiControllerIds.every((id) => certControllersSet.has(id))
+            )
+          ) {
             console.warn(
-              `controller: api=${canisterData.controllerId} state=${controller}`
+              `controllers: api=${apiControllerIds} state=${certControllerIds}`
             );
           }
         } else {
-          console.warn("state: no controller");
+          console.warn("state: no controllers");
         }
         const moduleHash = cert.lookup(pathModuleHash)?.toString("hex");
         if (moduleHash && canisterData.module?.id !== moduleHash) {
