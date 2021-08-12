@@ -48,13 +48,17 @@ export default function RecentCanistersBox() {
       {
         Header: "Controller",
         accessor: "controllers",
-        Cell: ({ value, row }) => (
-          <IdentifierLink
-            type="principal"
-            id={value}
-            name={row.original.controllers[0]?.name}
-          />
-        ),
+        Cell: ({ value, row }) =>
+          value.length <= 1
+            ? value.map(({ id, name }) => (
+                <IdentifierLink
+                  className="flex-1"
+                  type="principal"
+                  id={id}
+                  name={name}
+                />
+              ))
+            : `${value.length} controllers`,
         className: "px-2 sm:flex flex-1 hidden oneline",
       },
       {

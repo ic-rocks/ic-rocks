@@ -86,8 +86,6 @@ export default function PrincipalDetails({
       : generatedAccounts;
 
   const relationshipGraph: Relationship = useMemo(() => {
-    console.log({ ancestors: canisterData?.ancestors });
-
     if (!canisterData?.ancestors) return null;
     // if (canisterData.ancestors.length <= 1)
     //   return { id: null, name: "No controllers", parents: [] };
@@ -103,7 +101,6 @@ export default function PrincipalDetails({
         nodesById[child].parents.push(nodesById[parent]);
       }
     });
-    console.log({ nodesById });
 
     const parents =
       principalId in nodesById
