@@ -150,7 +150,7 @@ export const CanistersTable = ({
 
   const fetchData = ({ pageSize, pageIndex, sortBy, filters }) => {
     const hasInterfaceFilter = filters.find(({ id }) => id === "hasInterface");
-    const controllerFilter = filters.find(({ id }) => id === "controllerId");
+    const controllerFilter = filters.find(({ id }) => id === "controllers");
     const moduleFilter = filters.find(({ id }) => id === "moduleId");
     const canisterFilter = filters.find(({ id }) => id === "id");
     const subnetFilter = filters.find(({ id }) => id === "subnetId");
