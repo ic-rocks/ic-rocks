@@ -2,9 +2,8 @@ import classNames from "classnames";
 import { DateTime } from "luxon";
 import Link from "next/link";
 import React, { useMemo } from "react";
-import { Query, useQuery, useQueryClient } from "react-query";
+import { useQuery } from "react-query";
 import BalanceLabel from "../components/Labels/BalanceLabel";
-import NeuronsTable from "../components/Neurons/NeuronsTable";
 import SimpleTable from "../components/Tables/SimpleTable";
 import { groupBy } from "../lib/arrays";
 import { formatDuration } from "../lib/datetime";
@@ -16,6 +15,8 @@ import {
   NeuronsResponse,
 } from "../lib/types/API";
 import IdentifierLink from "./Labels/IdentifierLink";
+import { neuronsTableColumns } from "./Neurons/NeuronsTable";
+import { Table } from "./Tables/Table";
 
 const GenesisAccount = ({ genesisAccount }: { genesisAccount: string }) => {
   const { data, isFetching } = useQuery(
@@ -27,17 +28,20 @@ const GenesisAccount = ({ genesisAccount }: { genesisAccount: string }) => {
     }
   );
 
-  const queryClient = useQueryClient();
-  const queryCache = queryClient.getQueryCache();
-  const query = queryCache.findAll([
-    "genesis.neurons",
-    genesisAccount,
-  ])[0] as Query<NeuronsResponse>;
+  const { data: neurons, isFetching: isNeuronsFetching } =
+    useQuery<NeuronsResponse>(
+      ["genesis.neurons", genesisAccount],
+      () => {
+        return fetchJSON(`/api/neurons/genesis/${genesisAccount}`);
+      },
+      { placeholderData: { rows: [], count: 0 }, staleTime: Infinity }
+    );
 
   const summaryRows = useMemo(() => {
     let stats;
-    if (query?.state.data) {
-      const groups = groupBy(query.state.data.rows, "state");
+
+    if (neurons.rows.length > 0) {
+      const groups = groupBy(neurons.rows, "state");
       stats = ["1", "2", "3"].map((k) => {
         const [amount, sumTime] = (groups[k] || []).reduce(
           ([amt, ts]: [bigint, number], curr) => [
@@ -212,7 +216,7 @@ const GenesisAccount = ({ genesisAccount }: { genesisAccount: string }) => {
         },
       ],
     ];
-  }, [data, query]);
+  }, [data, neurons]);
 
   return (
     <>
@@ -225,9 +229,20 @@ const GenesisAccount = ({ genesisAccount }: { genesisAccount: string }) => {
           rows={summaryRows}
         />
       </section>
-      {genesisAccount && (
-        <NeuronsTable genesisAccount={genesisAccount} name="genesis" />
-      )}
+      <Table
+        columns={neuronsTableColumns}
+        data={neurons?.rows}
+        count={neurons?.count}
+        name="genesis.neurons"
+        style={{ minWidth: 480 }}
+        className="text-xs sm:text-base"
+        loading={isNeuronsFetching}
+        initialSortBy={[{ id: "dissolveDate", desc: false }]}
+        manualSortBy={false}
+        initialPageSize={50}
+        useFilter={true}
+        persistState={true}
+      />
     </>
   );
 };

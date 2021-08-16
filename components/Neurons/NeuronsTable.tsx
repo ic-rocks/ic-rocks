@@ -10,112 +10,92 @@ import { DataTable } from "../Tables/DataTable";
 import { SelectColumnFilter } from "../Tables/Table";
 import { NeuronLabel } from "./NeuronLabel";
 
-const NeuronsTable = ({
-  name,
-  genesisAccount,
-}: {
-  name: string;
-  genesisAccount?: string;
-}) => {
-  const columns = useMemo(
-    () => [
-      {
-        Header: "ID",
-        accessor: "id",
-        className: "px-2 flex-1 oneline",
-        Cell: ({ value, row }) => (
-          <>
-            <Link href={`/neuron/${value}`}>
-              <a className="link-overflow" title={row.original.name}>
-                {value}
-                {row.original.name && ` (${row.original.name})`}
-              </a>
-            </Link>
-          </>
-        ),
-        style: { minWidth: "4rem" },
-        Filter: SelectColumnFilter,
-        filterOptions: [
-          ["Genesis...", ""],
-          ["Is Genesis", "1"],
-          ["Is not Genesis", "0"],
-        ],
-      },
-      {
-        Header: "State",
-        accessor: "state",
-        Cell: ({ value, row }) => <NeuronLabel state={value} />,
-        className: "px-2 w-32",
-        Filter: SelectColumnFilter,
-        filterOptions: [["State...", "" as any]].concat(
-          entries(NeuronState).filter(([_, n]) => n > 0)
-        ),
-      },
-      {
-        Header: "Proposals",
-        accessor: "proposalCount",
-        sortDescFirst: true,
-        className: "px-2 hidden md:block w-28 text-right",
-        Filter: SelectColumnFilter,
-        filterOptions: [
-          ["Proposals...", ""],
-          ["Has Proposals", "1"],
-          ["No Proposals", "0"],
-        ],
-      },
-      {
-        Header: "Account",
-        accessor: "accountId",
-        Cell: ({ value, row }) =>
-          value ? (
-            <IdentifierLink type="account" id={value} />
-          ) : (
-            <span className="text-gray-500">Unknown</span>
-          ),
-        className: "px-2 flex-1 flex oneline",
-        style: { minWidth: "6rem" },
-      },
-      {
-        Header: "Staked ICP",
-        accessor: "stake",
-        sortDescFirst: true,
-        disableSortBy: !!genesisAccount,
-        Cell: ({ value, row }) => (
-          <BalanceLabel
-            value={
-              row.original.account &&
-              row.original.state === NeuronState.Dissolved
-                ? row.original.account.balance
-                : value
-            }
-          />
-        ),
-        className: "px-2 w-40 text-right",
-      },
-      {
-        Header: "Dissolve Date",
-        accessor: "dissolveDate",
-        Cell: ({ value, row }) => {
-          if (row.original.state === NeuronState.Dissolved) return "-";
-          const date = DateTime.fromISO(value);
-          return date.diffNow().toMillis() < 0
-            ? "Dissolvable"
-            : date.toRelative();
-        },
-        className: "px-2 w-36 text-right",
-      },
+export const neuronsTableColumns = [
+  {
+    Header: "ID",
+    accessor: "id",
+    className: "px-2 flex-1 oneline",
+    Cell: ({ value, row }) => (
+      <>
+        <Link href={`/neuron/${value}`}>
+          <a className="link-overflow" title={row.original.name}>
+            {value}
+            {row.original.name && ` (${row.original.name})`}
+          </a>
+        </Link>
+      </>
+    ),
+    style: { minWidth: "4rem" },
+    Filter: SelectColumnFilter,
+    filterOptions: [
+      ["Genesis...", ""],
+      ["Is Genesis", "1"],
+      ["Is not Genesis", "0"],
     ],
-    []
-  );
+  },
+  {
+    Header: "State",
+    accessor: "state",
+    Cell: ({ value, row }) => <NeuronLabel state={value} />,
+    className: "px-2 w-32",
+    Filter: SelectColumnFilter,
+    filterOptions: [["State...", "" as any]].concat(
+      entries(NeuronState).filter(([_, n]) => n > 0)
+    ),
+  },
+  {
+    Header: "Proposals",
+    accessor: "proposalCount",
+    sortDescFirst: true,
+    className: "px-2 hidden md:block w-28 text-right",
+    Filter: SelectColumnFilter,
+    filterOptions: [
+      ["Proposals...", ""],
+      ["Has Proposals", "1"],
+      ["No Proposals", "0"],
+    ],
+  },
+  {
+    Header: "Account",
+    accessor: "accountId",
+    Cell: ({ value, row }) =>
+      value ? (
+        <IdentifierLink type="account" id={value} />
+      ) : (
+        <span className="text-gray-500">Unknown</span>
+      ),
+    className: "px-2 flex-1 flex oneline",
+    style: { minWidth: "6rem" },
+  },
+  {
+    Header: "Staked ICP",
+    accessor: "stake",
+    sortDescFirst: true,
+    Cell: ({ value, row }) => (
+      <BalanceLabel
+        value={
+          row.original.account && row.original.state === NeuronState.Dissolved
+            ? row.original.account.balance
+            : value
+        }
+      />
+    ),
+    className: "px-2 w-40 text-right",
+  },
+  {
+    Header: "Dissolve Date",
+    accessor: "dissolveDate",
+    Cell: ({ value, row }) => {
+      if (row.original.state === NeuronState.Dissolved) return "-";
+      const date = DateTime.fromISO(value);
+      return date.diffNow().toMillis() < 0 ? "Dissolvable" : date.toRelative();
+    },
+    className: "px-2 w-36 text-right",
+  },
+];
 
-  const initialSort = useMemo(
-    () => [
-      genesisAccount
-        ? { id: "dissolveDate", desc: false }
-        : { id: "stake", desc: true },
-    ],
-    []
-  );
+const NeuronsTable = ({ name }: { name: string }) => {
+  const initialSort = useMemo(() => [{ id: "stake", desc: true }], []);
 
   const fetchData = ({ pageSize, pageIndex, sortBy, filters }) => {
     const stateFilter = filters.find(({ id }) => id === "state");
@@ -124,7 +104,6 @@ const NeuronsTable = ({
     return fetchJSON(
       "/api/neurons?" +
         new URLSearchParams({
-          ...(genesisAccount ? { genesisAccount } : {}),
           ...(sortBy.length > 0
             ? {
                 orderBy: sortBy[0].id,
@@ -143,15 +122,13 @@ const NeuronsTable = ({
   return (
     <DataTable
       name={`${name}.neurons`}
-      extraQueryParams={genesisAccount}
-      persistState={!genesisAccount}
+      persistState={true}
       style={{ minWidth: 480 }}
       className="text-xs sm:text-base"
-      columns={columns}
+      columns={neuronsTableColumns}
       fetchData={fetchData}
       initialSortBy={initialSort}
       useExpand={true}
-      initialPageSize={genesisAccount ? 50 : undefined}
       useFilter={true}
     />
   );

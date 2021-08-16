@@ -70,6 +70,7 @@ export type CommonTableProps = {
   tableHeaderGroupProps?: any;
   columns: Column<any>[];
   useSort?: boolean;
+  /** If true, we pass in pre-sorted data */
   manualSortBy?: boolean;
   initialSortBy?: SortingRule<any>[];
   usePage?: boolean;
@@ -78,6 +79,7 @@ export type CommonTableProps = {
   useExpand?: boolean;
   useFilter?: boolean;
   manualFilters?: boolean;
+  /** If true, the table's filter and sort state will be saved in localstorage and restored on load */
   persistState?: boolean;
 };
 
