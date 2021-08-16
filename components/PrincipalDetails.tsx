@@ -23,6 +23,100 @@ type Relationship = {
   parents: Relationship[];
 };
 
+const RelationshipGraph = ({
+  principalId,
+  principalData,
+  canisterData,
+}: {
+  principalId: string;
+  principalData?: APIPrincipal;
+  canisterData: Canister;
+}) => {
+  const relationshipGraph: Relationship = useMemo(() => {
+    if (!canisterData?.ancestors) return null;
+    const nodesById = {};
+    canisterData.ancestors.forEach(({ child, parent, name }) => {
+      if (child) {
+        if (!nodesById[child]) {
+          nodesById[child] = { id: child, parents: [], name: "" };
+        }
+        if (!nodesById[parent]) {
+          nodesById[parent] = { id: parent, parents: [], name };
+        }
+        nodesById[child].parents.push(nodesById[parent]);
+      }
+    });
+
+    const parents =
+      principalId in nodesById
+        ? `${nodesById[principalId].parents.length} ${pluralize(
+            "controller",
+            nodesById[principalId].parents.length
+          )}`
+        : "No controllers";
+
+    if (!(principalId in nodesById)) {
+      nodesById[principalId] = {};
+    }
+    nodesById[principalId].name = `This canister${
+      principalData?.name ? ` (${principalData.name})` : ""
+    } (${parents})`;
+    const root: Relationship =
+      principalData?.canisterCount > 0
+        ? {
+            id: null,
+            name: `${principalData.canisterCount} controlled`,
+            parents: [nodesById[principalId]],
+          }
+        : nodesById[principalId];
+
+    return root;
+  }, [principalData, canisterData]);
+
+  const rendered = {};
+
+  const render = (node: Relationship, isRoot = false) => {
+    rendered[node.id] = true;
+
+    return (
+      <>
+        <div className="flex items-center">
+          {!isRoot && (
+            <FaCaretRight className="text-gray-500 pointer-events-none" />
+          )}
+          {node.id ? (
+            <IdentifierLink
+              type="principal"
+              id={node.id}
+              name={node.name}
+              isLink={node.id !== principalId}
+            />
+          ) : (
+            node.name
+          )}
+        </div>
+        {node.parents?.map((parent, i) => {
+          if (rendered[parent.id]) {
+            return;
+          }
+          return (
+            <div
+              key={parent.id}
+              className={classNames({
+                "pl-3": !isRoot,
+              })}
+            >
+              {render(parent, false)}
+            </div>
+          );
+        })}
+      </>
+    );
+  };
+
+  return render(relationshipGraph, true);
+};
+
 export default function PrincipalDetails({
   className,
   principalId,
@@ -84,79 +178,6 @@ export default function PrincipalDetails({
     principalData?.accounts && principalData.accounts.length > 0
       ? principalData.accounts
       : generatedAccounts;
-
-  const relationshipGraph: Relationship = useMemo(() => {
-    if (!canisterData?.ancestors) return null;
-    // if (canisterData.ancestors.length <= 1)
-    //   return { id: null, name: "No controllers", parents: [] };
-    const nodesById = {};
-    canisterData.ancestors.forEach(({ child, parent, name }) => {
-      if (child) {
-        if (!nodesById[child]) {
-          nodesById[child] = { id: child, parents: [], name: "" };
-        }
-        if (!nodesById[parent]) {
-          nodesById[parent] = { id: parent, parents: [], name };
-        }
-        nodesById[child].parents.push(nodesById[parent]);
-      }
-    });
-
-    const parents =
-      principalId in nodesById
-        ? `${nodesById[principalId].parents.length} ${pluralize(
-            "controller",
-            nodesById[principalId].parents.length
-          )}`
-        : "No controllers";
-
-    if (!(principalId in nodesById)) {
-      nodesById[principalId] = {};
-    }
-    nodesById[principalId].name = `This canister${
-      principalData?.name ? ` (${principalData.name})` : ""
-    } (${parents})`;
-    const root: Relationship =
-      principalData?.canisterCount > 0
-        ? {
-            id: null,
-            name: `${principalData.canisterCount} controlled`,
-            parents: [nodesById[principalId]],
-          }
-        : nodesById[principalId];
-
-    return root;
-  }, [principalData, canisterData]);
-
-  const renderRelationshipGraph = (node: Relationship, isRoot = false) => (
-    <>
-      <div className="flex items-center">
-        {!isRoot && (
-          <FaCaretRight className="text-gray-500 pointer-events-none" />
-        )}
-        {node.id ? (
-          <IdentifierLink
-            type="principal"
-            id={node.id}
-            name={node.name}
-            isLink={node.id !== principalId}
-          />
-        ) : (
-          node.name
-        )}
-      </div>
-      {node.parents?.map((parent, i) => (
-        <div
-          key={parent.id}
-          className={classNames({
-            "pl-3": !isRoot,
-          })}
-        >
-          {renderRelationshipGraph(parent, false)}
-        </div>
-      ))}
-    </>
-  );
 
   return (
     <div className={className}>
@@ -336,8 +357,13 @@ export default function PrincipalDetails({
               <tr className="flex">
                 <td className="px-2 py-2 w-24 sm:w-44">Controller Tree</td>
                 <td className="px-2 py-2 flex-1 leading-tight text-xs">
-                  {relationshipGraph &&
-                    renderRelationshipGraph(relationshipGraph, true)}
+                  {canisterData && (
+                    <RelationshipGraph
+                      principalId={principalId}
+                      principalData={principalData}
+                      canisterData={canisterData}
+                    />
+                  )}
                 </td>
               </tr>
             </>
