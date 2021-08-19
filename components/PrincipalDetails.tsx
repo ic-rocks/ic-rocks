@@ -248,7 +248,9 @@ export default function PrincipalDetails({
           <tr className="flex">
             <td className="px-2 py-2 w-24 sm:w-44">Name</td>
             <td className="px-2 py-2 flex-1 flex items-center gap-2">
-              {principalData?.name || (!tags[0]?.label ? "-" : null)}
+              {principalData?.publicTags[0]
+                ? principalData?.publicTags[0].label
+                : principalData?.name || (!tags[0]?.label ? "-" : null)}
               {tags.map((tag, i) => (
                 <TaggedLabel key={i} label={tag.label} />
               ))}

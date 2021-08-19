@@ -114,7 +114,14 @@ const PrincipalPage = ({
       try {
         const foundCandid =
           (await actor.__get_candid_interface_tmp_hack()) as string;
-        setCandidAndBindings(foundCandid);
+        console.log("candid loaded from endpoint");
+        if (candid && foundCandid.trim() !== candid.trim()) {
+          console.log("candid from endpoint is different from state!");
+          console.log("endpoint", foundCandid);
+          console.log("state", candid);
+
+          setCandidAndBindings(foundCandid);
+        }
       } catch (error) {
         console.warn("no candid found");
       }
@@ -203,6 +210,7 @@ const PrincipalPage = ({
             return res.text();
           })
           .then((data) => {
+            console.log("candid loaded from file");
             setCandidAndBindings(data);
           })
           .catch((e) => {});
@@ -223,6 +231,7 @@ const PrincipalPage = ({
 
     /** If candid isn't available, try to fetch from local */
     if (canisterData.module?.candid) {
+      console.log("candid in api");
       setCandidAndBindings(canisterData.module.candid);
     } else {
       fetchLocalFiles();

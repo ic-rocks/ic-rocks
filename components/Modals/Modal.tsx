@@ -9,7 +9,7 @@ export default function Modal({ isOpen, openModal, closeModal, children }) {
     <Transition appear show={isOpen} as={Fragment}>
       <Dialog
         as="div"
-        className="fixed inset-0 z-10 overflow-y-auto backdrop-filter backdrop-brightness-50"
+        className="fixed inset-0 z-10 overflow-y-auto"
         onClose={closeModal}
         initialFocus={cancelButtonRef}
       >
@@ -23,7 +23,7 @@ export default function Modal({ isOpen, openModal, closeModal, children }) {
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <Dialog.Overlay className="fixed inset-0" />
+            <Dialog.Overlay className="fixed inset-0 backdrop-filter backdrop-brightness-50" />
           </Transition.Child>
 
           {/* This element is to trick the browser into centering the modal contents. */}
