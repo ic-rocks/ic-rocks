@@ -27,7 +27,6 @@ const NeuronsStats = () => {
   const headers = [
     { contents: "Neuron Status", className: "w-32" },
     { contents: "Count", className: "w-24 text-right hidden xs:block" },
-    { contents: "Controllers", className: "w-28 text-right hidden sm:block" },
     { contents: "Total ICP", className: "w-48 text-right" },
     { contents: "Supply %", className: "w-28 text-right hidden xs:block" },
   ];
@@ -41,10 +40,6 @@ const NeuronsStats = () => {
         {
           contents: formatNumber(row.count),
           className: "w-24 text-right hidden xs:block",
-        },
-        {
-          contents: formatNumber(row.controllers),
-          className: "w-28 text-right hidden sm:block",
         },
         {
           contents: <BalanceLabel value={row.stake} />,
