@@ -123,9 +123,11 @@ const NeuronIdPage = ({
           contents: data?.agingSinceDate ? (
             <>
               <TimestampLabel dt={agingSinceDate} />
-              <span className="ml-4 text-green-500">
-                +{formatPercent(ageBonus)} vote power
-              </span>
+              {!!data.votingPower && (
+                <span className="ml-4 text-green-500">
+                  +{formatPercent(ageBonus)} vote power
+                </span>
+              )}
             </>
           ) : (
             "-"
@@ -144,9 +146,11 @@ const NeuronIdPage = ({
             ) : (
               <>
                 <TimestampLabel dt={dissolveDate} />
-                <span className="ml-4 text-green-500">
-                  +{formatPercent(dissolveBonus)} vote power
-                </span>
+                {!!data.votingPower && (
+                  <span className="ml-4 text-green-500">
+                    +{formatPercent(dissolveBonus)} vote power
+                  </span>
+                )}
               </>
             )
           ) : (
