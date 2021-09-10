@@ -56,14 +56,20 @@ const PrincipalPage = ({
   const [protobuf, setProtobuf] = useState("");
 
   const setCandidAndBindings = (newCandid: string) => {
+    if (newCandid === candid) {
+      return;
+    }
+
     setCandid(newCandid);
     if (newCandid) {
       didc.then((mod) => {
         const gen = mod.generate(newCandid);
-        if (!gen) {
+        if (gen) {
+          setBindings(gen);
+        } else {
           console.warn("failed to generate bindings");
+          console.log(newCandid);
         }
-        setBindings(gen);
       });
     } else {
       setBindings(null);
@@ -115,12 +121,11 @@ const PrincipalPage = ({
         const foundCandid =
           (await actor.__get_candid_interface_tmp_hack()) as string;
         console.log("candid loaded from endpoint");
+        setCandidAndBindings(foundCandid);
         if (candid && foundCandid.trim() !== candid.trim()) {
           console.log("candid from endpoint is different from state!");
           console.log("endpoint", foundCandid);
           console.log("state", candid);
-
-          setCandidAndBindings(foundCandid);
         }
       } catch (error) {
         console.warn("no candid found");
