@@ -295,7 +295,7 @@ export default function CandidUI({
           <a
             className="hover:underline text-blue-600 flex items-center text-xs"
             href={`${CANDID_UI_URL}?id=${canisterId}&did=${encodeURIComponent(
-              window.btoa(candid)
+              window.btoa(candid.replace(/[^\x00-\x7F]+/g, ""))
             )}`}
             target="_blank"
           >
