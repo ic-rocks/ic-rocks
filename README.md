@@ -1,19 +1,26 @@
-# ic-tools
+# ic-rocks
 
-A collection of tools for the DFINITY Internet Computer.
+UI for [ic.rocks](https://ic.rocks).
 
-## Develop
+Uses [Next.js](https://nextjs.org/docs), [react-query](https://react-query.tanstack.com/), and [tailwind](https://tailwindcss.com/).
+
+## Environment Variables
+
+Create a `.env` file:
+
+```
+//API_ENDPOINT = http://localhost:3001 // If specified, will override the default API endpoint.
+```
+
+## Development
 
 ```bash
-# Generate system data before first run
-npm run sync
-
 npm run dev
 ```
 
-## Build
+## Building and Running
 
 ```bash
 npm run build
-npm run export
+npm start
 ```
