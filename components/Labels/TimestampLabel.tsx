@@ -1,6 +1,9 @@
-import { DateTime } from "luxon";
+import { DateTime, Duration } from "luxon";
 import React from "react";
 
+let duration = (d:Duration) =>{
+  console.log(d.years)
+}
 export function TimestampLabel({ dt }: { dt: DateTime }) {
   return (
     <>
@@ -8,7 +11,7 @@ export function TimestampLabel({ dt }: { dt: DateTime }) {
         ...DateTime.DATETIME_FULL_WITH_SECONDS,
         hour12: false,
       })}{" "}
-      ({dt.toRelative()})
+      ({dt.toRelativeCalendar()})
     </>
   );
 }
