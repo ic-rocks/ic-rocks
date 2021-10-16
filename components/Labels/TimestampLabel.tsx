@@ -1,9 +1,6 @@
-import { DateTime, Duration } from "luxon";
+import { DateTime } from "luxon";
 import React from "react";
 
-let duration = (d:Duration) =>{
-  console.log(d.years)
-}
 export function TimestampLabel({ dt }: { dt: DateTime }) {
   return (
     <>
