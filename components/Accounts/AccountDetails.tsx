@@ -90,7 +90,7 @@ const AccountDetails = ({ accountId }: { accountId: string }) => {
             data.neuron.state === NeuronState["Non-Dissolving"]
               ? "dissolvable "
               : ""
-          }${date.toRelative()}`;
+          }${date.toRelativeCalendar()}`;
   }
 
   return (
