@@ -2,9 +2,12 @@ import { DateTime } from "luxon";
 import React, { useMemo } from "react";
 import { formatNumber } from "../../lib/numbers";
 import LineBarChart from "../Charts/LineBarChart";
+import LineChart from "../Charts/LineChart";
 import { ChartId, ChartTypes } from "./ChartIds";
 import { ChartContainer } from "./ChartContainer";
 import TransactionsOverTimeChart from "./TransactionsOverTimeChart";
+
+type Series = { x: Date; y1: number; y2: number };
 
 const DataOverTimeChart = ({
   chartId,
@@ -14,7 +17,7 @@ const DataOverTimeChart = ({
   isFull?: boolean;
 }) => {
   const { hook, dataKey, heading, curve } = ChartTypes.find(
-    ({ id }) => id === chartId
+    ({ id }) => id === chartId,
   );
 
   if (chartId === "transactions") {
@@ -23,7 +26,7 @@ const DataOverTimeChart = ({
 
   const { data } = hook();
 
-  const series = useMemo(() => {
+  const series: Series[] = useMemo(() => {
     let sum = 0;
     return data
       ?.map((d) => {
@@ -43,7 +46,22 @@ const DataOverTimeChart = ({
 
   const height = isFull ? 400 : 250;
 
-  return (
+  if (chartId === "cycles-minted") {
+    return (
+      <ChartContainer
+        chartId={chartId}
+        isFull={isFull}
+        heading={heading}
+        dataKey={dataKey}
+        isLoading={!data}
+      >
+        <LineChart
+          height={height}
+          data={series?.map((d) => ({ x: d.x, y: d.y2 }))}
+        />
+      </ChartContainer>
+    );
+  }
   return (
     <ChartContainer
       chartId={chartId}

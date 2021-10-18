@@ -3,6 +3,7 @@ import { DateTime } from "luxon";
 import React, { useEffect, useRef } from "react";
 import useMeasure from "react-use-measure";
 import { formatNumber, formatNumberShortScale } from "../../lib/numbers";
+import WaterMark from "./WaterMark";
 
 const bisect = d3.bisector((d: { x: Date }) => d.x).center;
 
@@ -195,6 +196,7 @@ const LineChart = ({
           </div>
         </div>
       )}
+      <WaterMark />
       <svg width={width} height={height} ref={svgRef} />
     </div>
   ) : (
