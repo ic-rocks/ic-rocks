@@ -88,7 +88,7 @@ export const neuronsTableColumns = [
     Cell: ({ value, row }) => {
       if (row.original.state === NeuronState.Dissolved) return "-";
       const date = DateTime.fromISO(value);
-      return date.diffNow().toMillis() < 0 ? "Dissolvable" : date.toRelative();
+      return date.diffNow().toMillis() < 0 ? "Dissolvable" : date.toRelativeCalendar();
     },
     className: "px-2 w-36 text-right",
   },

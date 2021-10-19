@@ -219,7 +219,7 @@ const GenesisAccountsPage = () => {
           const date = DateTime.fromISO(value);
           return date.diffNow().toMillis() < 0
             ? "Dissolvable"
-            : date.toRelative();
+            : date.toRelativeCalendar();
         },
         className: "px-2 w-32 sm:w-48 text-right",
       },

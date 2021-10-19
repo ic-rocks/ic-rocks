@@ -8,7 +8,7 @@ export function TimestampLabel({ dt }: { dt: DateTime }) {
         ...DateTime.DATETIME_FULL_WITH_SECONDS,
         hour12: false,
       })}{" "}
-      ({dt.toRelative()})
+      ({dt.toRelativeCalendar()})
     </>
   );
 }
