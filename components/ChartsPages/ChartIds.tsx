@@ -3,6 +3,7 @@ import { UseQueryResult } from "react-query";
 import useCanisterCounts from "../../lib/hooks/useCanisterCounts";
 import useMintedCycles from "../../lib/hooks/useMintedCycles";
 import useNetworkCounts from "../../lib/hooks/useNetworkCounts";
+import useSubnets from "../../lib/hooks/useSubnets";
 import useTransactionCounts from "../../lib/hooks/useTransactionCounts";
 
 export type ChartId =
@@ -14,7 +15,8 @@ export type ChartId =
   | "transactions"
   | "icp-burned"
   | "icp-minted"
-  | "cycles-minted";
+  | "cycles-minted"
+  | "canisters-per-subnet";
 
 export type ChartType = {
   id: ChartId;
@@ -94,5 +96,11 @@ export const ChartTypes: ChartType[] = [
     heading: "Cycles Minted over Time",
     dataKey: "minted",
     curve: curveMonotoneX,
+  },
+  {
+    id: "canisters-per-subnet",
+    hook: useSubnets,
+    heading: "Canisters per subnet",
+    dataKey: "value",
   },
 ];
