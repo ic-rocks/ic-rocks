@@ -6,6 +6,8 @@ import LineChart from "../Charts/LineChart";
 import { ChartId, ChartTypes } from "./ChartIds";
 import { ChartContainer } from "./ChartContainer";
 import TransactionsOverTimeChart from "./TransactionsOverTimeChart";
+import { SubnetResponse } from "../../lib/types/API";
+import DonutChart, { DonutSeries } from "../Charts/DonutChart";
 
 type Series = { x: Date; y1: number; y2: number };
 
@@ -20,11 +22,39 @@ const DataOverTimeChart = ({
     ({ id }) => id === chartId,
   );
 
+  const height = isFull ? 400 : 250;
+
   if (chartId === "transactions") {
     return <TransactionsOverTimeChart heading={heading} isFull={isFull} />;
   }
 
   const { data } = hook();
+
+  const donutChartSeries: DonutSeries[] = useMemo(() => {
+    if (chartId === "canisters-per-subnet")
+      return (data as SubnetResponse[])
+        ?.map(({ id, canisterCount, subnetType, nodeCount }) => ({
+          name: id && `${id.slice(0, 5)}`,
+          value: canisterCount,
+          subnetType,
+          nodeCount,
+        }))
+        .sort((a, b) => b.value - a.value);
+  }, [data]);
+
+  if (chartId === "canisters-per-subnet") {
+    return (
+      <ChartContainer
+        isFull={isFull}
+        chartId={chartId}
+        heading={heading}
+        dataKey={dataKey}
+        isLoading={!data}
+      >
+        <DonutChart isFull={isFull} data={donutChartSeries} />
+      </ChartContainer>
+    );
+  }
 
   const series: Series[] = useMemo(() => {
     let sum = 0;
@@ -43,8 +73,6 @@ const DataOverTimeChart = ({
         y2: sum,
       });
   }, [data]);
-
-  const height = isFull ? 400 : 250;
 
   if (chartId === "cycles-minted") {
     return (
