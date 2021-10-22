@@ -1,3 +1,4 @@
+import Link from "next/link";
 import React from "react";
 import {
   PieChart,
@@ -7,6 +8,7 @@ import {
   Sector,
   PieLabelRenderProps,
 } from "recharts";
+import { pluralize } from "../../lib/strings";
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
@@ -44,7 +46,7 @@ const renderCustomizedLabel = ({
           <text fill="white" fontSize="30px" x={cx} y={cy} dy={8}>
             {subnetCount}
           </text>
-          <text fill="#333" fontSize="20px" x={cx} y={cy} dy={30}>
+          <text fill="#777" fontSize="20px" x={cx} y={cy} dy={30}>
             subnets
           </text>
         </g>
@@ -78,16 +80,20 @@ const renderActiveShape = (props) => {
 
   return (
     <g>
-      <text
-        fontSize="40px"
-        x={cx}
-        y={cy}
-        dy={8}
-        textAnchor="middle"
-        fill={fill}
-      >
-        {payload.name}
-      </text>
+      <Link href={`/subnet/${payload.name}`}>
+        <text
+          fontSize="40px"
+          x={cx}
+          y={cy}
+          dy={8}
+          textAnchor="middle"
+          fill={fill}
+        >
+          <a className="link-overflow inline-flex cursor-pointer">
+            {payload.name.slice(0, 5)}
+          </a>
+        </text>
+      </Link>
       <text
         fontSize="20px"
         x={cx}
@@ -126,8 +132,10 @@ const renderActiveShape = (props) => {
         x={ex + (cos >= 0 ? 1 : -1) * 12}
         y={ey}
         textAnchor={textAnchor}
-        fill="#333"
-      >{`${value} canister`}</text>
+        fill="#777"
+      >
+        {pluralize(`${value} canister`, value)}
+      </text>
       <text
         x={ex + (cos >= 0 ? 1 : -1) * 12}
         y={ey}
@@ -135,7 +143,7 @@ const renderActiveShape = (props) => {
         textAnchor={textAnchor}
         fill="#999"
       >
-        {`${payload.nodeCount} Nodes`}
+        {pluralize(`${payload.nodeCount} Node`, payload.nodeCount)}
       </text>
     </g>
   );

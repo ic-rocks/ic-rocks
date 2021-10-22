@@ -34,7 +34,7 @@ const DataOverTimeChart = ({
     if (chartId === "canisters-per-subnet")
       return (data as SubnetResponse[])
         ?.map(({ id, canisterCount, subnetType, nodeCount }) => ({
-          name: id && `${id.slice(0, 5)}`,
+          name: id,
           value: canisterCount,
           subnetType,
           nodeCount,
