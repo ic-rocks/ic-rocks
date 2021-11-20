@@ -137,7 +137,7 @@ const NeuronAllocationsPage = () => {
         description={`Overview of initial neuron allocations on the Internet Computer.`}
       />
       <NeuronNav />
-      <h1 className="text-3xl my-8 overflow-hidden overflow-ellipsis">
+      <h1 className="overflow-hidden my-8 text-3xl overflow-ellipsis">
         Initial Neuron Allocations
       </h1>
 

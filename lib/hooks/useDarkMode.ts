@@ -5,6 +5,7 @@ export const useDarkMode = () => {
     return { value: null } as DarkMode;
   }
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   return useDarkModeDefault(undefined, {
     classNameDark: "dark",
     classNameLight: "light",

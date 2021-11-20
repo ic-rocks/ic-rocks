@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 const { API_ENDPOINT } = require("./config");
 
 console.log("API_ENDPOINT:", API_ENDPOINT);

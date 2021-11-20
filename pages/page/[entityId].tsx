@@ -10,7 +10,9 @@ export async function getServerSideProps({ params }) {
   let data;
   try {
     data = await fetchJSON(`${API_ENDPOINT}/entities/${params.entityId}`);
-  } catch (error) {}
+  } catch (error) {
+    // Do nothing
+  }
   if (!data) {
     return {
       notFound: true,
@@ -29,7 +31,12 @@ const EntityPage = (data: Entity) => {
         { contents: "URL", className: "w-32" },
         {
           contents: data.url ? (
-            <a href={data.url} target="_blank" className="link-overflow">
+            <a
+              href={data.url}
+              target="_blank"
+              className="link-overflow"
+              rel="noreferrer"
+            >
               {data.url}
             </a>
           ) : (
@@ -77,8 +84,8 @@ const EntityPage = (data: Entity) => {
         title={data.name}
         description={`Details for ${data.name} on the Internet Computer ledger.`}
       />
-      <h1 className="text-3xl my-8 overflow-hidden overflow-ellipsis flex items-center">
-        {data.imageUrl && <img src={data.imageUrl} className="w-8 mr-2" />}
+      <h1 className="flex overflow-hidden items-center my-8 text-3xl overflow-ellipsis">
+        {data.imageUrl && <img src={data.imageUrl} className="mr-2 w-8" />}
         {data.name}
       </h1>
       <section className="mb-8">

@@ -58,10 +58,10 @@ const Network = () => {
         title={title}
         description="An overview of the Internet Computer network. View subnets, nodes, operators, and providers."
       />
-      <h1 className="text-3xl my-8">{title}</h1>
+      <h1 className="my-8 text-3xl">{title}</h1>
       <NetworkGraph />
       <section className="pt-8">
-        <h2 className="text-2xl mb-4">
+        <h2 className="mb-4 text-2xl">
           {isFetching ? "⁠—" : data.length} Subnets
         </h2>
         <Table

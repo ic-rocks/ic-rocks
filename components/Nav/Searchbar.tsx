@@ -1,6 +1,6 @@
 import { Principal } from "@dfinity/principal";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import React, { useState } from "react";
 import { isAccount, isAccountOrTransaction, isHex } from "../../lib/strings";
 
 export default function SearchBar() {
@@ -32,11 +32,11 @@ export default function SearchBar() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex-1 flex">
+    <form onSubmit={handleSubmit} className="flex flex-1">
       <input
         type="text"
         name="search"
-        className="px-2 py-1 bg-gray-200 dark:bg-gray-800 focus:outline-none focus:border border-black dark:border-gray-200 rounded font-sm flex-1"
+        className="flex-1 py-1 px-2 bg-gray-200 dark:bg-gray-800 rounded focus:border border-black dark:border-gray-200 focus:outline-none"
         placeholder="Search for principal, account, tx, neuron"
         value={input}
         onChange={handleChange}

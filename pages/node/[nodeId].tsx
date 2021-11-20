@@ -37,7 +37,7 @@ const NodePage = ({
         title={`Node ${nodeId}`}
         description={`Details for node ${nodeId} on the Internet Computer.`}
       />
-      <h1 className="text-3xl my-8 overflow-hidden">
+      <h1 className="overflow-hidden my-8 text-3xl">
         Node <small className="text-xl">{nodeId}</small>
       </h1>
       <table className="w-full table-fixed">
@@ -47,15 +47,15 @@ const NodePage = ({
             <td className="w-3/4" />
           </tr>
           <tr>
-            <th colSpan={2} className="px-2 py-2">
+            <th colSpan={2} className="py-2 px-2">
               Node Details
             </th>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-300 dark:divide-gray-700">
           <tr>
-            <td className="px-2 py-2 w-1/4">Node Operator</td>
-            <td className="px-2 py-2 w-3/4 overflow-hidden">
+            <td className="py-2 px-2 w-1/4">Node Operator</td>
+            <td className="overflow-hidden py-2 px-2 w-3/4">
               {data?.operator ? (
                 <IdentifierLink
                   type="principal"
@@ -68,8 +68,8 @@ const NodePage = ({
             </td>
           </tr>
           <tr>
-            <td className="px-2 py-2 w-1/4">Node Provider</td>
-            <td className="px-2 py-2 w-3/4 overflow-hidden">
+            <td className="py-2 px-2 w-1/4">Node Provider</td>
+            <td className="overflow-hidden py-2 px-2 w-3/4">
               {data?.provider ? (
                 <IdentifierLink
                   type="principal"
@@ -82,8 +82,8 @@ const NodePage = ({
             </td>
           </tr>
           <tr>
-            <td className="px-2 py-2 w-1/4">Subnet</td>
-            <td className="px-2 py-2 w-3/4 overflow-hidden">
+            <td className="py-2 px-2 w-1/4">Subnet</td>
+            <td className="overflow-hidden py-2 px-2 w-3/4">
               {data?.subnet ? (
                 <Link href={`/subnet/${data.subnet.id}`}>
                   <a className="link-overflow">
@@ -96,8 +96,8 @@ const NodePage = ({
             </td>
           </tr>
           <tr>
-            <td className="px-2 py-2 w-1/4">Node Allowance</td>
-            <td className="px-2 py-2 w-3/4 overflow-hidden">
+            <td className="py-2 px-2 w-1/4">Node Allowance</td>
+            <td className="overflow-hidden py-2 px-2 w-3/4">
               {data?.operator?.operatorAllowance || "-"}
             </td>
           </tr>

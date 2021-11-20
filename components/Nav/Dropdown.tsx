@@ -58,10 +58,10 @@ export default function Dropdown() {
   }, []);
 
   return (
-    <div className="flex-1 xs:flex-none flex h-full">
+    <div className="flex flex-1 xs:flex-none h-full">
       <Menu as="div" className="relative flex-1">
         <div className="w-full h-full">
-          <Menu.Button className="w-full h-full inline-flex justify-between items-center px-2 py-1 btn-default focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
+          <Menu.Button className="inline-flex justify-between items-center py-1 px-2 w-full h-full focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus:outline-none btn-default">
             {!!principal && (
               <span className="mr-2">
                 User {principal.toText().split("-")[0]}
@@ -79,19 +79,19 @@ export default function Dropdown() {
           leaveFrom="transform opacity-100 scale-100"
           leaveTo="transform opacity-0 scale-95"
         >
-          <Menu.Items className="absolute xs:right-0 w-32 mt-2 origin-top-right bg-gray-100 dark:bg-gray-800 divide-y divide-default rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-            <div className="px-1 py-1 ">
+          <Menu.Items className="absolute xs:right-0 mt-2 w-32 bg-gray-100 dark:bg-gray-800 rounded-md divide-y ring-1 ring-black ring-opacity-5 shadow-lg origin-top-right focus:outline-none divide-default">
+            <div className="py-1 px-1">
               <Menu.Item>
-                <DarkModeToggle className="flex w-full p-1 text-sm btn-default" />
+                <DarkModeToggle className="flex p-1 w-full text-sm btn-default" />
               </Menu.Item>
             </div>
-            <div className="px-1 py-1">
+            <div className="py-1 px-1">
               <Menu.Item>
                 <button
-                  className="flex items-center w-full p-1 text-sm btn-default"
+                  className="flex items-center p-1 w-full text-sm btn-default"
                   onClick={principal ? handleLogout : handleLogin}
                 >
-                  <img src="/img/dfinity.png" className="w-4 mr-2" />
+                  <img src="/img/dfinity.png" className="mr-2 w-4" />
                   {principal ? "Logout" : "Login"}
                 </button>
               </Menu.Item>

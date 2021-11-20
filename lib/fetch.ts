@@ -23,4 +23,6 @@ export const fetchAuthed = (url, auth, opts?) =>
       }
       return res.json();
     })
-    .catch((e) => {});
+    .catch(() => {
+      console.warn("Fetch failed");
+    });

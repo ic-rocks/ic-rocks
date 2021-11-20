@@ -21,7 +21,7 @@ const Bookmarks = () => {
       {
         Header: "Identifier",
         id: "id",
-        Cell: ({ value, row }) => {
+        Cell: ({ row }) => {
           const id = row.original.principalId || row.original.accountId;
           return (
             <Link
@@ -44,7 +44,7 @@ const Bookmarks = () => {
       {
         Header: "",
         accessor: "bookmarked",
-        Cell: ({ value, row }) =>
+        Cell: ({ value }) =>
           value ? (
             <FaBookmark className="h-3" />
           ) : (
@@ -62,7 +62,7 @@ const Bookmarks = () => {
       {
         Header: "Identifier",
         id: "id",
-        Cell: ({ value, row }) => {
+        Cell: ({ row }) => {
           const id = row.original.principalId || row.original.accountId;
           return (
             <Link
@@ -99,9 +99,9 @@ const Bookmarks = () => {
         title="Bookmarks"
         description="Manage your bookmarks and tags."
       />
-      {!!auth ? (
+      {auth ? (
         <>
-          <h2 className="text-2xl mt-8 mb-4">Private Bookmarks</h2>
+          <h2 className="mt-8 mb-4 text-2xl">Private Bookmarks</h2>
           {tags.private.length > 0 ? (
             <>
               <p className="mb-4">
@@ -118,13 +118,13 @@ const Bookmarks = () => {
               />
             </>
           ) : (
-            <p>You haven't saved any bookmarks yet.</p>
+            <p>You have not saved any bookmarks yet.</p>
           )}
-          <h2 className="text-2xl mt-12 mb-4">Public Labels</h2>
+          <h2 className="mt-12 mb-4 text-2xl">Public Labels</h2>
           {tags.public.length > 0 ? (
             <>
               <p className="mb-4">
-                This is public data that you've contributed.
+                This is public data that you have contributed.
               </p>
               <Table
                 name="bookmarks.public"
@@ -137,7 +137,7 @@ const Bookmarks = () => {
               />
             </>
           ) : (
-            <p>You haven't contributed any public data yet.</p>
+            <p>You have not contributed any public data yet.</p>
           )}
         </>
       ) : (

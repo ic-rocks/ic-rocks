@@ -72,7 +72,7 @@ const ModulesTable = () => {
 
   const initialSort = useMemo(() => [{ id: "canisters", desc: true }], []);
 
-  const fetchData = ({ pageSize, pageIndex, sortBy }) =>
+  const fetchData = ({ pageSize, pageIndex }) =>
     fetchJSON(
       "/api/modules?" +
         new URLSearchParams({
@@ -113,7 +113,7 @@ const ModulesPage = () => {
         title={title}
         description="A list of duplicate modules on the Internet Computer."
       />
-      <h1 className="text-3xl my-8">{title}</h1>
+      <h1 className="my-8 text-3xl">{title}</h1>
       <ModulesTable />
     </CanisterPage>
   );

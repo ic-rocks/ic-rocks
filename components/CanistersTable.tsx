@@ -21,7 +21,7 @@ export const CanistersTable = ({
 
   const columns = useMemo(() => {
     const sortedSubnets = subnets.sort((a, b) =>
-      a.displayName > b.displayName ? 1 : -1
+      a.displayName > b.displayName ? 1 : -1,
     );
     return [
       {
@@ -63,10 +63,11 @@ export const CanistersTable = ({
         Header: "Controllers",
         accessor: "controllers",
         disableSortBy: true,
-        Cell: ({ value, row }) =>
+        Cell: ({ value }) =>
           value.length <= 2
             ? value.map(({ id, name }) => (
                 <IdentifierLink
+                  key={id}
                   className="flex-1"
                   type="principal"
                   id={id}
@@ -117,7 +118,7 @@ export const CanistersTable = ({
         className: "px-2 sm:flex flex-1 hidden oneline",
         Filter: SelectColumnFilter,
         filterOptions: [["Subnet...", ""]].concat(
-          sortedSubnets.map(({ displayName, id }) => [displayName, id])
+          sortedSubnets.map(({ displayName, id }) => [displayName, id]),
         ),
       },
       {
@@ -134,7 +135,11 @@ export const CanistersTable = ({
         disableSortBy: true,
         Cell: ({ value, row }) =>
           value ? (
-            <a href={`https://${row.original.id}.raw.ic0.app`} target="_blank">
+            <a
+              href={`https://${row.original.id}.raw.ic0.app`}
+              target="_blank"
+              rel="noreferrer"
+            >
               <FiExternalLink className="inline link-overflow" />
             </a>
           ) : null,
@@ -145,7 +150,7 @@ export const CanistersTable = ({
 
   const initialSort = useMemo(
     () => [{ id: "latestVersionDate", desc: true }],
-    []
+    [],
   );
 
   const fetchData = ({ pageSize, pageIndex, sortBy, filters }) => {
@@ -176,7 +181,7 @@ export const CanistersTable = ({
           ...(subnetFilter ? { subnetId: subnetFilter.value } : {}),
           pageSize,
           page: pageIndex,
-        })
+        }),
     );
   };
 

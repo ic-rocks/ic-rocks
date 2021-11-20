@@ -1,2 +1,2 @@
-export const entries = (enum_: Object): [string, number][] =>
-  Object.entries(enum_).filter(([name, id]) => typeof id === "number");
+export const entries = (enum_: unknown): [string, number][] =>
+  Object.entries(enum_).filter(([, id]) => typeof id === "number");

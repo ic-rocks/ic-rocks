@@ -90,7 +90,7 @@ export const QueryButton = ({
   isQuery: boolean;
 }) => (
   <SpinnerButton
-    className="mt-2 w-16 py-1 text-center btn-default"
+    className="py-1 mt-2 w-16 text-center btn-default"
     isLoading={isLoading}
   >
     {isQuery ? "Query" : "Call"}
@@ -98,7 +98,7 @@ export const QueryButton = ({
 );
 
 export const Nested = ({ children }) => (
-  <div className="flex flex-col pl-2 border-l border-gray-300 dark:border-gray-700 gap-1">
+  <div className="flex flex-col gap-1 pl-2 border-l border-gray-300 dark:border-gray-700">
     {children}
   </div>
 );
@@ -154,7 +154,7 @@ export const BufferEncodingButtons = ({
 }) => {
   const options = showRaw ? BUFFER_ENCODINGS : BUFFER_ENCODINGS.slice(0, -1);
   return (
-    <div className="text-xs ml-2">
+    <div className="ml-2 text-xs">
       {options.map((value) => (
         <button
           key={value}
@@ -252,7 +252,7 @@ export const BufferInput = ({
     <div className="flex flex-col">
       <input
         placeholder={placeholder}
-        className="px-2 py-1 bg-gray-100 dark:bg-gray-800 text-sm"
+        className="py-1 px-2 text-sm bg-gray-100 dark:bg-gray-800"
         type="text"
         onChange={(e) => {
           setCurrentValue(e.target.value);

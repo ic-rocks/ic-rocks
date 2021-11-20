@@ -90,7 +90,7 @@ const NeuronIdPage = ({
                   data-balloon-pos="down"
                   data-balloon-length="medium"
                 >
-                  <BsInfoCircle className="ml-1 inline text-xs align-middle" />
+                  <BsInfoCircle className="inline ml-1 text-xs align-middle" />
                 </span>
               </span>
             )
@@ -191,7 +191,7 @@ const NeuronIdPage = ({
         title={`Neuron ${neuronId}`}
         description={`Details for Neuron ${neuronId} on the Internet Computer ledger.`}
       />
-      <h1 className="text-3xl my-8 overflow-hidden overflow-ellipsis">
+      <h1 className="overflow-hidden my-8 text-3xl overflow-ellipsis">
         Neuron <small className="text-xl break-all">{neuronId}</small>
       </h1>
       <section className="mb-8">

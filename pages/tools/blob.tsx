@@ -77,7 +77,9 @@ export default function BlobDebugger() {
           if (decoded) {
             setAsCbor(stringify(decoded));
           }
-        } catch (error) {}
+        } catch (error) {
+          console.warn(error.message);
+        }
       }
     }
   }, [input]);
@@ -88,11 +90,15 @@ export default function BlobDebugger() {
         description="Debug arbitrary binary data"
       />
       <SecondaryNav
-        items={[<ActiveLink href="/tools/blob">Blob Debugger</ActiveLink>]}
+        items={[
+          <ActiveLink key="1" href="/tools/blob">
+            Blob Debugger
+          </ActiveLink>,
+        ]}
       />
-      <h1 className="text-3xl my-8">Blob Debugger</h1>
+      <h1 className="my-8 text-3xl">Blob Debugger</h1>
       <p>Paste any hex or base64 to debug.</p>
-      <div className="my-2 flex text-xs gap-2">
+      <div className="flex gap-2 my-2 text-xs">
         <label>Examples:</label>
         <a
           className="cursor-pointer link-overflow"
@@ -146,13 +152,13 @@ export default function BlobDebugger() {
         </a>
       </div>
       <textarea
-        className="w-full p-4 rounded bg-gray-100 dark:bg-gray-800 text-xs font-mono"
+        className="p-4 w-full font-mono text-xs bg-gray-100 dark:bg-gray-800 rounded"
         style={{ minHeight: 250 }}
         onChange={(e) => setInput(e.target.value)}
         placeholder="Enter any hex blob to debug it"
         value={input}
       />
-      <div className="my-4 flex gap-8 items-baseline">
+      <div className="flex gap-8 items-baseline my-4">
         <h3 className="text-xl">Output</h3>
         <label>
           {!!input &&
@@ -186,7 +192,7 @@ export default function BlobDebugger() {
           <p>As Hex</p>
           <textarea
             readOnly
-            className="w-full p-4 rounded bg-gray-100 dark:bg-gray-800 text-xs font-mono"
+            className="p-4 w-full font-mono text-xs bg-gray-100 dark:bg-gray-800 rounded"
             value={asHex}
           />
         </div>
@@ -196,7 +202,7 @@ export default function BlobDebugger() {
           <p>As CBOR</p>
           <textarea
             readOnly
-            className="w-full p-4 rounded bg-gray-100 dark:bg-gray-800 text-xs font-mono"
+            className="p-4 w-full font-mono text-xs bg-gray-100 dark:bg-gray-800 rounded"
             style={{ minHeight: asCbor.split("\n").length * 20 }}
             value={asCbor}
           />
@@ -224,7 +230,7 @@ export default function BlobDebugger() {
       {outputType === IdentityKind.None && !asCbor && (
         <textarea
           readOnly
-          className="w-full p-4 rounded bg-gray-100 dark:bg-gray-800 text-xs font-mono"
+          className="p-4 w-full font-mono text-xs bg-gray-100 dark:bg-gray-800 rounded"
           placeholder="Results will appear here..."
           value={output}
         />

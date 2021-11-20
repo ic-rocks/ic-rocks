@@ -48,10 +48,11 @@ export default function RecentCanistersBox() {
       {
         Header: "Controller",
         accessor: "controllers",
-        Cell: ({ value, row }) =>
+        Cell: ({ value }) =>
           value.length <= 1
             ? value.map(({ id, name }) => (
                 <IdentifierLink
+                  key={id}
                   className="flex-1"
                   type="principal"
                   id={id}
@@ -73,11 +74,11 @@ export default function RecentCanistersBox() {
 
   return (
     <InfoBox>
-      <div className="flex xxs:flex-row flex-col justify-between items-baseline">
-        <h3 className="text-lg xxs:mb-4">🛢 Recently Updated Canisters</h3>
+      <div className="flex flex-col xxs:flex-row justify-between items-baseline">
+        <h3 className="xxs:mb-4 text-lg">🛢 Recently Updated Canisters</h3>
         <Link href={`/canisters`}>
           <a className="text-xs link-overflow">
-            view all <BsArrowRight className="ml-0.5 inline" />
+            view all <BsArrowRight className="inline ml-0.5" />
           </a>
         </Link>
       </div>

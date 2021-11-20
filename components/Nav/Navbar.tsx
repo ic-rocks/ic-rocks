@@ -11,34 +11,34 @@ export default function Nav() {
   const [auth] = useAtom(authAtom);
 
   return (
-    <nav className="pt-4 flex flex-col gap-4">
-      <div className="flex flex-col xs:flex-row items-stretch xs:justify-between gap-2">
+    <nav className="flex flex-col gap-4 pt-4">
+      <div className="flex flex-col xs:flex-row gap-2 xs:justify-between items-stretch">
         <div className="flex-none xs:pr-8">
           <Link href="/">
             <img
               src="/img/icrocks-light.svg"
               alt="ic.rocks"
-              className="h-8 dark:hidden cursor-pointer"
+              className="dark:hidden h-8 cursor-pointer"
             />
           </Link>
           <Link href="/">
             <img
               src="/img/icrocks-dark.svg"
               alt="ic.rocks"
-              className="h-8 hidden dark:block cursor-pointer"
+              className="hidden dark:block h-8 cursor-pointer"
             />
           </Link>
         </div>
 
-        <div className="flex-1 flex flex-col xs:flex-row items-stretch xs:items-start max-w-md gap-2">
+        <div className="flex flex-col xs:flex-row flex-1 gap-2 items-stretch xs:items-start max-w-md">
           <SearchBar />
           {!!auth && (
             <Link href="/bookmarks">
               <a
-                className="btn-default px-1.5 py-1 h-full inline-flex items-center"
+                className="inline-flex items-center py-1 px-1.5 h-full btn-default"
                 title="Bookmarks"
               >
-                <FaBookmark className="text-green-400 h-3" />
+                <FaBookmark className="h-3 text-green-400" />
                 <span className="xs:hidden">Bookmarks</span>
               </a>
             </Link>
@@ -47,7 +47,7 @@ export default function Nav() {
         </div>
       </div>
 
-      <ul className="flex flex-1 xs:py-2 divide-y divide-default xs:divide-none flex-col xs:flex-wrap xs:flex-row xs:items-center border-b xs:border-t border-gray-200 dark:border-gray-800 xs:gap-4">
+      <ul className="flex flex-col xs:flex-row xs:flex-wrap flex-1 xs:gap-4 xs:items-center xs:py-2 xs:border-t border-b border-gray-200 dark:border-gray-800 divide-y xs:divide-none divide-default">
         <li>
           <ActiveLink href="/network">Network</ActiveLink>
         </li>

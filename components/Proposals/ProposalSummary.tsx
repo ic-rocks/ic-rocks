@@ -14,7 +14,7 @@ export const ProposalSummary = ({ proposal }: { proposal: Proposal }) => {
     const data = JSON.parse(proposal.payloadJson);
     const source = JSON.parse(data.data_source);
     return (
-      <div className="text-xs flex flex-col gap-2">
+      <div className="flex flex-col gap-2 text-xs">
         <div>
           <strong>Date Source</strong>
           <div className="flex">
@@ -69,7 +69,7 @@ export const ProposalSummary = ({ proposal }: { proposal: Proposal }) => {
   if (proposal.nnsFunction === NnsFunction["Set Authorized Subnetworks"]) {
     const data = JSON.parse(proposal.payloadJson);
     return (
-      <div className="text-xs flex flex-col gap-2">
+      <div className="flex flex-col gap-2 text-xs">
         <div>
           <strong>Who</strong>
           <ul>
@@ -99,7 +99,7 @@ export const ProposalSummary = ({ proposal }: { proposal: Proposal }) => {
   if (proposal.nnsFunction === NnsFunction["Add Node to Subnet"]) {
     const data = JSON.parse(proposal.payloadJson);
     return (
-      <div className="text-xs flex flex-col gap-2">
+      <div className="flex flex-col gap-2 text-xs">
         <div>
           <strong>Subnets</strong>
           <div>
@@ -132,7 +132,7 @@ export const ProposalSummary = ({ proposal }: { proposal: Proposal }) => {
       account = buf.toString("hex");
     }
     return (
-      <div className="text-xs flex flex-col gap-2">
+      <div className="flex flex-col gap-2 text-xs">
         <div>
           <strong>Node Provider</strong>
           <ul>
@@ -146,7 +146,7 @@ export const ProposalSummary = ({ proposal }: { proposal: Proposal }) => {
         <div>
           <strong>Account</strong>
           <div>
-            {!!account ? <IdentifierLink type="account" id={account} /> : "-"}
+            {account ? <IdentifierLink type="account" id={account} /> : "-"}
           </div>
         </div>
         <div>
@@ -185,9 +185,9 @@ export const ProposalSummary = ({ proposal }: { proposal: Proposal }) => {
       console.warn(error.message);
     }
     if (buf) {
-      return <pre className="text-xs mb-1">{buf.toString("hex")}</pre>;
+      return <pre className="mb-1 text-xs">{buf.toString("hex")}</pre>;
     }
   }
 
-  return <pre className="text-xs mb-1">{proposal.payloadJson}</pre>;
+  return <pre className="mb-1 text-xs">{proposal.payloadJson}</pre>;
 };

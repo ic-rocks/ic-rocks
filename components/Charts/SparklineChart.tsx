@@ -1,5 +1,5 @@
 import * as d3 from "d3";
-import { useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import useMeasure from "react-use-measure";
 import useMarkets from "../../lib/hooks/useMarkets";
 
@@ -8,7 +8,7 @@ const SparklineChart = () => {
   const [ref, { width }] = useMeasure();
   const { data: markets } = useMarkets();
 
-  let height = 150;
+  const height = 150;
 
   useEffect(() => {
     if (!width || !markets?.sparkline) return;

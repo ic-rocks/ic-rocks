@@ -42,7 +42,7 @@ export const TransactionsTable = ({ accountId }: { accountId?: string }) => {
       {
         Header: "Timestamp",
         accessor: "blockHeight",
-        Cell: ({ value, row }) =>
+        Cell: ({ row }) =>
           DateTime.fromISO(row.original.createdDate).toRelative(),
         className: "px-2 w-32 oneline",
         sortDescFirst: true,

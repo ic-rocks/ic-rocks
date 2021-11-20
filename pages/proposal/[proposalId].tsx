@@ -177,12 +177,12 @@ const ProposalIdPage = ({
         title={`Proposal ${proposalId}`}
         description={`Details for Proposal ${proposalId} on the Internet Computer ledger.`}
       />
-      <h1 className="text-3xl my-8 overflow-hidden overflow-ellipsis">
+      <h1 className="overflow-hidden my-8 text-3xl overflow-ellipsis">
         Proposal <small className="text-xl break-all">{proposalId}</small>
       </h1>
       <section className="flex flex-col gap-4">
         <div>
-          <div className="p-2 bg-heading font-bold">Votes</div>
+          <div className="p-2 font-bold bg-heading">Votes</div>
           {!!data && <Votes data={data} />}
         </div>
         <SimpleTable headers={headers} rows={summaryRows} />

@@ -57,6 +57,7 @@ export const getIdentityKind = (
       try {
         const principal = Principal.fromText(input);
         return [IdentityKind.Principal, principal];
+        // eslint-disable-next-line no-empty
       } catch {}
     }
     if (isHex(input) && input.startsWith("0x")) {
@@ -125,11 +126,10 @@ export type SignDisplay = "auto" | "never" | "always" | "exceptZero";
 export const formatPercent = (
   number: number,
   signDisplay: SignDisplay = "auto",
-  digits: number = 2
+  digits = 2
 ) => {
   return Intl.NumberFormat("en-US", {
     style: "percent",
-    // @ts-ignore
     signDisplay,
     minimumFractionDigits: digits,
     maximumFractionDigits: digits,

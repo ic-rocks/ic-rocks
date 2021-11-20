@@ -57,7 +57,7 @@ const LineBarChart = ({
 
     const tooltip = d3.select(tooltipRef.current);
 
-    let series = d3.sort(data, ({ x }) => x);
+    const series = d3.sort(data, ({ x }) => x);
 
     const paddedExtent = [
       d3.min(series.map((d) => d3.utcDay.round(d3.utcDay.offset(d.x, -1)))),
@@ -249,14 +249,14 @@ const LineBarChart = ({
     <div ref={ref} className="relative">
       {useTooltip && (
         <div
-          className="p-1 bg-black absolute rounded-md pointer-events-none origin-bottom"
+          className="absolute p-1 bg-black rounded-md origin-bottom pointer-events-none"
           style={{ opacity: 0 }}
           ref={tooltipRef}
         >
           <div className="flex flex-col">
-            <label className="label-y2 text-xs text-white"></label>
-            <label className="label-y1 text-xs text-white"></label>
-            <span className="label-x text-xxs text-gray-500"></span>
+            <label className="text-xs text-white"></label>
+            <label className="text-xs text-white"></label>
+            <span className="text-xxs text-gray-500"></span>
           </div>
         </div>
       )}
@@ -264,7 +264,7 @@ const LineBarChart = ({
       <svg width={width} height={height} ref={svgRef} />
     </div>
   ) : (
-    <div className="flex-1 flex items-center justify-center text-xs text-gray-500">
+    <div className="flex flex-1 justify-center items-center text-xs text-gray-500">
       No data
     </div>
   );

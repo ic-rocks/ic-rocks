@@ -3,7 +3,6 @@ import { useRouter } from "next/router";
 import React, { useState } from "react";
 
 export default function CandidAttach({
-  className,
   candid,
 }: {
   className?: string;
@@ -23,18 +22,18 @@ export default function CandidAttach({
     }
 
     const url = `/principal/${canister}?candid=${encodeURIComponent(
-      window.btoa(candid)
+      window.btoa(candid),
     )}`;
     router.push(url);
   };
 
   return (
     <div className="flex flex-col mb-8">
-      <label className="text-md">Attach this interface to a canister</label>
+      <label>Attach this interface to a canister</label>
       <form className="flex" onSubmit={onSubmit}>
         <input
           placeholder="Canister ID"
-          className="w-64 px-2 py-1 bg-gray-100 dark:bg-gray-800 text-sm"
+          className="py-1 px-2 w-64 text-sm bg-gray-100 dark:bg-gray-800"
           type="text"
           onChange={(e) => setCanister(e.target.value)}
           value={canister}

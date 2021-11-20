@@ -33,7 +33,7 @@ const GenesisAccountsStats = () => {
 
   const statsByStatusRows = useMemo(() => {
     const order = ["Claimed", "Unclaimed", "Donated", "Forwarded"];
-    return order.map((label, i) => {
+    return order.map((label) => {
       if (!genesisStats) {
         return [
           {
@@ -84,7 +84,7 @@ const GenesisAccountsStats = () => {
       ["dissolvingCount", "dissolvingAmount", "Dissolving"],
       ["dissolvedCount", "dissolvedAmount", "Dissolved"],
     ];
-    return order.map(([countKey, amountKey, label], i) => {
+    return order.map(([countKey, amountKey, label]) => {
       if (!genesisStats) {
         return [
           {
@@ -121,7 +121,7 @@ const GenesisAccountsStats = () => {
   }, [genesisStats]);
 
   return (
-    <section className="mb-8 md:flex-row flex-col flex gap-8">
+    <section className="flex flex-col md:flex-row gap-8 mb-8">
       <div className="flex-1" style={{ minWidth: 320 }}>
         <SimpleTable headers={statsByStatusHeaders} rows={statsByStatusRows} />
       </div>
@@ -212,7 +212,7 @@ const GenesisAccountsPage = () => {
       {
         Header: "Next Dissolve Date",
         accessor: "earliestDissolveDate",
-        Cell: ({ value, row }) => {
+        Cell: ({ value }) => {
           if (!value) {
             return "-";
           }
@@ -260,7 +260,7 @@ const GenesisAccountsPage = () => {
         description={`Overview of the Genesis Accounts on the Internet Computer.`}
       />
       <NeuronNav />
-      <h1 className="text-3xl my-8 overflow-hidden overflow-ellipsis">
+      <h1 className="overflow-hidden my-8 text-3xl overflow-ellipsis">
         Genesis Accounts
       </h1>
       <GenesisAccountsStats />

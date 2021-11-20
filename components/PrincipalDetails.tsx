@@ -186,23 +186,23 @@ export default function PrincipalDetails({
           <tr className="flex">
             <th
               colSpan={2}
-              className="px-2 py-2 flex-1 flex flex-wrap justify-between"
+              className="flex flex-wrap flex-1 justify-between py-2 px-2"
             >
               <div className="flex gap-1">
                 <label className="mr-4">Overview</label>
                 {principalData?.entityId && (
-                  <a className="cursor-default font-normal label-tag bg-blue-200 dark:bg-blue-400 inline-flex items-center">
+                  <a className="inline-flex items-center font-normal bg-blue-200 dark:bg-blue-400 cursor-default label-tag">
                     {principalData.entity.name}
                     {/* <BsChevronRight className="ml-1" /> */}
                   </a>
                 )}
                 {principalData?.genesisAccount?.id && (
-                  <label className="font-normal label-tag bg-purple-200 dark:bg-purple-400">
+                  <label className="font-normal bg-purple-200 dark:bg-purple-400 label-tag">
                     Genesis Account
                   </label>
                 )}
                 {principalData?.isKyc && (
-                  <label className="font-normal label-tag bg-purple-200 dark:bg-purple-400">
+                  <label className="font-normal bg-purple-200 dark:bg-purple-400 label-tag">
                     KYC
                   </label>
                 )}
@@ -226,9 +226,9 @@ export default function PrincipalDetails({
                       </span>
                     )}
                     <a
-                      className="hover:underline font-normal label-tag bg-green-label inline-flex items-center"
+                      className="inline-flex items-center font-normal hover:underline label-tag bg-green-label"
                       href={`https://${principalId}.raw.ic0.app`}
-                      target="_blank"
+                      target="_blank" rel="noreferrer"
                     >
                       View URL <FiExternalLink className="ml-1" />
                     </a>
@@ -246,8 +246,8 @@ export default function PrincipalDetails({
         </thead>
         <tbody className="block divide-y divide-gray-300 dark:divide-gray-700">
           <tr className="flex">
-            <td className="px-2 py-2 w-24 sm:w-44">Name</td>
-            <td className="px-2 py-2 flex-1 flex items-center gap-2">
+            <td className="py-2 px-2 w-24 sm:w-44">Name</td>
+            <td className="flex flex-1 gap-2 items-center py-2 px-2">
               {principalData?.publicTags[0]
                 ? principalData?.publicTags[0].label
                 : principalData?.name || (!tags[0]?.label ? "-" : null)}
@@ -257,8 +257,8 @@ export default function PrincipalDetails({
             </td>
           </tr>
           <tr className="flex">
-            <td className="px-2 py-2 w-24 sm:w-44">Type</td>
-            <td className="px-2 py-2 flex-1">
+            <td className="py-2 px-2 w-24 sm:w-44">Type</td>
+            <td className="flex-1 py-2 px-2">
               {type}
               {type == "Canister" &&
                 canisterData &&
@@ -274,8 +274,8 @@ export default function PrincipalDetails({
           </tr>
           {principalData?.isKyc && (
             <tr className="flex">
-              <td className="px-2 py-2 w-24 sm:w-44">KYC Proposal</td>
-              <td className="px-2 py-2 flex-1 flex oneline">
+              <td className="py-2 px-2 w-24 sm:w-44">KYC Proposal</td>
+              <td className="flex flex-1 py-2 px-2 oneline">
                 {principalData.kyc ? (
                   <Link href={`/proposal/${principalData.kyc[0].proposalId}`}>
                     <a className="link-overflow">
@@ -291,8 +291,8 @@ export default function PrincipalDetails({
           {type == "Canister" && (
             <>
               <tr className="flex">
-                <td className="px-2 py-2 w-24 sm:w-44">Subnet</td>
-                <td className="px-2 py-2 flex-1 overflow-hidden">
+                <td className="py-2 px-2 w-24 sm:w-44">Subnet</td>
+                <td className="overflow-hidden flex-1 py-2 px-2">
                   {canisterData?.subnetId ? (
                     <Link href={`/subnet/${canisterData.subnetId}`}>
                       <a className="link-overflow">
@@ -305,8 +305,8 @@ export default function PrincipalDetails({
                 </td>
               </tr>
               <tr className="flex">
-                <td className="px-2 py-2 w-24 sm:w-44">Created</td>
-                <td className="px-2 py-2 flex-1">
+                <td className="py-2 px-2 w-24 sm:w-44">Created</td>
+                <td className="flex-1 py-2 px-2">
                   {canisterData?.createdDate ? (
                     <TimestampLabel
                       dt={DateTime.fromISO(canisterData.createdDate)}
@@ -317,8 +317,8 @@ export default function PrincipalDetails({
                 </td>
               </tr>
               <tr className="flex">
-                <td className="px-2 py-2 w-24 sm:w-44">Last Updated</td>
-                <td className="px-2 py-2 flex-1">
+                <td className="py-2 px-2 w-24 sm:w-44">Last Updated</td>
+                <td className="flex-1 py-2 px-2">
                   {canisterData?.latestVersionDate ? (
                     <TimestampLabel
                       dt={DateTime.fromISO(canisterData.latestVersionDate)}
@@ -329,14 +329,14 @@ export default function PrincipalDetails({
                 </td>
               </tr>
               <tr className="flex">
-                <td className="px-2 py-2 w-24 sm:w-44">Versions</td>
-                <td className="px-2 py-2 flex-1">
+                <td className="py-2 px-2 w-24 sm:w-44">Versions</td>
+                <td className="flex-1 py-2 px-2">
                   {canisterData?.versions ? canisterData.versions.length : "-"}
                 </td>
               </tr>
               <tr className="flex">
-                <td className="px-2 py-2 w-24 sm:w-44">Module Hash</td>
-                <td className="px-2 py-2 flex-1 break-words overflow-hidden">
+                <td className="py-2 px-2 w-24 sm:w-44">Module Hash</td>
+                <td className="overflow-hidden flex-1 py-2 px-2 break-words">
                   {canisterData?.module ? (
                     <>
                       {canisterData.module.name && (
@@ -357,8 +357,8 @@ export default function PrincipalDetails({
                 </td>
               </tr>
               <tr className="flex">
-                <td className="px-2 py-2 w-24 sm:w-44">Controller Tree</td>
-                <td className="px-2 py-2 flex-1 leading-tight text-xs">
+                <td className="py-2 px-2 w-24 sm:w-44">Controller Tree</td>
+                <td className="flex-1 py-2 px-2 text-xs leading-tight">
                   {canisterData && (
                     <RelationshipGraph
                       principalId={principalId}
@@ -371,10 +371,10 @@ export default function PrincipalDetails({
             </>
           )}
           <tr className="flex">
-            <td className="px-2 py-2 w-24 sm:w-44 align-top">
+            <td className="py-2 px-2 w-24 sm:w-44 align-top">
               Ledger Accounts
             </td>
-            <td className="px-2 py-2 flex-1 overflow-hidden">
+            <td className="overflow-hidden flex-1 py-2 px-2">
               <div className="divide-y divide-gray-200 dark:divide-gray-800">
                 {accounts.map(({ id, balance, displayName }) => {
                   return (
@@ -394,7 +394,7 @@ export default function PrincipalDetails({
                   );
                 })}
                 {principalData?.accountCount > accounts.length && (
-                  <div className="text-gray-500 text-xs">
+                  <div className="text-xs text-gray-500">
                     Showing {accounts.length} of {principalData.accountCount}{" "}
                     known accounts
                   </div>

@@ -13,7 +13,7 @@ const MetricsCharts = () => {
         description="Custom metrics tracked by ic.rocks Metrics."
       />
       <ChartsNav />
-      <h1 className="text-3xl my-8">{title}</h1>
+      <h1 className="my-8 text-3xl">{title}</h1>
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {[0, 1].map((id) => (
           <div key={id}>

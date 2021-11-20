@@ -89,7 +89,7 @@ const renderActiveShape = (props) => {
           textAnchor="middle"
           fill={fill}
         >
-          <a className="link-overflow inline-flex cursor-pointer">
+          <a className="inline-flex cursor-pointer link-overflow">
             {payload.name.slice(0, 5)}
           </a>
         </text>

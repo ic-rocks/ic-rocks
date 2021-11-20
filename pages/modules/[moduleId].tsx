@@ -82,7 +82,12 @@ const ModuleCanistersPage = ({
       },
       {
         contents: data?.sourceUrl ? (
-          <a href={data.sourceUrl} target="_blank" className="link-overflow">
+          <a
+            href={data.sourceUrl}
+            target="_blank"
+            className="link-overflow"
+            rel="noreferrer"
+          >
             {data.sourceUrl}
           </a>
         ) : (
@@ -130,7 +135,7 @@ const ModuleCanistersPage = ({
         title={`Module ${moduleId}`}
         description={`Details for module ${moduleId} on the Internet Computer.`}
       />
-      <h1 className="text-3xl my-8 overflow-hidden overflow-ellipsis">
+      <h1 className="overflow-hidden my-8 text-3xl overflow-ellipsis">
         Module <small className="text-xl break-all">{moduleId}</small>
       </h1>
       <section className="mb-8">
@@ -140,7 +145,7 @@ const ModuleCanistersPage = ({
         <CodeBlock className="mb-8" candid={data.candid} bindings={bindings} />
       )}
       <section>
-        <h2 className="text-2xl mb-4">Matching Canisters</h2>
+        <h2 className="mb-4 text-2xl">Matching Canisters</h2>
         <CanistersTable name="matching-canisters" moduleId={moduleId} />
       </section>
     </CanisterPage>

@@ -186,13 +186,13 @@ const LineChart = ({
     <div ref={ref} className="relative">
       {useTooltip && (
         <div
-          className="p-1 bg-black absolute rounded-md pointer-events-none origin-bottom"
+          className="absolute p-1 bg-black rounded-md origin-bottom pointer-events-none"
           style={{ opacity: 0 }}
           ref={tooltipRef}
         >
           <div className="flex flex-col">
-            <label className="label-y text-xs text-white"></label>
-            <span className="label-x text-xxs text-gray-500"></span>
+            <label className="text-xs text-white"></label>
+            <span className="text-xxs text-gray-500"></span>
           </div>
         </div>
       )}
@@ -200,7 +200,7 @@ const LineChart = ({
       <svg width={width} height={height} ref={svgRef} />
     </div>
   ) : (
-    <div className="flex-1 flex items-center justify-center text-xs text-gray-500">
+    <div className="flex flex-1 justify-center items-center text-xs text-gray-500">
       No data
     </div>
   );

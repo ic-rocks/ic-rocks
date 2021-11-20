@@ -33,7 +33,7 @@ const MetricsDataChart = ({
   );
 
   return (
-    <div className="bg-gray-100 dark:bg-gray-850 p-4 shadow-md rounded-md">
+    <div className="p-4 bg-gray-100 dark:bg-gray-850 rounded-md shadow-md">
       <div className="flex flex-col" style={{ minHeight: 220 }}>
         {data ? (
           <>
@@ -47,27 +47,27 @@ const MetricsDataChart = ({
                 />
               )}
             </div>
-            <p className="dark:text-gray-400 text-xs pb-2">
+            <p className="pb-2 text-xs dark:text-gray-400">
               {data.description.description[0]}
             </p>
             <Menu
               as="div"
-              className="dark:text-gray-400 flex justify-end relative text-xs"
+              className="flex relative justify-end text-xs dark:text-gray-400"
             >
               <div className="inline-flex items-center">
                 {isFetching && (
                   <CgSpinner className="inline-block animate-spin" />
                 )}
-                <Menu.Button className="w-18 inline-flex justify-between items-center px-2 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
+                <Menu.Button className="inline-flex justify-between items-center px-2 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 cursor-pointer focus:outline-none w-18">
                   {PERIODS.find((p) => p.value === period)?.label || "Period"}
                   <FiChevronDown className="ml-1" />
                 </Menu.Button>
               </div>
-              <Menu.Items className="absolute z-10 right-2 w-18 mt-5 origin-top-right shadow-lg">
+              <Menu.Items className="absolute right-2 z-10 mt-5 shadow-lg origin-top-right w-18">
                 {PERIODS.map(({ label, value }) => (
                   <Menu.Item key={value}>
                     <button
-                      className="flex items-center w-full px-2 py-1 btn-default"
+                      className="flex items-center py-1 px-2 w-full btn-default"
                       onClick={() => setPeriod(value as Period)}
                     >
                       {label}

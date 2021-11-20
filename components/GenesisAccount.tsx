@@ -19,13 +19,13 @@ import { neuronsTableColumns } from "./Neurons/NeuronsTable";
 import { Table } from "./Tables/Table";
 
 const GenesisAccount = ({ genesisAccount }: { genesisAccount: string }) => {
-  const { data, isFetching } = useQuery(
+  const { data } = useQuery(
     ["genesis", genesisAccount],
     () => fetchJSON(`/api/genesis/${genesisAccount}`),
     {
       enabled: !!genesisAccount,
       staleTime: Infinity,
-    }
+    },
   );
 
   const { data: neurons, isFetching: isNeuronsFetching } =
@@ -34,7 +34,7 @@ const GenesisAccount = ({ genesisAccount }: { genesisAccount: string }) => {
       () => {
         return fetchJSON(`/api/neurons/genesis/${genesisAccount}`);
       },
-      { placeholderData: { rows: [], count: 0 }, staleTime: Infinity }
+      { placeholderData: { rows: [], count: 0 }, staleTime: Infinity },
     );
 
   const summaryRows = useMemo(() => {
@@ -48,7 +48,7 @@ const GenesisAccount = ({ genesisAccount }: { genesisAccount: string }) => {
             amt + BigInt(curr.originalStake),
             ts + DateTime.fromISO(curr.dissolveDate).toSeconds(),
           ],
-          [BigInt(0), 0]
+          [BigInt(0), 0],
         );
         const count = (groups[k] || []).length;
         const avgDuration = DateTime.fromSeconds(sumTime / count).diffNow([
@@ -139,8 +139,8 @@ const GenesisAccount = ({ genesisAccount }: { genesisAccount: string }) => {
         {
           contents: stats ? (
             <div className="flex">
-              <strong className="w-6 pr-2 text-right">{stats[0].count}</strong>
-              <div className="w-44 text-right pr-6">
+              <strong className="pr-2 w-6 text-right">{stats[0].count}</strong>
+              <div className="pr-6 w-44 text-right">
                 <BalanceLabel value={stats[0].amount} />
               </div>
               {stats[0].count > 0 && (
@@ -162,8 +162,8 @@ const GenesisAccount = ({ genesisAccount }: { genesisAccount: string }) => {
         {
           contents: stats ? (
             <div className="flex flex-wrap">
-              <strong className="w-6 pr-2 text-right">{stats[1].count}</strong>
-              <div className="w-44 text-right pr-6">
+              <strong className="pr-2 w-6 text-right">{stats[1].count}</strong>
+              <div className="pr-6 w-44 text-right">
                 <BalanceLabel value={stats[1].amount} />
               </div>
               {stats[1].count > 0 && (
@@ -185,8 +185,8 @@ const GenesisAccount = ({ genesisAccount }: { genesisAccount: string }) => {
         {
           contents: stats ? (
             <div className="flex">
-              <strong className="w-6 pr-2 text-right">{stats[2].count}</strong>
-              <div className="w-44 text-right pr-6">
+              <strong className="pr-2 w-6 text-right">{stats[2].count}</strong>
+              <div className="pr-6 w-44 text-right">
                 <BalanceLabel value={stats[2].amount} />
               </div>
             </div>
@@ -203,10 +203,10 @@ const GenesisAccount = ({ genesisAccount }: { genesisAccount: string }) => {
         {
           contents: data ? (
             <div className="flex">
-              <strong className="w-6 pr-2 text-right inline-block">
+              <strong className="inline-block pr-2 w-6 text-right">
                 {data.neuronCount}
               </strong>
-              <div className="w-44 text-right pr-6">
+              <div className="pr-6 w-44 text-right">
                 {formatNumber(data.icpts)} <span className="text-xs">ICP</span>
               </div>
             </div>
@@ -220,7 +220,7 @@ const GenesisAccount = ({ genesisAccount }: { genesisAccount: string }) => {
 
   return (
     <>
-      <h1 className="text-3xl my-8 overflow-hidden">
+      <h1 className="overflow-hidden my-8 text-3xl">
         Genesis Account <small className="text-xl">{genesisAccount}</small>
       </h1>
       <section className="mb-8">

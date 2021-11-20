@@ -1,3 +1,4 @@
+import React from "react";
 import { useDarkMode } from "../../lib/hooks/useDarkMode";
 
 export default function DarkModeToggle({ className }: { className: string }) {
@@ -10,7 +11,7 @@ export default function DarkModeToggle({ className }: { className: string }) {
 
   return (
     <button className={className} onClick={onClick}>
-      <span className="inline-block w-4 mr-2">
+      <span className="inline-block mr-2 w-4">
         {darkMode.value ? "☀" : "☾"}
       </span>
       {darkMode.value ? "Light Mode" : "Dark Mode"}

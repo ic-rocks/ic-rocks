@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import { ReactNode } from "react";
+import React, { ReactNode } from "react";
 import { NeuronState } from "../../lib/types/governance";
 
 export const NeuronLabel = ({

@@ -34,7 +34,7 @@ const ProposalsPage = () => {
           Header: "ID",
           accessor: "id",
           sortDescFirst: true,
-          Cell: ({ value, row }) => (
+          Cell: ({ value }) => (
             <Link href={`/proposal/${value}`}>
               <a className="link-overflow">{value}</a>
             </Link>
@@ -71,7 +71,7 @@ const ProposalsPage = () => {
         {
           Header: "Proposer",
           accessor: "proposerId",
-          Cell: ({ value, row }) => (
+          Cell: ({ value }) => (
             <Link href={`/neuron/${value}`}>
               <a className="link-overflow">{value}</a>
             </Link>
@@ -98,7 +98,7 @@ const ProposalsPage = () => {
                 <strong>
                   <a
                     onClick={() => row.toggleRowExpanded(!row.isExpanded)}
-                    className="link-overflow cursor-pointer flex items-center"
+                    className="flex items-center cursor-pointer link-overflow"
                   >
                     {row.isExpanded ? <BsChevronDown /> : <BsChevronRight />}
                     {Topic[value]}
@@ -113,7 +113,7 @@ const ProposalsPage = () => {
                 <p className="text-xs">{row.original.summary}</p>
               </div>
               {row.isExpanded && (
-                <div className="overflow-auto flex flex-col gap-2">
+                <div className="flex overflow-auto flex-col gap-2">
                   {row.original.url && (
                     <div className="text-xs">
                       <strong className="block">URL</strong>
@@ -157,7 +157,7 @@ const ProposalsPage = () => {
           Header: "Votes",
           accessor: "tallyTotal",
           disableSortBy: true,
-          Cell: ({ value, row }) => {
+          Cell: ({ row }) => {
             const tallyYes = Number(
               BigInt(row.original.tallyYes) / BigInt(1e8)
             );
@@ -279,7 +279,7 @@ const ProposalsPage = () => {
         description={`A list of governance proposals on the Internet Computer.`}
       />
       <ProposalNav />
-      <h1 className="text-3xl my-8 overflow-hidden overflow-ellipsis">
+      <h1 className="overflow-hidden my-8 text-3xl overflow-ellipsis">
         Proposals
       </h1>
       <section className="mb-8">

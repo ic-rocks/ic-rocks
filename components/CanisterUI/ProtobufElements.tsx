@@ -278,7 +278,9 @@ const MessageField = ({
     ) {
       inputType = "number";
     } else if (field.type === "bool") {
+      // Do nothing
     } else if (field.type === "bytes") {
+      // eslint-disable-next-line react-hooks/rules-of-hooks
       const [encoding, setEncoding] = useState<typeof BUFFER_ENCODINGS[number]>(
         BUFFER_ENCODINGS[0]
       );
@@ -311,7 +313,7 @@ const MessageField = ({
       <>
         <input
           placeholder={description}
-          className="px-2 py-1 bg-gray-100 dark:bg-gray-800 text-sm"
+          className="py-1 px-2 text-sm bg-gray-100 dark:bg-gray-800"
           type={inputType}
           onChange={(e) => handleInput(e.target.value, path)}
           value={value}

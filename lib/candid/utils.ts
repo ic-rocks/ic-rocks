@@ -75,7 +75,7 @@ export const decodeBlob = (bytes: Buffer) => {
   for (let i = 0; i < length; i++) {
     rawTypes.push(Number(leb128.slebDecode(pipe)));
   }
-  const table = rawTable.map((_) => IDL.Rec());
+  const table = rawTable.map(() => IDL.Rec());
   function getType(t) {
     if (t < -24) {
       throw new Error("future value not supported");
@@ -201,7 +201,7 @@ export function getDefaultValue(type: IDL.Type) {
   }
   if (type instanceof IDL.RecordClass) {
     if (type instanceof IDL.TupleClass) {
-      return type["_fields"].map(([_, t]) => getDefaultValue(t));
+      return type["_fields"].map(([, t]) => getDefaultValue(t));
     }
 
     const fields = type["_fields"];
@@ -255,15 +255,15 @@ export function getShortname(type: IDL.Type): string {
  * @param input The value
  * @returns A tuple of [coerced value, error]
  */
-export const validate = (type: IDL.Type | protobuf.Type, input: any) =>
+export const validate = (type: IDL.Type | protobuf.Type, input: unknown) =>
   type instanceof IDL.Type
     ? validateCandid(type, input)
     : validateProtobuf(type, input || {});
 
 function validateProtobuf(
   type: protobuf.Type | string,
-  input: any
-): [any, any] {
+  input: unknown
+): [unknown, unknown] {
   if (type instanceof protobuf.Type) {
     type.resolveAll();
     const fields = type.fieldsArray.filter(
@@ -278,7 +278,7 @@ function validateProtobuf(
           const validated = input[field.name].map((item) =>
             validateProtobuf(type, item)
           );
-          const errs = validated.map(([_, err]) => err);
+          const errs = validated.map(([, err]) => err);
           return [
             field.name,
             validated.map(([res]) => res),
@@ -287,10 +287,10 @@ function validateProtobuf(
         }
         return [field.name, ...validateProtobuf(type, input[field.name])];
       });
-      if (validated.some(([_, __, err]) => err)) {
+      if (validated.some(([, , err]) => err)) {
         return [
           null,
-          Object.fromEntries(validated.map(([name, _, err]) => [name, err])),
+          Object.fromEntries(validated.map(([name, , err]) => [name, err])),
         ];
       } else {
         return [
@@ -311,6 +311,7 @@ function validateProtobuf(
   else return [input, null];
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function validateCandid(type: IDL.Type, input: any): [any, any] {
   if (type instanceof IDL.RecClass) {
     return validateCandid(type["_type"], input);
@@ -319,10 +320,10 @@ function validateCandid(type: IDL.Type, input: any): [any, any] {
     const inputOrDefault = input || getDefaultValue(type);
     if (type instanceof IDL.TupleClass) {
       if (Array.isArray(input)) {
-        const validated = type["_fields"].map(([_, fieldType], i) =>
+        const validated = type["_fields"].map(([, fieldType], i) =>
           validateCandid(fieldType, input[i])
         );
-        const errs = validated.map(([_, err]) => err);
+        const errs = validated.map(([, err]) => err);
         return [
           validated.map(([res]) => res),
           errs.some(Boolean) ? errs : null,
@@ -356,7 +357,7 @@ function validateCandid(type: IDL.Type, input: any): [any, any] {
       const validated = input
         .filter((arg) => arg !== undefined)
         .map((arg) => validateCandid(type["_type"], arg));
-      const errs = validated.map(([_, err]) => err);
+      const errs = validated.map(([, err]) => err);
       return [validated.map(([res]) => res), errs.some(Boolean) ? errs : null];
     } else {
       return [[], null];
@@ -366,7 +367,7 @@ function validateCandid(type: IDL.Type, input: any): [any, any] {
     if (typeof inputOrDefault === "object") {
       const [selectedName] = Object.keys(inputOrDefault);
       if (selectedName != undefined) {
-        const [_, selectedType] = type["_fields"].find(
+        const [, selectedType] = type["_fields"].find(
           ([name]) => name === selectedName
         );
         const [res, err] = validateCandid(
