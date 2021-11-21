@@ -29,11 +29,14 @@ const ModuleCanistersPage = ({
     return <Search404 input={moduleId} />;
   }
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [bindings, setBindings] = useState(null);
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const { data } = useQuery<Module>(["modules", moduleId], async () =>
-    fetchJSON(`/api/modules/${moduleId}`)
+    fetchJSON(`/api/modules/${moduleId}`),
   );
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
     if (data?.candid) {
       didc.then((mod) => {
@@ -43,6 +46,7 @@ const ModuleCanistersPage = ({
     }
   }, [data]);
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [showInterface, setShowInterface] = useState(false);
 
   const rows = [
@@ -68,10 +72,10 @@ const ModuleCanistersPage = ({
             ? "No canisters found with this module hash"
             : `${data.canisterCount} ${pluralize(
                 "canister",
-                data.canisterCount
+                data.canisterCount,
               )} match this module hash on ${data.subnetCount} ${pluralize(
                 "subnet",
-                data.subnetCount
+                data.subnetCount,
               )}`,
       },
     ],

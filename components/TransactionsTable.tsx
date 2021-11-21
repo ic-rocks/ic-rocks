@@ -98,7 +98,7 @@ export const TransactionsTable = ({ accountId }: { accountId?: string }) => {
         disableSortBy: true,
       },
     ],
-    []
+    [accountId]
   );
 
   const initialSort = useMemo(() => [{ id: "blockHeight", desc: true }], []);

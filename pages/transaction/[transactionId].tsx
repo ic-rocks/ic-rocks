@@ -31,12 +31,14 @@ const TransactionPage = ({
     return <Search404 input={transactionId} />;
   }
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const { data } = useQuery<Transaction>(
     ["transaction", transactionId],
     () => fetchJSON(`/api/transactions/${transactionId}`),
-    { staleTime: Infinity }
+    { staleTime: Infinity },
   );
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const { data: markets } = useMarkets();
 
   return (
@@ -79,7 +81,7 @@ const TransactionPage = ({
             <td
               className={classnames(
                 "flex overflow-hidden flex-1 py-2 px-2",
-                {}
+                {},
               )}
             >
               {data ? (
@@ -100,7 +102,7 @@ const TransactionPage = ({
             <td
               className={classnames(
                 "flex overflow-hidden flex-1 py-2 px-2",
-                {}
+                {},
               )}
             >
               {data ? (
@@ -127,7 +129,7 @@ const TransactionPage = ({
                       (
                       {formatNumberUSD(
                         (Number(markets.ticker.price) * Number(data.amount)) /
-                          1e8
+                          1e8,
                       )}
                       )
                     </small>
@@ -148,7 +150,7 @@ const TransactionPage = ({
                         (
                         {formatNumberUSD(
                           (Number(markets.ticker.price) * Number(data.fee)) /
-                            1e8
+                            1e8,
                         )}
                         )
                       </small>

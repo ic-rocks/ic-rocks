@@ -25,10 +25,11 @@ const NodePage = ({
     return <Search404 input={nodeId} />;
   }
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const { data } = useQuery<NodeResponse>(
     ["nodes", nodeId],
     () => fetchJSON(`/api/nodes/${nodeId}`),
-    { staleTime: Infinity }
+    { staleTime: Infinity },
   );
 
   return (

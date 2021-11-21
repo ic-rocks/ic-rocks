@@ -127,7 +127,7 @@ const NeuronAllocationsPage = () => {
         className: "px-2 w-64",
       },
     ],
-    []
+    [stats]
   );
 
   return (

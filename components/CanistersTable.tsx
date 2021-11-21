@@ -146,7 +146,7 @@ export const CanistersTable = ({
         className: "w-16 text-center hidden sm:block",
       },
     ].filter(Boolean);
-  }, [subnets]);
+  }, [controllerId, moduleId, subnets]);
 
   const initialSort = useMemo(
     () => [{ id: "latestVersionDate", desc: true }],

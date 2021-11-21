@@ -196,7 +196,16 @@ export const TableInner = ({
     if (onStateChange) {
       onStateChange({ pageIndex, pageSize, sortBy, filters });
     }
-  }, [pageIndex, pageSize, sortBy, filters]);
+  }, [
+    pageIndex,
+    pageSize,
+    sortBy,
+    filters,
+    persistState,
+    onStateChange,
+    name,
+    setTableState,
+  ]);
 
   return (
     <div className="overflow-x-auto xs:overflow-x-visible max-w-full">

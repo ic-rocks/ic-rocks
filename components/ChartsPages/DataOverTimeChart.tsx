@@ -1,13 +1,13 @@
 import { DateTime } from "luxon";
 import React, { useMemo } from "react";
 import { formatNumber } from "../../lib/numbers";
-import LineBarChart from "../Charts/LineBarChart";
-import LineChart from "../Charts/LineChart";
-import { ChartId, ChartTypes } from "./ChartIds";
-import { ChartContainer } from "./ChartContainer";
-import TransactionsOverTimeChart from "./TransactionsOverTimeChart";
 import { SubnetResponse } from "../../lib/types/API";
 import DonutChart, { DonutSeries } from "../Charts/DonutChart";
+import LineBarChart from "../Charts/LineBarChart";
+import LineChart from "../Charts/LineChart";
+import { ChartContainer } from "./ChartContainer";
+import { ChartId, ChartTypes } from "./ChartIds";
+import TransactionsOverTimeChart from "./TransactionsOverTimeChart";
 
 type Series = { x: Date; y1: number; y2: number };
 
@@ -30,6 +30,7 @@ const DataOverTimeChart = ({
 
   const { data } = hook();
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const donutChartSeries: DonutSeries[] = useMemo(() => {
     if (chartId === "canisters-per-subnet")
       return (data as SubnetResponse[])
@@ -40,7 +41,7 @@ const DataOverTimeChart = ({
           nodeCount,
         }))
         .sort((a, b) => b.value - a.value);
-  }, [data]);
+  }, [chartId, data]);
 
   if (chartId === "canisters-per-subnet") {
     return (
@@ -56,6 +57,7 @@ const DataOverTimeChart = ({
     );
   }
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const series: Series[] = useMemo(() => {
     let sum = 0;
     return data
@@ -72,7 +74,7 @@ const DataOverTimeChart = ({
         y1: 0,
         y2: sum,
       });
-  }, [data]);
+  }, [data, dataKey]);
 
   if (chartId === "cycles-minted") {
     return (

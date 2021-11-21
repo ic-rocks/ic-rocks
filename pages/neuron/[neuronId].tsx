@@ -35,10 +35,12 @@ const NeuronIdPage = ({
     return <Search404 input={neuronId} />;
   }
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const { data } = useQuery<Neuron>(["neurons", neuronId], () =>
-    fetchJSON(`/api/neurons/${neuronId}`)
+    fetchJSON(`/api/neurons/${neuronId}`),
   );
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const summaryRows = useMemo(() => {
     let createdDate,
       dissolveDate,
@@ -58,13 +60,13 @@ const NeuronIdPage = ({
       dissolveBonus =
         Math.min(
           MAX_DISSOLVE_DELAY_SECONDS,
-          Math.abs(dissolveDateRelative / 1e3)
+          Math.abs(dissolveDateRelative / 1e3),
         ) / MAX_DISSOLVE_DELAY_SECONDS;
       agingSinceDate = DateTime.fromISO(data.agingSinceDate);
       ageBonus =
         Math.min(
           MAX_NEURON_AGE_FOR_AGE_BONUS,
-          Math.abs(agingSinceDate.diffNow().toMillis() / 1e3)
+          Math.abs(agingSinceDate.diffNow().toMillis() / 1e3),
         ) /
         (4 * MAX_NEURON_AGE_FOR_AGE_BONUS);
     }

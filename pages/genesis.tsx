@@ -69,7 +69,7 @@ const GenesisAccountsStats = () => {
         },
       ];
     });
-  }, [genesisStats]);
+  }, [genesisStats, stats]);
 
   const statsByNeuronStateHeaders = [
     { contents: "Neuron State", className: "w-32" },
@@ -118,7 +118,7 @@ const GenesisAccountsStats = () => {
         },
       ];
     });
-  }, [genesisStats]);
+  }, [genesisStats, stats]);
 
   return (
     <section className="flex flex-col md:flex-row gap-8 mb-8">
