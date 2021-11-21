@@ -33,8 +33,8 @@ export default function StatsBoxes() {
   ];
 
   return (
-    <section className="rounded p-4 border border-gray-500 flex flex-row-reverse flex-wrap sm:flex-nowrap justify-evenly gap-8 mb-8">
-      <div className="flex-none flex flex-col w-full xs:w-64">
+    <section className="flex flex-row-reverse flex-wrap sm:flex-nowrap gap-8 justify-evenly p-4 mb-8 rounded border border-gray-500">
+      <div className="flex flex-col flex-none w-full xs:w-64">
         <div className="flex justify-between">
           <label>ICP Price</label>
           {markets?.ticker && (

@@ -11,7 +11,7 @@ export default function useAuth() {
     if (!auth) {
       queryClient.invalidateQueries("tags");
     }
-  }, [auth]);
+  }, [auth, queryClient]);
 
   return null;
 }

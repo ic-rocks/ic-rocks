@@ -100,17 +100,17 @@ const AccountDetails = ({ accountId }: { accountId: string }) => {
           <tr className="flex">
             <th
               colSpan={2}
-              className="px-2 py-2 flex-1 flex flex-wrap justify-between"
+              className="flex flex-wrap flex-1 justify-between py-2 px-2"
             >
               <div className="flex gap-1">
                 <label className="mr-4">Account Details</label>
                 {data?.neuron?.genesisAccountId && (
-                  <label className="font-normal label-tag bg-purple-200 dark:bg-purple-400">
+                  <label className="font-normal bg-purple-200 dark:bg-purple-400 label-tag">
                     Genesis Account
                   </label>
                 )}
                 {data?.principal?.isKyc && (
-                  <label className="font-normal label-tag bg-purple-200 dark:bg-purple-400">
+                  <label className="font-normal bg-purple-200 dark:bg-purple-400 label-tag">
                     KYC
                   </label>
                 )}
@@ -125,8 +125,8 @@ const AccountDetails = ({ accountId }: { accountId: string }) => {
         </thead>
         <tbody className="divide-y divide-default">
           <tr className="flex">
-            <td className="px-2 py-2 w-32 sm:w-40">Name</td>
-            <td className="px-2 py-2 flex-1 flex items-center gap-2">
+            <td className="py-2 px-2 w-32 sm:w-40">Name</td>
+            <td className="flex flex-1 gap-2 items-center py-2 px-2">
               {data?.name || (!tags[0]?.label ? "-" : null)}
               {tags.map((tag, i) => (
                 <TaggedLabel key={i} label={tag.label} />
@@ -135,8 +135,8 @@ const AccountDetails = ({ accountId }: { accountId: string }) => {
           </tr>
           {data?.neuron?.genesisAccountId && (
             <tr className="flex">
-              <td className="px-2 py-2 w-32 sm:w-40">Genesis Account</td>
-              <td className="px-2 py-2 flex-1 flex oneline">
+              <td className="py-2 px-2 w-32 sm:w-40">Genesis Account</td>
+              <td className="flex flex-1 py-2 px-2 oneline">
                 <Link href={`/genesis/${data.neuron.genesisAccountId}`}>
                   <a className="link-overflow">
                     {data.neuron.genesisAccountId}
@@ -147,12 +147,12 @@ const AccountDetails = ({ accountId }: { accountId: string }) => {
           )}
           {data?.isNeuron && (
             <tr className="flex">
-              <td className="px-2 py-2 w-32 sm:w-40">Neuron</td>
-              <td className="px-2 py-2 flex-1 break-words">
+              <td className="py-2 px-2 w-32 sm:w-40">Neuron</td>
+              <td className="flex-1 py-2 px-2 break-words">
                 {data.neuron ? (
                   <>
                     <Link href={`/neuron/${data.neuron.id}`}>
-                      <a className="link-overflow mr-2">
+                      <a className="mr-2 link-overflow">
                         {data.neuron.name || data.neuron.id}
                       </a>
                     </Link>
@@ -169,7 +169,7 @@ const AccountDetails = ({ accountId }: { accountId: string }) => {
                       data-balloon-pos="down"
                       data-balloon-length="medium"
                     >
-                      <BsInfoCircle className="ml-1 inline text-xs align-middle" />
+                      <BsInfoCircle className="inline ml-1 text-xs align-middle" />
                     </span>
                   </span>
                 )}
@@ -177,8 +177,8 @@ const AccountDetails = ({ accountId }: { accountId: string }) => {
             </tr>
           )}
           <tr className="flex">
-            <td className="px-2 py-2 w-32 sm:w-40">Principal</td>
-            <td className="px-2 py-2 flex-1 flex oneline">
+            <td className="py-2 px-2 w-32 sm:w-40">Principal</td>
+            <td className="flex flex-1 py-2 px-2 oneline">
               {data?.principalId ? (
                 <IdentifierLink
                   type="principal"
@@ -192,8 +192,8 @@ const AccountDetails = ({ accountId }: { accountId: string }) => {
           </tr>
           {data?.principal?.isKyc && (
             <tr className="flex">
-              <td className="px-2 py-2 w-32 sm:w-40">KYC Proposal</td>
-              <td className="px-2 py-2 flex-1 flex oneline">
+              <td className="py-2 px-2 w-32 sm:w-40">KYC Proposal</td>
+              <td className="flex flex-1 py-2 px-2 oneline">
                 <Link href={`/proposal/${data.principal.kyc[0].proposalId}`}>
                   <a className="link-overflow">
                     {data.principal.kyc[0].proposalId}
@@ -203,14 +203,14 @@ const AccountDetails = ({ accountId }: { accountId: string }) => {
             </tr>
           )}
           <tr className="flex">
-            <td className="px-2 py-2 w-32 sm:w-40">Subaccount</td>
-            <td className="px-2 py-2 flex-1 flex oneline">
+            <td className="py-2 px-2 w-32 sm:w-40">Subaccount</td>
+            <td className="flex flex-1 py-2 px-2 oneline">
               {subaccount ? hideLeadingZeros(subaccount) : "-"}
             </td>
           </tr>
           <tr className="flex">
-            <td className="px-2 py-2 w-32 sm:w-40">Balance</td>
-            <td className="px-2 py-2 flex-1">
+            <td className="py-2 px-2 w-32 sm:w-40">Balance</td>
+            <td className="flex-1 py-2 px-2">
               {data || ledgerBalance ? (
                 <BalanceLabel
                   value={data.balance ?? ledgerBalance}
@@ -222,8 +222,8 @@ const AccountDetails = ({ accountId }: { accountId: string }) => {
             </td>
           </tr>
           <tr className="flex">
-            <td className="px-2 py-2 w-32 sm:w-40">Value</td>
-            <td className="px-2 py-2 flex-1">
+            <td className="py-2 px-2 w-32 sm:w-40">Value</td>
+            <td className="flex-1 py-2 px-2">
               {data && markets?.ticker ? (
                 <>
                   {formatNumberUSD(
@@ -239,8 +239,8 @@ const AccountDetails = ({ accountId }: { accountId: string }) => {
             </td>
           </tr>
           <tr className="flex">
-            <td className="px-2 py-2 w-32 sm:w-40">Transactions</td>
-            <td className="px-2 py-2 flex-1">
+            <td className="py-2 px-2 w-32 sm:w-40">Transactions</td>
+            <td className="flex-1 py-2 px-2">
               {data?.tx_count ? formatNumber(data.tx_count) : 0}
             </td>
           </tr>

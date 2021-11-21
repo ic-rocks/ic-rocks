@@ -25,7 +25,7 @@ function Inner({ Component, pageProps }) {
 
   return (
     <div className="flex flex-col items-center">
-      <div className="flex flex-col justify-between min-h-screen w-full sm:max-w-screen-lg px-4">
+      <div className="flex flex-col justify-between px-4 w-full sm:max-w-screen-lg min-h-screen">
         <main>
           <Nav />
           <Component {...pageProps} />

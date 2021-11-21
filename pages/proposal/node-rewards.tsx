@@ -28,7 +28,7 @@ const NodeRewardsStats = () => {
             data-balloon-pos="right"
             data-balloon-length="medium"
           >
-            <BsInfoCircle className="ml-1 inline text-xs align-middle" />
+            <BsInfoCircle className="inline ml-1 text-xs align-middle" />
           </span>
         </>
       ),
@@ -152,7 +152,7 @@ export default function NodeRewardsPage() {
         description={`A list of Node Rewards on the Internet Computer.`}
       />
       <ProposalNav />
-      <h1 className="text-3xl my-8 overflow-hidden overflow-ellipsis">
+      <h1 className="overflow-hidden my-8 text-3xl overflow-ellipsis">
         Node Provider Rewards
       </h1>
       <section className="mb-8">

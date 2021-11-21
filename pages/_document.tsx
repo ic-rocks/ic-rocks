@@ -1,4 +1,5 @@
 import Document, { Head, Html, Main, NextScript } from "next/document";
+import React from "react";
 
 export default class MyDocument extends Document {
   render() {
@@ -12,7 +13,7 @@ export default class MyDocument extends Document {
           />
           <meta property="og:type" content="website" />
         </Head>
-        <body className="dark:bg-gray-900 dark:text-white">
+        <body className="dark:text-white dark:bg-gray-900">
           <script src="/noflash.js" />
           <Main />
           <NextScript />

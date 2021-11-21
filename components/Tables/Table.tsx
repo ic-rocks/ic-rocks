@@ -53,7 +53,7 @@ export function MultiSelectColumnFilter({
       value={filterValue || []}
       disableSearch={true}
       options={filterOptions}
-      valueRenderer={(selected, _options) =>
+      valueRenderer={(selected) =>
         selected.length
           ? `${filterLabel}: ${selected.length} selected`
           : `${filterLabel}: Select...`
@@ -66,12 +66,14 @@ export type CommonTableProps = {
   name?: string;
   className?: string;
   style?: CSSProperties;
-  tableBodyProps?: any;
-  tableHeaderGroupProps?: any;
+  tableBodyProps?: unknown;
+  tableHeaderGroupProps?: unknown;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   columns: Column<any>[];
   useSort?: boolean;
   /** If true, we pass in pre-sorted data */
   manualSortBy?: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   initialSortBy?: SortingRule<any>[];
   usePage?: boolean;
   manualPagination?: boolean;
@@ -84,6 +86,7 @@ export type CommonTableProps = {
 };
 
 type TableProps = CommonTableProps & {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: any[];
   count?: number;
 
@@ -96,7 +99,9 @@ type TableProps = CommonTableProps & {
   }: {
     pageSize: number;
     pageIndex: number;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     sortBy: SortingRule<any>[];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     filters: Filters<any>;
   }) => void;
   loading?: boolean;
@@ -154,7 +159,7 @@ export const TableInner = ({
     nextPage,
     previousPage,
     setPageSize,
-    state: { pageIndex, pageSize, sortBy, expanded, filters },
+    state: { pageIndex, pageSize, sortBy, filters },
   } = useTable(
     {
       columns,
@@ -191,12 +196,21 @@ export const TableInner = ({
     if (onStateChange) {
       onStateChange({ pageIndex, pageSize, sortBy, filters });
     }
-  }, [pageIndex, pageSize, sortBy, filters]);
+  }, [
+    pageIndex,
+    pageSize,
+    sortBy,
+    filters,
+    persistState,
+    onStateChange,
+    name,
+    setTableState,
+  ]);
 
   return (
-    <div className="max-w-full overflow-x-auto xs:overflow-x-visible">
+    <div className="overflow-x-auto xs:overflow-x-visible max-w-full">
       {useFilter && (
-        <div className="py-2 flex flex-wrap gap-1">
+        <div className="flex flex-wrap gap-1 py-2">
           {allColumns.map((column) =>
             column.canFilter && column.Filter
               ? column.render("Filter", { key: column.id })
@@ -218,6 +232,7 @@ export const TableInner = ({
         <thead className="block">
           {headerGroups.map((headerGroup) => (
             <tr
+              key={headerGroup.id}
               {...headerGroup.getHeaderGroupProps([
                 {
                   className: "flex",
@@ -229,6 +244,7 @@ export const TableInner = ({
                 .filter((c) => !c.hidden)
                 .map((column) => (
                   <th
+                    key={column.id}
                     {...column.getHeaderProps([
                       {
                         className: "items-center",
@@ -241,9 +257,9 @@ export const TableInner = ({
                     {column.render("Header")}
                     {column.isSorted &&
                       (column.isSortedDesc ? (
-                        <FaSortAmountDown className="ml-1 inline" />
+                        <FaSortAmountDown className="inline ml-1" />
                       ) : (
-                        <FaSortAmountUp className="ml-1 inline" />
+                        <FaSortAmountUp className="inline ml-1" />
                       ))}
                   </th>
                 ))}
@@ -258,15 +274,16 @@ export const TableInner = ({
             tableBodyProps,
           ])}
         >
-          {page.map((row, i) => {
+          {page.map((row) => {
             prepareRow(row);
             return (
-              <tr {...row.getRowProps({ className: "flex" })}>
+              <tr key={row.id} {...row.getRowProps({ className: "flex" })}>
                 {row.cells
                   .filter((c) => !c.column.hidden)
                   .map((cell) => {
                     return (
                       <td
+                        key={cell.row.id + cell.column.id}
                         {...cell.getCellProps([
                           { className: cell.column.className },
                           { style: cell.column.style },
@@ -286,11 +303,11 @@ export const TableInner = ({
             >
               <td
                 colSpan={columns.length}
-                className="flex-1 text-center py-2 text-xs text-gray-600 dark:text-gray-400"
+                className="flex-1 py-2 text-xs text-center text-gray-600 dark:text-gray-400"
               >
                 {loading ? (
                   <>
-                    <CgSpinner className="mr-1 inline-block animate-spin" />
+                    <CgSpinner className="inline-block mr-1 animate-spin" />
                     Loading...
                   </>
                 ) : (
@@ -304,7 +321,7 @@ export const TableInner = ({
             <tr className="flex">
               <td
                 colSpan={columns.length}
-                className="flex-1 text-center py-2 text-xs text-gray-600 dark:text-gray-400"
+                className="flex-1 py-2 text-xs text-center text-gray-600 dark:text-gray-400"
               >
                 <CgSpinner
                   className={classNames("mr-1 inline-block animate-spin", {

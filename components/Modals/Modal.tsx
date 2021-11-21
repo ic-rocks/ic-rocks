@@ -9,11 +9,11 @@ export default function Modal({ isOpen, openModal, closeModal, children }) {
     <Transition appear show={isOpen} as={Fragment}>
       <Dialog
         as="div"
-        className="fixed inset-0 z-10 overflow-y-auto"
+        className="overflow-y-auto fixed inset-0 z-10"
         onClose={closeModal}
         initialFocus={cancelButtonRef}
       >
-        <div className="min-h-screen px-4 text-center">
+        <div className="px-4 min-h-screen text-center">
           <Transition.Child
             as={Fragment}
             enter="ease-out duration-300"
@@ -42,14 +42,14 @@ export default function Modal({ isOpen, openModal, closeModal, children }) {
             leaveFrom="opacity-100 scale-100"
             leaveTo="opacity-0 scale-95"
           >
-            <div className="inline-block w-full max-w-sm p-4 my-8 overflow-hidden text-left align-middle transition-all transform bg-gray-100 dark:bg-gray-800 shadow-xl rounded-2xl">
+            <div className="inline-block overflow-hidden p-4 my-8 w-full max-w-sm text-left align-middle bg-gray-100 dark:bg-gray-800 rounded-2xl shadow-xl transition-all transform">
               <div className="flex justify-between">
                 <Dialog.Title as="h3" className="text-lg leading-tight">
                   Manage Tags
                 </Dialog.Title>
                 <button
                   type="button"
-                  className="btn-default p-1"
+                  className="p-1 btn-default"
                   onClick={closeModal}
                   ref={cancelButtonRef}
                 >

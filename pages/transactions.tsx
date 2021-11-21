@@ -22,17 +22,17 @@ const Transactions = () => {
         description="A list of transactions on the Internet Computer ledger."
       />
       <section>
-        <table className="table-fixed w-full">
+        <table className="w-full table-fixed">
           <tbody className="divide-y divide-gray-300 dark:divide-gray-700">
             <tr className="flex">
-              <td className="px-2 py-2 w-28 sm:w-44">Total Transactions</td>
-              <td className="px-2 py-2 flex-1 overflow-hidden overflow-ellipsis">
+              <td className="py-2 px-2 w-28 sm:w-44">Total Transactions</td>
+              <td className="overflow-hidden flex-1 py-2 px-2 overflow-ellipsis">
                 {stats ? formatNumber(stats.stats.count) : null}
               </td>
             </tr>
             <tr className="flex">
-              <td className="px-2 py-2 w-28 sm:w-44">Total Minted</td>
-              <td className="px-2 py-2 flex-1">
+              <td className="py-2 px-2 w-28 sm:w-44">Total Minted</td>
+              <td className="flex-1 py-2 px-2">
                 {stats ? (
                   <>
                     <BalanceLabel value={stats.stats.total_minted} />
@@ -52,8 +52,8 @@ const Transactions = () => {
               </td>
             </tr>
             <tr className="flex">
-              <td className="px-2 py-2 w-28 sm:w-44">Total Burned</td>
-              <td className="px-2 py-2 flex-1">
+              <td className="py-2 px-2 w-28 sm:w-44">Total Burned</td>
+              <td className="flex-1 py-2 px-2">
                 {stats ? (
                   <>
                     <BalanceLabel value={stats.stats.total_burned} />
@@ -73,8 +73,8 @@ const Transactions = () => {
               </td>
             </tr>
             <tr className="flex">
-              <td className="px-2 py-2 w-28 sm:w-44">Total Fees</td>
-              <td className="px-2 py-2 flex-1">
+              <td className="py-2 px-2 w-28 sm:w-44">Total Fees</td>
+              <td className="flex-1 py-2 px-2">
                 {stats ? (
                   <>
                     <BalanceLabel value={stats.stats.total_fees} />
@@ -94,8 +94,8 @@ const Transactions = () => {
               </td>
             </tr>
             <tr className="flex">
-              <td className="px-2 py-2 w-28 sm:w-44">Average Transfer</td>
-              <td className="px-2 py-2 flex-1">
+              <td className="py-2 px-2 w-28 sm:w-44">Average Transfer</td>
+              <td className="flex-1 py-2 px-2">
                 {stats ? (
                   <>
                     <BalanceLabel value={stats.stats.avg_transferred} />
@@ -115,14 +115,14 @@ const Transactions = () => {
               </td>
             </tr>
             <tr className="flex">
-              <td className="px-2 py-2 w-28 sm:w-44">Unique Senders</td>
-              <td className="px-2 py-2 flex-1">
+              <td className="py-2 px-2 w-28 sm:w-44">Unique Senders</td>
+              <td className="flex-1 py-2 px-2">
                 {stats ? formatNumber(stats.stats.senders) : null}
               </td>
             </tr>
             <tr className="flex">
-              <td className="px-2 py-2 w-28 sm:w-44">Unique Receivers</td>
-              <td className="px-2 py-2 flex-1">
+              <td className="py-2 px-2 w-28 sm:w-44">Unique Receivers</td>
+              <td className="flex-1 py-2 px-2">
                 {stats ? formatNumber(stats.stats.receivers) : null}
               </td>
             </tr>

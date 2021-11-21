@@ -35,10 +35,12 @@ const NeuronIdPage = ({
     return <Search404 input={neuronId} />;
   }
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const { data } = useQuery<Neuron>(["neurons", neuronId], () =>
-    fetchJSON(`/api/neurons/${neuronId}`)
+    fetchJSON(`/api/neurons/${neuronId}`),
   );
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const summaryRows = useMemo(() => {
     let createdDate,
       dissolveDate,
@@ -58,13 +60,13 @@ const NeuronIdPage = ({
       dissolveBonus =
         Math.min(
           MAX_DISSOLVE_DELAY_SECONDS,
-          Math.abs(dissolveDateRelative / 1e3)
+          Math.abs(dissolveDateRelative / 1e3),
         ) / MAX_DISSOLVE_DELAY_SECONDS;
       agingSinceDate = DateTime.fromISO(data.agingSinceDate);
       ageBonus =
         Math.min(
           MAX_NEURON_AGE_FOR_AGE_BONUS,
-          Math.abs(agingSinceDate.diffNow().toMillis() / 1e3)
+          Math.abs(agingSinceDate.diffNow().toMillis() / 1e3),
         ) /
         (4 * MAX_NEURON_AGE_FOR_AGE_BONUS);
     }
@@ -90,7 +92,7 @@ const NeuronIdPage = ({
                   data-balloon-pos="down"
                   data-balloon-length="medium"
                 >
-                  <BsInfoCircle className="ml-1 inline text-xs align-middle" />
+                  <BsInfoCircle className="inline ml-1 text-xs align-middle" />
                 </span>
               </span>
             )
@@ -191,7 +193,7 @@ const NeuronIdPage = ({
         title={`Neuron ${neuronId}`}
         description={`Details for Neuron ${neuronId} on the Internet Computer ledger.`}
       />
-      <h1 className="text-3xl my-8 overflow-hidden overflow-ellipsis">
+      <h1 className="overflow-hidden my-8 text-3xl overflow-ellipsis">
         Neuron <small className="text-xl break-all">{neuronId}</small>
       </h1>
       <section className="mb-8">

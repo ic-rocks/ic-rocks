@@ -7,7 +7,7 @@ export const ProposalUrl = ({ url }: { url: string }) => {
     <a
       href={url}
       target="_blank"
-      className="inline-flex items-center oneline link-overflow"
+      className="inline-flex items-center oneline link-overflow" rel="noreferrer"
     >
       {url} <FiExternalLink className="ml-1" />
     </a>

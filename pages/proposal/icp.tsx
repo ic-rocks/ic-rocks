@@ -54,6 +54,7 @@ function Prices() {
         limit: proposals.length ? 1 : count,
         exclude_topic: [1, 3, 4, 5, 6, 7, 8, 9, 10].map(BigInt),
         include_status: [1, 2, 3, 4, 5].map(BigInt),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       })) as { proposal_info: any[] };
 
       const filtered = data.proposal_info.filter(
@@ -64,6 +65,7 @@ function Prices() {
         const payload = IDL.decode(
           [UpdateIcpXdrConversionRatePayload(IDL)],
           Buffer.from(p.proposal[0].action[0].ExecuteNnsFunction.payload)
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ) as any[];
         const source = JSON.parse(payload[0].data_source);
         return {
@@ -95,6 +97,7 @@ function Prices() {
   };
 
   useEffect(fetchPrice, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(fetchData, []);
   useInterval(fetchPrice, 30 * 1000);
   useInterval(fetchData, 30 * 1000);
@@ -124,25 +127,25 @@ function Prices() {
       />
       <ProposalNav />
       <section className="pb-8">
-        <h1 className="text-3xl my-8">ICP Price Oracle</h1>
+        <h1 className="my-8 text-3xl">ICP Price Oracle</h1>
         <table className="w-full">
           <tbody className="divide-y divide-gray-300 dark:divide-gray-700">
             <tr>
-              <td className="px-2 py-2 w-1/6">Latest ICP Price</td>
-              <td className="px-2 py-2 w-5/6">{latestPrice}</td>
+              <td className="py-2 px-2 w-1/6">Latest ICP Price</td>
+              <td className="py-2 px-2 w-5/6">{latestPrice}</td>
             </tr>
             <tr>
-              <td className="px-2 py-2 w-1/6">Timestamp</td>
-              <td className="px-2 py-2 w-5/6">{timestamp}</td>
+              <td className="py-2 px-2 w-1/6">Timestamp</td>
+              <td className="py-2 px-2 w-5/6">{timestamp}</td>
             </tr>
             <tr>
-              <td className="px-2 py-2 w-1/6">XDR Rate</td>
-              <td className="px-2 py-2 w-5/6">
+              <td className="py-2 px-2 w-1/6">XDR Rate</td>
+              <td className="py-2 px-2 w-5/6">
                 {xdrUsd ? `1 XDR = ${xdrUsd} USD` : null}
               </td>
             </tr>
             <tr>
-              <td colSpan={2} className="px-2 py-2">
+              <td colSpan={2} className="py-2 px-2">
                 Price data is read from the governance canister, and acts as an
                 on-chain oracle of ICP price.
               </td>
@@ -150,38 +153,38 @@ function Prices() {
           </tbody>
         </table>
       </section>
-      <h2 className="text-xl mb-4">Latest {count} price updates</h2>
-      <table className="table-auto w-full">
+      <h2 className="mb-4 text-xl">Latest {count} price updates</h2>
+      <table className="w-full table-auto">
         <thead className="bg-heading">
           <tr>
-            <th className="px-2 py-2">ID</th>
-            <th className="px-2 py-2">Proposed Timestamp</th>
-            <th className="px-2 py-2">Executed Timestamp</th>
-            <th className="px-2 py-2">Payload Timestamp</th>
-            <th className="px-2 py-2">ICP Source</th>
-            <th className="px-2 py-2">SDR Source</th>
-            <th className="px-2 py-2">Price (XDR)</th>
-            <th className="px-2 py-2">Price (USD)</th>
+            <th className="py-2 px-2">ID</th>
+            <th className="py-2 px-2">Proposed Timestamp</th>
+            <th className="py-2 px-2">Executed Timestamp</th>
+            <th className="py-2 px-2">Payload Timestamp</th>
+            <th className="py-2 px-2">ICP Source</th>
+            <th className="py-2 px-2">SDR Source</th>
+            <th className="py-2 px-2">Price (XDR)</th>
+            <th className="py-2 px-2">Price (USD)</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-300 dark:divide-gray-700">
           {proposals.map((proposal) => {
             return (
               <tr key={proposal.id}>
-                <td className="px-2 py-2">{proposal.id.toString()}</td>
-                <td className="px-2 py-2">
+                <td className="py-2 px-2">{proposal.id.toString()}</td>
+                <td className="py-2 px-2">
                   {formatTimestamp(proposal.timestamp_proposal)}
                 </td>
-                <td className="px-2 py-2">
+                <td className="py-2 px-2">
                   {formatTimestamp(proposal.timestamp_executed)}
                 </td>
-                <td className="px-2 py-2">
+                <td className="py-2 px-2">
                   {formatTimestamp(proposal.timestamp_payload)}
                 </td>
-                <td className="px-2 py-2">{proposal.source.icp}</td>
-                <td className="px-2 py-2">{proposal.source.sdr}</td>
-                <td className="px-2 py-2">{proposal.icp_xdr.toFixed(4)}</td>
-                <td className="px-2 py-2">
+                <td className="py-2 px-2">{proposal.source.icp}</td>
+                <td className="py-2 px-2">{proposal.source.sdr}</td>
+                <td className="py-2 px-2">{proposal.icp_xdr.toFixed(4)}</td>
+                <td className="py-2 px-2">
                   {xdrUsd ? `${(xdrUsd * proposal.icp_xdr).toFixed(2)}` : null}
                 </td>
               </tr>

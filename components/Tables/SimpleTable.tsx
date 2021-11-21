@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import { CSSProperties, ReactNode } from "react";
+import React, { CSSProperties, ReactNode } from "react";
 
 type SimpleTableRow = {
   contents: ReactNode;

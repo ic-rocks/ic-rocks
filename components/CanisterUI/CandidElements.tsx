@@ -92,6 +92,8 @@ export const CandidInput = ({
   if (type instanceof IDL.VecClass) {
     const vec = get(inputs, path, []);
     const isVecNat8 = type["_type"].name === "nat8";
+
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     const [vecInput, setVecInput] = useState<typeof BUFFER_ENCODINGS[number]>(
       BUFFER_ENCODINGS[0]
     );
@@ -237,7 +239,7 @@ export const CandidInput = ({
     <Node label={showLabel && label}>
       <input
         placeholder={description}
-        className="px-2 py-1 bg-gray-100 dark:bg-gray-800 text-sm"
+        className="py-1 px-2 text-sm bg-gray-100 dark:bg-gray-800"
         type={inputType}
         onChange={(e) => handleInput(e.target.value, path)}
         value={get(inputs, path, "")}
@@ -460,6 +462,7 @@ export const CandidOutput = ({
               href={value}
               target="_blank"
               className="text-blue-600 hover:underline"
+              rel="noreferrer"
             >
               {value}
             </a>
@@ -473,6 +476,7 @@ export const CandidOutput = ({
     );
   } else if (type instanceof IDL.PrincipalClass) {
     const principal = value instanceof Principal ? value.toText() : value;
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     const router = useRouter();
     const { principalId } = router.query;
     return (
@@ -482,6 +486,7 @@ export const CandidOutput = ({
             href={`/principal/${principal}`}
             target="_blank"
             className="text-blue-600 hover:underline"
+            rel="noreferrer"
           >
             {principal}
           </a>

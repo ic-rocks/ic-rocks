@@ -25,7 +25,7 @@ const ChartsPage = ({ chartId }: { chartId: ChartId }) => {
         description={`Chart of ${heading} on the Internet Computer.`}
       />
       <ChartsNav />
-      <h1 className="text-3xl my-8">{heading}</h1>
+      <h1 className="my-8 text-3xl">{heading}</h1>
       <div className="flex flex-col gap-4">
         {description}
         <DataOverTimeChart chartId={chartId} isFull={true} />

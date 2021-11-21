@@ -13,7 +13,7 @@ const NeuronsPage = () => {
         description={`Overview of neurons on the Internet Computer.`}
       />
       <NeuronNav />
-      <h1 className="text-3xl my-8 overflow-hidden overflow-ellipsis">
+      <h1 className="overflow-hidden my-8 text-3xl overflow-ellipsis">
         Known Neurons
       </h1>
       <section className="mb-8">

@@ -70,7 +70,7 @@ export default function TagModal({
         <button
           type="button"
           onClick={openModal}
-          className="text-xs px-2 py-1 btn-default-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75"
+          className="py-1 px-2 text-xs focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus:outline-none btn-default-2"
         >
           Manage Tags
         </button>
@@ -82,7 +82,7 @@ export default function TagModal({
                 action: "update",
               })
             }
-            className="text-xs px-2 py-1 btn-default-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75"
+            className="py-1 px-2 text-xs focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus:outline-none btn-default-2"
           >
             {bookmarked ? <FaBookmark /> : <FaRegBookmark />}
           </button>
@@ -168,7 +168,7 @@ function PublicForm({
             <input
               type="text"
               placeholder="Submit Public Label..."
-              className="w-full px-2 py-1 bg-gray-200 dark:bg-gray-700 text-sm"
+              className="py-1 px-2 w-full text-sm bg-gray-200 dark:bg-gray-700"
               value={label}
               onChange={(e) => setLabel(e.target.value)}
               maxLength={40}
@@ -178,7 +178,7 @@ function PublicForm({
         <ul className="text-sm">
           {!!name && (
             <li className="flex items-center">
-              <div className="w-6 flex justify-end mr-2">
+              <div className="flex justify-end mr-2 w-6">
                 <HiCheckCircle className="text-green-400" />
               </div>
               {name}
@@ -187,7 +187,7 @@ function PublicForm({
           {publicTags.map((tag, i) => {
             return (
               <li key={i} className="flex">
-                <div className="w-6 text-right mr-2">{tag.count}</div>
+                <div className="mr-2 w-6 text-right">{tag.count}</div>
                 {tag.label}
               </li>
             );
@@ -198,14 +198,14 @@ function PublicForm({
             <CheckButton
               isLoading={isLoading && action.current === "update"}
               isChecked={isChecked}
-              className="btn-default-2 px-2 py-1 text-center w-16"
+              className="py-1 px-2 w-16 text-center btn-default-2"
             >
               Save
             </CheckButton>
             {!!myTag && (
               <SpinnerButton
                 isLoading={isLoading && action.current === "delete"}
-                className="btn-default-2 w-16 text-center py-1 text-red-500"
+                className="py-1 w-16 text-center text-red-500 btn-default-2"
                 onClick={handleDelete}
               >
                 Delete
@@ -269,7 +269,7 @@ function PrivateForm({
           <input
             type="text"
             placeholder="Private Label"
-            className="w-full px-2 py-1 bg-gray-200 dark:bg-gray-700 text-sm"
+            className="py-1 px-2 w-full text-sm bg-gray-200 dark:bg-gray-700"
             value={label}
             onChange={(e) => setLabel(e.target.value)}
             maxLength={40}
@@ -283,7 +283,7 @@ function PrivateForm({
         <div>
           <Label>Private Note</Label>
           <textarea
-            className="w-full px-2 py-1 bg-gray-200 dark:bg-gray-700 text-sm"
+            className="py-1 px-2 w-full text-sm bg-gray-200 dark:bg-gray-700"
             style={{ minHeight: "8rem" }}
             value={note}
             onChange={(e) => setNote(e.target.value)}
@@ -297,14 +297,14 @@ function PrivateForm({
           <CheckButton
             isLoading={isLoading && action.current === "update"}
             isChecked={isChecked}
-            className="btn-default-2 px-2 py-1 text-center w-16"
+            className="py-1 px-2 w-16 text-center btn-default-2"
           >
             Save
           </CheckButton>
           {!!myTag && (
             <SpinnerButton
               isLoading={isLoading && action.current === "delete"}
-              className="btn-default-2 w-16 text-center py-1 text-red-500"
+              className="py-1 w-16 text-center text-red-500 btn-default-2"
               onClick={handleDelete}
             >
               Delete

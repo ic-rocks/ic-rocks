@@ -86,11 +86,11 @@ export default function RecentTransactionsBox() {
 
   return (
     <InfoBox>
-      <div className="flex xxs:flex-row flex-col justify-between items-baseline">
-        <h3 className="text-lg xxs:mb-4">📝 Recent Ledger Transactions</h3>
+      <div className="flex flex-col xxs:flex-row justify-between items-baseline">
+        <h3 className="xxs:mb-4 text-lg">📝 Recent Ledger Transactions</h3>
         <Link href={`/transactions`}>
           <a className="text-xs link-overflow">
-            view all <BsArrowRight className="ml-0.5 inline" />
+            view all <BsArrowRight className="inline ml-0.5" />
           </a>
         </Link>
       </div>

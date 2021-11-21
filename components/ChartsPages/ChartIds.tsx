@@ -1,4 +1,5 @@
 import { CurveFactory, curveMonotoneX, curveStepAfter } from "d3";
+import React from "react";
 import { UseQueryResult } from "react-query";
 import useCanisterCounts from "../../lib/hooks/useCanisterCounts";
 import useMintedCycles from "../../lib/hooks/useMintedCycles";
@@ -20,6 +21,7 @@ export type ChartId =
 
 export type ChartType = {
   id: ChartId;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   hook?: () => UseQueryResult<any, unknown>;
   heading?: string;
   dataKey?: string;
@@ -65,7 +67,7 @@ export const ChartTypes: ChartType[] = [
     description: (
       <div>
         <p>New canisters created by day.</p>
-        <p className="text-gray-500 text-xs">
+        <p className="text-xs text-gray-500">
           Note: Canisters created before June 6, 2021 are missing exact creation
           dates.
         </p>

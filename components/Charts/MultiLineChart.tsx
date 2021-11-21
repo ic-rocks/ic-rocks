@@ -26,7 +26,7 @@ const MultiLineChart = ({
   height?: number;
   useTooltip?: boolean;
   xTooltipFormat?: (d: Date) => string;
-  yTooltipFormat?: (i: Number, d: Data) => string;
+  yTooltipFormat?: (i: number, d: Data) => string;
   curve?: d3.CurveFactory | d3.CurveFactoryLineOnly;
   colors?: readonly string[];
 }) => {
@@ -196,18 +196,18 @@ const MultiLineChart = ({
     <div ref={ref} className="relative">
       {useTooltip && (
         <div
-          className="p-1 bg-black absolute rounded-md pointer-events-none"
+          className="absolute p-1 bg-black rounded-md pointer-events-none"
           style={{ opacity: 0 }}
           ref={tooltipRef}
         >
           <div className="flex flex-col">
             {data.map((_, i) => (
-              <div key={i} className="inline-flex items-center gap-1">
+              <div key={i} className="inline-flex gap-1 items-center">
                 <div className="w-2 h-2" style={{ background: colors[i] }} />
                 <label className={`label-y${i} text-xs text-white`} />
               </div>
             ))}
-            <span className="label-x text-xxs text-gray-500"></span>
+            <span className="text-xxs text-gray-500 label-x"></span>
           </div>
         </div>
       )}
@@ -215,7 +215,7 @@ const MultiLineChart = ({
       <svg width={width} height={height} ref={svgRef} />
     </div>
   ) : (
-    <div className="flex-1 flex items-center justify-center text-xs text-gray-500">
+    <div className="flex flex-1 justify-center items-center text-xs text-gray-500">
       No data
     </div>
   );

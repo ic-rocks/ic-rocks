@@ -29,11 +29,14 @@ const ModuleCanistersPage = ({
     return <Search404 input={moduleId} />;
   }
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [bindings, setBindings] = useState(null);
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const { data } = useQuery<Module>(["modules", moduleId], async () =>
-    fetchJSON(`/api/modules/${moduleId}`)
+    fetchJSON(`/api/modules/${moduleId}`),
   );
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
     if (data?.candid) {
       didc.then((mod) => {
@@ -43,6 +46,7 @@ const ModuleCanistersPage = ({
     }
   }, [data]);
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [showInterface, setShowInterface] = useState(false);
 
   const rows = [
@@ -68,10 +72,10 @@ const ModuleCanistersPage = ({
             ? "No canisters found with this module hash"
             : `${data.canisterCount} ${pluralize(
                 "canister",
-                data.canisterCount
+                data.canisterCount,
               )} match this module hash on ${data.subnetCount} ${pluralize(
                 "subnet",
-                data.subnetCount
+                data.subnetCount,
               )}`,
       },
     ],
@@ -82,7 +86,12 @@ const ModuleCanistersPage = ({
       },
       {
         contents: data?.sourceUrl ? (
-          <a href={data.sourceUrl} target="_blank" className="link-overflow">
+          <a
+            href={data.sourceUrl}
+            target="_blank"
+            className="link-overflow"
+            rel="noreferrer"
+          >
             {data.sourceUrl}
           </a>
         ) : (
@@ -130,7 +139,7 @@ const ModuleCanistersPage = ({
         title={`Module ${moduleId}`}
         description={`Details for module ${moduleId} on the Internet Computer.`}
       />
-      <h1 className="text-3xl my-8 overflow-hidden overflow-ellipsis">
+      <h1 className="overflow-hidden my-8 text-3xl overflow-ellipsis">
         Module <small className="text-xl break-all">{moduleId}</small>
       </h1>
       <section className="mb-8">
@@ -140,7 +149,7 @@ const ModuleCanistersPage = ({
         <CodeBlock className="mb-8" candid={data.candid} bindings={bindings} />
       )}
       <section>
-        <h2 className="text-2xl mb-4">Matching Canisters</h2>
+        <h2 className="mb-4 text-2xl">Matching Canisters</h2>
         <CanistersTable name="matching-canisters" moduleId={moduleId} />
       </section>
     </CanisterPage>

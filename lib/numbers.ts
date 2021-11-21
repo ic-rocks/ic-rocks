@@ -8,7 +8,8 @@ export const formatNumberShortScale = (n: number) => {
   return n.toString();
 };
 
-export const formatNumberUSD = (number: any, digits: number = 2) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const formatNumberUSD = (number: any, digits = 2) => {
   return Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
@@ -17,6 +18,7 @@ export const formatNumberUSD = (number: any, digits: number = 2) => {
   }).format(number);
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const formatNumber = (number: any, digits?) => {
   let n = number;
   if (typeof number !== "number") {
@@ -29,6 +31,7 @@ export const formatNumber = (number: any, digits?) => {
   }).format(n);
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const maybeTimestamp = (number: any): DateTime | null => {
   // Assume timestamps are in the range 1e9 < seconds < 2.5e9 (from 2001-09-09 to 2049-03-22)
   let n = number;

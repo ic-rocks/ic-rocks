@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export function countBy<T>(xs: T[], key: string | ((x: any) => T)): number {
   return xs.reduce(
     (s: Set<any>, x) => s.add(typeof key === "function" ? key(x) : x[key]),

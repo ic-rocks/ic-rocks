@@ -7,9 +7,15 @@ const CanisterPage = ({ children }) => {
     <div className="pb-16">
       <SecondaryNav
         items={[
-          <ActiveLink href="/canisters">Canisters</ActiveLink>,
-          <ActiveLink href="/modules">Modules</ActiveLink>,
-          <ActiveLink href="/interfaces">Interfaces</ActiveLink>,
+          <ActiveLink key="canisters" href="/canisters">
+            Canisters
+          </ActiveLink>,
+          <ActiveLink key="modules" href="/modules">
+            Modules
+          </ActiveLink>,
+          <ActiveLink key="interfaces" href="/interfaces">
+            Interfaces
+          </ActiveLink>,
         ]}
       />
       {children}

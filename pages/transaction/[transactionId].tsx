@@ -31,12 +31,14 @@ const TransactionPage = ({
     return <Search404 input={transactionId} />;
   }
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const { data } = useQuery<Transaction>(
     ["transaction", transactionId],
     () => fetchJSON(`/api/transactions/${transactionId}`),
-    { staleTime: Infinity }
+    { staleTime: Infinity },
   );
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const { data: markets } = useMarkets();
 
   return (
@@ -45,41 +47,41 @@ const TransactionPage = ({
         title={`Transaction ${transactionId}`}
         description={`Details for transaction ${transactionId} on the Internet Computer ledger.`}
       />
-      <h1 className="text-3xl my-8">Transaction Details</h1>
-      <table className="table-fixed w-full">
+      <h1 className="my-8 text-3xl">Transaction Details</h1>
+      <table className="w-full table-fixed">
         <tbody className="divide-y divide-default">
           <tr className="flex">
-            <td className="px-2 py-2 w-24">Hash</td>
-            <td className="px-2 py-2 flex-1 overflow-hidden overflow-ellipsis">
+            <td className="py-2 px-2 w-24">Hash</td>
+            <td className="overflow-hidden flex-1 py-2 px-2 overflow-ellipsis">
               {data ? data.id : null}
             </td>
           </tr>
           <tr className="flex">
-            <td className="px-2 py-2 w-24">Block</td>
-            <td className="px-2 py-2 flex-1">
+            <td className="py-2 px-2 w-24">Block</td>
+            <td className="flex-1 py-2 px-2">
               {data ? data.blockHeight : null}
             </td>
           </tr>
           <tr className="flex">
-            <td className="px-2 py-2 w-24">Type</td>
-            <td className="px-2 py-2 flex-1">
+            <td className="py-2 px-2 w-24">Type</td>
+            <td className="flex-1 py-2 px-2">
               {data ? <TransactionTypeLabel type={data.type} /> : null}
             </td>
           </tr>
           <tr className="flex">
-            <td className="px-2 py-2 w-24">Timestamp</td>
-            <td className="px-2 py-2 flex-1">
+            <td className="py-2 px-2 w-24">Timestamp</td>
+            <td className="flex-1 py-2 px-2">
               {data ? (
                 <TimestampLabel dt={DateTime.fromISO(data.createdDate)} />
               ) : null}
             </td>
           </tr>
           <tr className="flex">
-            <td className="px-2 py-2 w-24">From</td>
+            <td className="py-2 px-2 w-24">From</td>
             <td
               className={classnames(
-                "px-2 py-2 flex-1 overflow-hidden flex",
-                {}
+                "flex overflow-hidden flex-1 py-2 px-2",
+                {},
               )}
             >
               {data ? (
@@ -96,11 +98,11 @@ const TransactionPage = ({
             </td>
           </tr>
           <tr className="flex">
-            <td className="px-2 py-2 w-24">To</td>
+            <td className="py-2 px-2 w-24">To</td>
             <td
               className={classnames(
-                "px-2 py-2 flex-1 overflow-hidden flex",
-                {}
+                "flex overflow-hidden flex-1 py-2 px-2",
+                {},
               )}
             >
               {data ? (
@@ -117,8 +119,8 @@ const TransactionPage = ({
             </td>
           </tr>
           <tr className="flex">
-            <td className="px-2 py-2 w-24">Amount</td>
-            <td className="px-2 py-2 flex-1">
+            <td className="py-2 px-2 w-24">Amount</td>
+            <td className="flex-1 py-2 px-2">
               {data != null ? (
                 <>
                   <BalanceLabel value={data.amount} />
@@ -127,7 +129,7 @@ const TransactionPage = ({
                       (
                       {formatNumberUSD(
                         (Number(markets.ticker.price) * Number(data.amount)) /
-                          1e8
+                          1e8,
                       )}
                       )
                     </small>
@@ -137,8 +139,8 @@ const TransactionPage = ({
             </td>
           </tr>
           <tr className="flex">
-            <td className="px-2 py-2 w-24">Fee</td>
-            <td className="px-2 py-2 flex-1">
+            <td className="py-2 px-2 w-24">Fee</td>
+            <td className="flex-1 py-2 px-2">
               {data ? (
                 data.fee ? (
                   <>
@@ -148,7 +150,7 @@ const TransactionPage = ({
                         (
                         {formatNumberUSD(
                           (Number(markets.ticker.price) * Number(data.fee)) /
-                            1e8
+                            1e8,
                         )}
                         )
                       </small>
@@ -161,8 +163,8 @@ const TransactionPage = ({
             </td>
           </tr>
           <tr className="flex">
-            <td className="px-2 py-2 w-24">Memo</td>
-            <td className="px-2 py-2 flex-1 break-all">
+            <td className="py-2 px-2 w-24">Memo</td>
+            <td className="flex-1 py-2 px-2 break-all">
               {data ? data.memo : null}
             </td>
           </tr>

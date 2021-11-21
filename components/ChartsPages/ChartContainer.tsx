@@ -23,13 +23,13 @@ export const ChartContainer = ({
 }: Props) => {
   const height = isFull ? 400 : 250;
   return (
-    <div className="bg-gray-100 dark:bg-gray-850 p-4 shadow-md rounded-md">
+    <div className="p-4 bg-gray-100 dark:bg-gray-850 rounded-md shadow-md">
       <div className="flex flex-col" style={{ minHeight: height }}>
         {!isLoading ? (
           <>
             {!isFull && (
               <Link href={`/charts/${chartId}`}>
-                <a className="font-bold link-overflow inline-flex items-center">
+                <a className="inline-flex items-center font-bold link-overflow">
                   {heading} <FiChevronRight />
                 </a>
               </Link>

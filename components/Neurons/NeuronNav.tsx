@@ -6,9 +6,15 @@ export default function NeuronNav() {
   return (
     <SecondaryNav
       items={[
-        <ActiveLink href="/neurons">Neurons</ActiveLink>,
-        <ActiveLink href="/neuron/allocations">Allocations</ActiveLink>,
-        <ActiveLink href="/genesis">Genesis Accounts</ActiveLink>,
+        <ActiveLink key="neurons" href="/neurons">
+          Neurons
+        </ActiveLink>,
+        <ActiveLink key="neuron-allocations" href="/neuron/allocations">
+          Allocations
+        </ActiveLink>,
+        <ActiveLink key="genesis" href="/genesis">
+          Genesis Accounts
+        </ActiveLink>,
       ]}
     />
   );

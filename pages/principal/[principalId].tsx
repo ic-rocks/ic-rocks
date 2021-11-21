@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import { Actor, Certificate, HttpAgent } from "@dfinity/agent";
 import { blobFromText, blobFromUint8Array } from "@dfinity/candid";
 import { Principal } from "@dfinity/principal";
@@ -23,6 +24,7 @@ const didc = import("didc");
 
 const agent = new HttpAgent({ host: "https://ic0.app" });
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const cbor = require("borc");
 
 const decoder = new cbor.Decoder({
@@ -91,14 +93,14 @@ const PrincipalPage = ({
 
   const { data: principalData } = useQuery<APIPrincipal>(
     ["principals", principalId],
-    () => fetchJSON(`/api/principals/${principalId}`)
+    () => fetchJSON(`/api/principals/${principalId}`),
   );
   const { data: canisterData } = useQuery<Canister>(
     ["canisters", principalId],
     () => fetchJSON(`/api/canisters/${principalId}`),
     {
       enabled: type === "Canister",
-    }
+    },
   );
 
   useEffect(() => {
@@ -139,7 +141,7 @@ const PrincipalPage = ({
     /** Read from state to verify data integrity */
     const checkState = async () => {
       const principal = blobFromUint8Array(
-        Principal.fromText(principalId).toUint8Array()
+        Principal.fromText(principalId).toUint8Array(),
       );
       const pathCommon = [blobFromText("canister"), principal];
       const pathModuleHash = pathCommon.concat(blobFromText("module_hash"));
@@ -165,7 +167,7 @@ const PrincipalPage = ({
         if (subnet) {
           if (subnet !== canisterData.subnetId) {
             console.warn(
-              `subnet: api=${canisterData.subnetId} state=${subnet}`
+              `subnet: api=${canisterData.subnetId} state=${subnet}`,
             );
           }
         } else {
@@ -186,7 +188,7 @@ const PrincipalPage = ({
             )
           ) {
             console.warn(
-              `controllers: api=${apiControllerIds} state=${certControllerIds}`
+              `controllers: api=${apiControllerIds} state=${certControllerIds}`,
             );
           }
         } else {
@@ -195,7 +197,7 @@ const PrincipalPage = ({
         const moduleHash = cert.lookup(pathModuleHash)?.toString("hex");
         if (moduleHash && canisterData.module?.id !== moduleHash) {
           console.warn(
-            `moduleHash: api=${canisterData.module?.id} state=${moduleHash}`
+            `moduleHash: api=${canisterData.module?.id} state=${moduleHash}`,
           );
         }
       } else {
@@ -218,7 +220,9 @@ const PrincipalPage = ({
             console.log("candid loaded from file");
             setCandidAndBindings(data);
           })
-          .catch((e) => {});
+          .catch((e) => {
+            console.warn("failed to load candid from file", e);
+          });
 
         fetch(`/data/interfaces/${canisterData.principal.name}.proto`)
           .then((res) => {
@@ -230,7 +234,9 @@ const PrincipalPage = ({
           .then((data) => {
             setProtobuf(data);
           })
-          .catch((e) => {});
+          .catch((e) => {
+            console.warn("failed to load protobuf from file", e);
+          });
       }
     };
 

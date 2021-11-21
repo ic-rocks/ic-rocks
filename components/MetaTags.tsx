@@ -1,4 +1,5 @@
 import Head from "next/head";
+import React from "react";
 import { TITLE_SUFFIX } from "../lib/constants";
 
 export const homeDescription =

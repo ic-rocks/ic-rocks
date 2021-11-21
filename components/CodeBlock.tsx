@@ -37,7 +37,7 @@ export default function CodeBlock({
   protobuf?: string;
 }) {
   const [language, setLanguage] = useState<typeof LANGUAGES[number]>(
-    candid ? "candid" : "protobuf"
+    candid ? "candid" : "protobuf",
   );
 
   const displayCode =
@@ -56,7 +56,7 @@ export default function CodeBlock({
   });
   const handleCopy = useCallback(
     () => clipboard.copy(displayCode),
-    [clipboard.copy, displayCode]
+    [clipboard.copy, displayCode],
   );
 
   return (
@@ -71,7 +71,7 @@ export default function CodeBlock({
             <button
               key={lang}
               className={classnames(
-                "text-xs px-3 py-1 focus:outline-none transition-200 transition-colors",
+                "py-1 px-3 text-xs transition-colors focus:outline-none",
                 {
                   "text-gray-300 dark:text-gray-700 cursor-not-allowed":
                     disabled,
@@ -79,7 +79,7 @@ export default function CodeBlock({
                     !disabled && lang !== language,
                   "bg-gray-200 dark:bg-gray-800": lang !== language,
                   "bg-gray-400 dark:bg-gray-600": lang === language,
-                }
+                },
               )}
               onClick={() => setLanguage(lang)}
               disabled={disabled}
@@ -92,7 +92,7 @@ export default function CodeBlock({
       <div className="relative">
         <button
           onClick={handleCopy}
-          className="absolute right-2 top-2 z-10 p-2 bg-gray-600 text-gray-400 fill-current focus:outline-none rounded border border-gray-400 border-0.5"
+          className="absolute top-2 right-2 z-10 p-2 text-gray-400 bg-gray-600 rounded border border-gray-400 focus:outline-none fill-current"
         >
           {clipboard.copied ? <BsCheck /> : <BsClipboard />}
         </button>

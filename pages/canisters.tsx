@@ -12,7 +12,7 @@ const Canisters = () => {
         title={title}
         description="A list of known canisters on the Internet Computer."
       />
-      <h1 className="text-3xl my-8">{title}</h1>
+      <h1 className="my-8 text-3xl">{title}</h1>
       <CanistersTable name="canisters" />
     </CanisterPage>
   );

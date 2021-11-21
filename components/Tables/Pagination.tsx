@@ -1,9 +1,10 @@
 import classnames from "classnames";
+import React from "react";
 import {
   FiChevronLeft,
   FiChevronRight,
   FiChevronsLeft,
-  FiChevronsRight,
+  FiChevronsRight
 } from "react-icons/fi";
 
 export const Pagination = ({
@@ -23,7 +24,7 @@ export const Pagination = ({
       <button
         disabled={!canPreviousPage}
         className={classnames(
-          "px-1 py-0.5 rounded bg-gray-100 dark:bg-gray-800 transition-colors",
+          "py-0.5 px-1 bg-gray-100 dark:bg-gray-800 rounded transition-colors",
           {
             "text-gray-300 dark:text-gray-700 cursor-default": !canPreviousPage,
             "cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700":
@@ -37,7 +38,7 @@ export const Pagination = ({
       <button
         disabled={!canPreviousPage}
         className={classnames(
-          "px-1 py-0.5 rounded bg-gray-100 dark:bg-gray-800 transition-colors",
+          "py-0.5 px-1 bg-gray-100 dark:bg-gray-800 rounded transition-colors",
           {
             "text-gray-300 dark:text-gray-700 cursor-default": !canPreviousPage,
             "cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700":
@@ -50,7 +51,7 @@ export const Pagination = ({
       </button>
       <span
         className={classnames(
-          "px-1 py-0.5 text-xs rounded bg-gray-100 dark:bg-gray-800 cursor-default",
+          "py-0.5 px-1 text-xs bg-gray-100 dark:bg-gray-800 rounded cursor-default",
           {
             "text-gray-500": pageOptions.length === 0,
           }
@@ -63,7 +64,7 @@ export const Pagination = ({
       <button
         disabled={!canNextPage}
         className={classnames(
-          "px-1 py-0.5 rounded bg-gray-100 dark:bg-gray-800 transition-colors",
+          "py-0.5 px-1 bg-gray-100 dark:bg-gray-800 rounded transition-colors",
           {
             "text-gray-300 dark:text-gray-600 cursor-default": !canNextPage,
             "cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700":
@@ -77,7 +78,7 @@ export const Pagination = ({
       <button
         disabled={!canNextPage}
         className={classnames(
-          "px-1 py-0.5 rounded bg-gray-100 dark:bg-gray-800 transition-colors",
+          "py-0.5 px-1 bg-gray-100 dark:bg-gray-800 rounded transition-colors",
           {
             "text-gray-300 dark:text-gray-600 cursor-default": !canNextPage,
             "cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700":

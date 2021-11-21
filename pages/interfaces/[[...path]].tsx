@@ -134,7 +134,7 @@ const Interfaces = ({ current, children }) => {
           current ? ` ${current}` : ""
         } on the Internet Computer.`}
       />
-      <h1 className="text-3xl my-8">
+      <h1 className="my-8 text-3xl">
         <ActiveLink
           href="/interfaces"
           linkClassName="text-blue-600 hover:underline"
@@ -152,7 +152,7 @@ const Interfaces = ({ current, children }) => {
                 <Link
                   href={`/interfaces${current ? "/" + current : ""}/${child}`}
                 >
-                  <a className="hover:underline text-blue-600">{child}</a>
+                  <a className="text-blue-600 hover:underline">{child}</a>
                 </Link>
               </li>
             ))}
@@ -160,7 +160,7 @@ const Interfaces = ({ current, children }) => {
           <a
             className="inline-flex items-center text-blue-600 hover:underline"
             href={`${GITHUB_REPO}/new/main/public/data/interfaces/${current}?value=%2F%2F%20Candid%20file%20here`}
-            target="_blank"
+            target="_blank" rel="noreferrer"
           >
             <FiFilePlus className="mr-0.5" />
             Add new interface...
@@ -180,7 +180,7 @@ const Interfaces = ({ current, children }) => {
           <a
             className="inline-flex items-center text-blue-600 hover:underline"
             href={`${GITHUB_REPO}/edit/main/public/data/interfaces/${current}`}
-            target="_blank"
+            target="_blank" rel="noreferrer"
           >
             <BiPencil className="mr-0.5" /> Edit {current}
           </a>

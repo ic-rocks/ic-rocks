@@ -6,8 +6,12 @@ export default function ChartsNav() {
   return (
     <SecondaryNav
       items={[
-        <ActiveLink href="/charts">Charts</ActiveLink>,
-        <ActiveLink href="/charts/metrics">Custom Metrics</ActiveLink>,
+        <ActiveLink key="charts" href="/charts">
+          Charts
+        </ActiveLink>,
+        <ActiveLink key="-charts-metrics" href="/charts/metrics">
+          Custom Metrics
+        </ActiveLink>,
       ]}
     />
   );

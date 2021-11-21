@@ -9,6 +9,6 @@ export default function useAutoToggle(
       const timeout = setTimeout(() => setState(false), delay);
       return () => clearTimeout(timeout);
     }
-  }, [state]);
+  }, [delay, state]);
   return [state, setState];
 }

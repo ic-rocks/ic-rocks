@@ -13,7 +13,7 @@ export default function Home() {
         image="hero"
         description={homeDescription}
       />
-      <h1 className="text-3xl mb-16">The Internet Computer rocks</h1>
+      <h1 className="mb-16 text-3xl">The Internet Computer rocks</h1>
       <StatsBoxes />
       <section className="grid md:grid-cols-2 gap-8 justify-center items-stretch">
         <RecentCanistersBox />

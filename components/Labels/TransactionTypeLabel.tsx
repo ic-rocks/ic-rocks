@@ -1,4 +1,5 @@
 import classNames from "classnames";
+import React from "react";
 import { TransactionType } from "../../lib/types/API";
 
 export function TransactionTypeLabel({ type }: { type: TransactionType }) {

@@ -269,7 +269,7 @@ export default function CandidUI({
 
   return (
     <div className={className}>
-      <div className="px-2 py-2 bg-heading flex justify-between items-baseline">
+      <div className="flex justify-between items-baseline py-2 px-2 bg-heading">
         <div>
           <span className="font-bold">
             {sortedMethods.length}{" "}
@@ -277,12 +277,12 @@ export default function CandidUI({
           </span>
           {isAttached && (
             <div className="inline-flex items-stretch">
-              <label className="rounded-l text-xs py-1 px-2 bg-yellow-200 dark:text-black ml-2">
+              <label className="py-1 px-2 ml-2 text-xs dark:text-black bg-yellow-200 rounded-l">
                 Attached
               </label>
               <Link href={`/principal/${canisterId}`}>
                 <a
-                  className="rounded-r cursor-pointer py-1.5 px-2 text-xs bg-yellow-200 hover:bg-yellow-400 transition-colors dark:text-black"
+                  className="py-1.5 px-2 text-xs dark:text-black bg-yellow-200 hover:bg-yellow-400 rounded-r transition-colors cursor-pointer"
                   title="Remove attached candid"
                 >
                   <FaTimes />
@@ -293,11 +293,13 @@ export default function CandidUI({
         </div>
         <div className="flex gap-2">
           <a
-            className="hover:underline text-blue-600 flex items-center text-xs"
+            className="flex items-center text-xs text-blue-600 hover:underline"
             href={`${CANDID_UI_URL}?id=${canisterId}&did=${encodeURIComponent(
+              // eslint-disable-next-line no-control-regex
               window.btoa(candid.replace(/[^\x00-\x7F]+/g, ""))
             )}`}
             target="_blank"
+            rel="noreferrer"
           >
             View in Candid UI <FiExternalLink className="ml-1" />
           </a>
@@ -413,13 +415,13 @@ export default function CandidUI({
         return (
           <form
             key={funcName}
-            className="border border-gray-300 dark:border-gray-700 mt-2"
+            className="mt-2 border border-gray-300 dark:border-gray-700"
             onSubmit={(e) => {
               e.preventDefault();
               call(funcName, method, state.inputs[funcName]);
             }}
           >
-            <div className="px-2 py-2 bg-heading flex justify-between items-center">
+            <div className="flex justify-between items-center py-2 px-2 bg-heading">
               {funcName}
               <label
                 className={classNames("label-tag ml-2", {
@@ -430,13 +432,13 @@ export default function CandidUI({
                 {format}
               </label>
             </div>
-            <div className="px-2 py-2">
+            <div className="py-2 px-2">
               {inputs}
               <QueryButton
                 isLoading={state.isLoading[funcName]}
                 isQuery={isQuery}
               />
-              <div className="mt-2 flex items-center gap-2">
+              <div className="flex gap-2 items-center mt-2">
                 <span className="text-xs italic text-gray-500">
                   <BsArrowReturnRight className="inline" />
                   {responseTypes}

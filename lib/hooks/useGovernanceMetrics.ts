@@ -21,7 +21,7 @@ export default function useGovernanceMetrics() {
       let i = 0;
       while (i < arr.length - 3) {
         const [name, value, timestamp] = arr[i + 2].split(" ");
-        const [_, desc] = arr[i].split(name);
+        const [, desc] = arr[i].split(name);
 
         gauges[name] = {
           name,

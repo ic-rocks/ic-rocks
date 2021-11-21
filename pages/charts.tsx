@@ -14,7 +14,7 @@ const ChartsPage = () => {
         description="Charts on network and canister data on the Internet Computer."
       />
       <ChartsNav />
-      <h1 className="text-3xl my-8">{title}</h1>
+      <h1 className="my-8 text-3xl">{title}</h1>
       <section className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {ChartTypes.map(({ id }) => (
           <DataOverTimeChart key={id} chartId={id} />

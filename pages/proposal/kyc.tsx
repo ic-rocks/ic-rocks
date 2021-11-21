@@ -34,14 +34,14 @@ const KycPage = () => {
               data-balloon-pos="down"
               data-balloon-length="large"
             >
-              <BsInfoCircle className="ml-1 inline text-xs align-middle" />
+              <BsInfoCircle className="inline ml-1 text-xs align-middle" />
             </span>
           </>
         ),
         id: "accounts",
         accessor: (d) => d.principal.accounts[0]?.id,
         disableSortBy: true,
-        Cell: ({ value, row }) => (
+        Cell: ({ row }) => (
           <div className="flex flex-col">
             {row.original.principal.accounts.map(({ id, name }) => (
               <div key={id} className="flex oneline">
@@ -62,7 +62,7 @@ const KycPage = () => {
               data-balloon-pos="down"
               data-balloon-length="large"
             >
-              <BsInfoCircle className="ml-1 inline text-xs align-middle" />
+              <BsInfoCircle className="inline ml-1 text-xs align-middle" />
             </span>
           </>
         ),
@@ -126,7 +126,7 @@ const KycPage = () => {
         description={`A list of KYCed principals on the Internet Computer.`}
       />
       <ProposalNav />
-      <h1 className="text-3xl my-8 overflow-hidden overflow-ellipsis">
+      <h1 className="overflow-hidden my-8 text-3xl overflow-ellipsis">
         KYCed Principals
       </h1>
       <section className="mb-8">

@@ -30,7 +30,7 @@ const AccountPage = ({
         title={`Account ${accountId}`}
         description={`Details for account ${accountId} on the Internet Computer ledger.`}
       />
-      <h1 className="text-3xl my-8 overflow-hidden overflow-ellipsis">
+      <h1 className="overflow-hidden my-8 text-3xl overflow-ellipsis">
         Account <small className="text-xl break-all">{accountId}</small>
       </h1>
       <AccountDetails accountId={accountId} />
