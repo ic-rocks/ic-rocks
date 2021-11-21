@@ -121,6 +121,7 @@ export default function CandidUI({
   isAttached?: boolean;
 }) {
   const [agent] = useAtom(agentAtom);
+  const [visibleMethods, setVisibleMethods] = useState<string[]>([]);
   const [methods, setMethods] = useState<CanisterMethod>({});
   const [actor, setActor] = useState(null);
   const [state, dispatch] = useReducer(reducer, {
@@ -131,6 +132,19 @@ export default function CandidUI({
     outputDisplays: {},
     history: [],
   });
+
+  const toggleMethodsVisibility = useCallback(
+    (method: string) => {
+      setVisibleMethods((visibleMethods) => {
+        if (visibleMethods.includes(method)) {
+          return visibleMethods.filter((m) => m !== method);
+        } else {
+          return [...visibleMethods, method];
+        }
+      });
+    },
+    [visibleMethods],
+  );
 
   useEffect(() => {
     if (!actor || !protobuf) return;
@@ -419,7 +433,10 @@ export default function CandidUI({
               call(funcName, method, state.inputs[funcName]);
             }}
           >
-            <div className="px-2 py-2 bg-heading flex justify-between items-center">
+            <div
+              onClick={() => toggleMethodsVisibility(funcName)}
+              className="px-2 py-2 cursor-pointer bg-heading flex justify-between items-center"
+            >
               {funcName}
               <label
                 className={classNames("label-tag ml-2", {
@@ -430,7 +447,11 @@ export default function CandidUI({
                 {format}
               </label>
             </div>
-            <div className="px-2 py-2">
+            <div
+              className={`px-2 py-2 ${
+                visibleMethods.includes(funcName) ? "" : "hidden"
+              }`}
+            >
               {inputs}
               <QueryButton
                 isLoading={state.isLoading[funcName]}
