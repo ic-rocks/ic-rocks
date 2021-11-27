@@ -2,17 +2,13 @@ const { API_ENDPOINT } = require("./config");
 
 console.log("API_ENDPOINT:", API_ENDPOINT);
 
-/**
- * Use webpack 4 for better Wasm support.
- * @dfinity/agent uses the export namespace proposal, so it must be transpiled with Babel. This is supported by default in Webpack 5, but must be done manually in 4.
- */
-const withTM = require("next-transpile-modules")([
-  "didc",
-  "@dfinity/agent",
-  "@dfinity/candid",
-]);
+module.exports = {
+  webpack(config) {
+    // Since Webpack 5 doesn't enable WebAssembly by default, we should do it manually
+    config.experiments = { asyncWebAssembly: true };
 
-module.exports = withTM({
+    return config;
+  },
   async rewrites() {
     return [
       {
@@ -21,4 +17,4 @@ module.exports = withTM({
       },
     ];
   },
-});
+};
